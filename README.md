@@ -50,7 +50,7 @@ some of this class properties
 `phone` the phone of the customer object from stripe.
 
 ```
-getCustomer(key: String): Array[SrdRef[Customer]]
+func getCustomer(key: String): Array[SrdRef[Customer]]
 ```
 
 This function get customers array from Stripe Api.
@@ -91,7 +91,7 @@ some of this class properties
 
 
 ```
-getBalance(key: String): Array[SrdRef[Balance]]
+func getBalance(key: String): Array[SrdRef[Balance]]
 ```
 
 This function get Balances array from Stripe Api.
@@ -121,7 +121,7 @@ some of this class properties
 `exchangeRate` the exchangeRate of the transaction.
 
 ```
-getBalanceTranasaction(key: String): Array[SrdRef[BalanceTranasaction]]
+func getBalanceTranasaction(key: String): Array[SrdRef[BalanceTranasaction]]
 ```
 
 This function get BalanceTranasactions array from Stripe Api.
