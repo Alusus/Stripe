@@ -1,0 +1,23 @@
+
+import "Apm";
+Apm.importFile("Alusus/Stripe");
+use Stripe;
+def balanceArray : Array[SrdRef[Balance]];
+def key : String="my_test_key"
+balanceArray = getBalance(key);
+def i : int =0;
+for i=0 , i<balanceArray.getLength(),i++{
+    balanceArray(i).print();
+}
+def balanceTArray : Array[SrdRef[BalanceTransaction]];
+balanceTArray = getBalanceTranasaction(key);
+for i=0 , i<balanceArray.getLength(),i++{
+    balanceArray(i).print();
+
+}
+def customerArray : Array[SrdRef[Customer]];
+customerArray = getCustomer(key);
+for i=0 , i<customerArray.getLength(),i++{
+    customerArray(i).print();
+
+}
