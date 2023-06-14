@@ -1,0 +1,98 @@
+@merge module Stripe {
+    func getBalanceTranasaction(key: String): Array[SrdRef[BalanceTransaction]] {
+        def data: ptr;
+        def size: Int;
+        def balanceTransactionArray: Array[SrdRef[BalanceTransaction]];
+        if Net2.get("https:/api.stripe.com/v1/balance_transactions", data~ptr, size~ptr, key.buf) {
+            def balanceString: String;
+            balanceString = String.format("%s", data);
+            def balanceObject: Json = balanceString.buf;
+            Console.print("%s\n", data);
+            def i: int = 0;
+            def j: int = 0;
+            def balanceTransaction: SrdRef[BalanceTransaction];
+            def feeDetails: Array[String];
+            def feeDetail: String = "";
+            for i = 0, i < balanceObject.getObject("data").getLength(), i += 1 {
+                for j = 0, j < balanceObject.getObject("data").getObject(i).getObject("fee_details").getLength(), j++ {
+                    feeDetail = balanceObject.getObject("data").getObject(i).getObject("fee_details").getString(i);
+                    feeDetails.add(feeDetail);
+                }
+                balanceTransaction = SrdRef[BalanceTransaction](). {
+                    alloc()~init(balanceObject.getObject("data").getObject(i).getString("id"),
+                        stringTofloat(balanceObject.getObject("data")
+                        .getObject(i).getString("amount")),
+                        stringToInt(balanceObject.getObject("data")
+                        .getObject(i).getString("available_on")),
+                        stringToInt(balanceObject.getObject("data")
+                        .getObject(i).getString("created")),
+                        balanceObject.getObject("data").getObject(i).getString("currency"),
+                        balanceObject.getObject("data").getObject(i).getString("description"),
+                        stringTofloat(balanceObject.getObject("data").getObject(i).getString("exchange_rate")),
+                        stringTofloat(balanceObject.getObject("data").getObject(i).getString("fee")),
+                        feeDetails,
+                        stringTofloat(balanceObject.getObject("data").getObject(i).getString("net")),
+                        balanceObject.getObject("data").getObject(i).getString("reporting_category"),
+                        balanceObject.getObject("data").getObject(i).getString("source"),
+                        balanceObject.getObject("data").getObject(i).getString("status"),
+                        balanceObject.getObject("data").getObject(i).getString("type"),)
+                }
+                balanceTransactionArray.add(balanceTransaction);
+                feeDetails.clear();
+            }
+            Memory.free(data);
+        } else {
+            Console.print("error\n");
+        }
+        return balanceTransactionArray
+    }
+
+    func getBalanceTranasaction(key: String, id: String): SrdRef[BalanceTransaction] {
+        def data: ptr;
+        def size: Int;
+
+        def url: String
+            url = String.format("https:/api.stripe.com/v1/balance_transactions/%s", id.buf)
+            if Net2.get(url.buf, data~ptr, size~ptr, key.buf) {
+            def balanceString: String;
+            balanceString = String.format("%s", data);
+            def balanceObject: Json = balanceString.buf;
+            Console.print("%s\n", data);
+            def i: int = 0;
+            def j: int = 0;
+            def balanceTransaction: SrdRef[BalanceTransaction];
+            def feeDetails: Array[String];
+            def feeDetail: String = "";
+
+            for j = 0, j < balanceObject.getObject("fee_details").getLength(), j++ {
+                feeDetail = balanceObject.getObject("fee_details").getString(j);
+                feeDetails.add(feeDetail);
+            }
+            balanceTransaction = SrdRef[balanceTransaction](). {
+                alloc()~init(balanceObject.getString("id"),
+                    stringTofloat(balanceObject.getString("amount")),
+                    stringToInt(balanceObject
+                    .getString("available_on")),
+                    stringToInt(balanceObject
+                    .getString("created")),
+                    balanceObject.getString("currency"),
+                    balanceObject.getString("description"),
+                    stringTofloat(balanceObject.getString("exchange_rate")),
+                    stringTofloat(balanceObject.getString("fee")),
+                    feeDetails,
+                    stringTofloat(balanceObject.getString("net")),
+                    balanceObject.getString("reporting_category"),
+                    balanceObject.getString("source"),
+                    balanceObject.getString("status"),
+                    balanceObject.getString("type"),)
+            }
+            feeDetails.clear();
+
+            Memory.free(data);
+        } else {
+            Console.print("error\n");
+        }
+        return balanceTransaction
+    }
+}
+

@@ -1,0 +1,161 @@
+@merge module Stripe {
+    func getCustomer(key: String): Array[SrdRef[Customer]] {
+        def data: ptr;
+        def size: Int;
+        def customerArray: Array[SrdRef[Customer]];
+        def sourceArray: Array[SrdRef[Source]];
+        def loc: String;
+        def prfLoc: Array[String];
+        if Net2.get("https:/api.stripe.com/v1/customers", data~ptr, size~ptr, key.buf) {
+            def customerString: String;
+            customerString = String.format("%s", data);
+            def customerObject: Json = customerString.buf;
+            Console.print("%s\n", data);
+            def i: int = 0;
+            def j: int = 0;
+            def source: SrdRef[Source];
+            def customer: SrdRef[Customer];
+            def address: SrdRef[Address];
+            def delinquent: bool;
+            for i = 0, i < customerObject.getObject("data").getLength(), i += 1 {
+                for j = 0, j < customerObject.getObject("data").getObject(i).getObject("preferred_locales").getLength(), j++ {
+                    loc = customerObject.getObject("data")
+                        .getObject(i).getObject("preferred_locales").getString(j);
+
+                    prfLoc.add(loc);
+                }
+                if customerObject.getObject("data").getObject(i).getString("address") != String("null") {
+                    address = SrdRef[Address]().{
+                        alloc()~init(customerObject.getObject("data")
+                            .getObject(i).getObject("address").getString("city")
+                            , customerObject.getObject("data")
+                            .getObject(i).getObject("address").getString("country")
+                            , customerObject.getObject("data")
+                            .getObject(i).getObject("address").getString("line1")
+                            , customerObject.getObject("data")
+                            .getObject(i).getObject("address").getString("line2")
+                            , customerObject.getObject("data")
+                            .getObject(i).getObject("address").getString("postalCode")
+                            , customerObject.getObject("data")
+                            .getObject(i).getObject("address").getString("state"))
+                    };
+                } else {
+                    address = SrdRef[Address]().{
+                        alloc()~init()
+                    };
+                }
+                if customerObject.getObject("data").getObject(i).getString("delinquent") == String("true") {
+                    delinquent = true;
+                } else
+                    delinquent = false;
+                customer = SrdRef[Customer]().{
+                    alloc()~init(customerObject.getObject("data")
+                        .getObject(i).getString("id"),
+                        address,
+                        stringTofloat(customerObject.getObject("data").getObject(i).getString("balance")),
+                        stringToInt(customerObject.getObject("data").getObject(i).getString("created")),
+                        customerObject.getObject("data")
+                        .getObject(i).getString("currency"),
+                        customerObject.getObject("data")
+                        .getObject(i).getString("default_source"),
+                        delinquent,
+                        customerObject.getObject("data")
+                        .getObject(i).getString("description"),
+                        customerObject.getObject("data")
+                        .getObject(i).getString("email"),
+                        customerObject.getObject("data")
+                        .getObject(i).getString("invoice_prefix"),
+                        customerObject.getObject("data").getObject(i).getString("name"),
+                        stringToInt(customerObject.getObject("data")
+                        .getObject(i).getString("nextInvoiceSequence")),
+                        customerObject.getObject("data").getObject(i).getString("phone"),
+                        prfLoc,
+                        customerObject.getObject("data").getObject(i).getString("shipping"),
+                        customerObject.getObject("data").getObject(i).getString("tax_exempt"),
+                        customerObject.getObject("data").getObject(i).getString("test_clock"),)
+                }
+                customerArray.add(customer);
+                prfLoc.clear();
+            }
+            Memory.free(data);
+        } else {
+            Console.print("error\n");
+        }
+        return customerArray
+    }
+
+    func getCustomer(key: String, id: String): SrdRef[Customer] {
+        def data: ptr;
+        def size: Int;
+        def sourceArray: Array[SrdRef[Source]];
+        def loc: String;
+        def prfLoc: Array[String];
+        def url: String = "https:/api.stripe.com/v1/customers/"
+            url = url + id;
+        if Net2.get(url.buf, data~ptr, size~ptr, key.buf) {
+            def customerString: String;
+            customerString = String.format("%s", data);
+            def customerObject: Json = customerString.buf;
+            Console.print("%s\n", data);
+            def i: int = 0;
+            def j: int = 0;
+            def source: SrdRef[Source];
+            def customer: SrdRef[Customer];
+            def address: SrdRef[Address];
+            def delinquent: bool;
+
+            for j = 0, j < customerObject.getObject("preferred_locales").getLength(), j++ {
+                loc = customerObject.getObject("preferred_locales").getString(j);
+                prfLoc.add(loc);
+            }
+            if customerObject.getString("address") != String("null") {
+                address = SrdRef[Address]().{
+                    alloc()~init(customerObject.getObject("address").getString("city")
+
+                    , customerObject.getObject("address").getString("country")
+                        , customerObject.getObject("address").getString("line1")
+                        , customerObject.getObject("address").getString("line2")
+                        , customerObject.getObject("address").getString("postalCode")
+                        , customerObject.getObject("address").getString("state"))
+                };
+            } else {
+                address = SrdRef[Address]().{
+                    alloc()~init()
+                };
+            }
+            if customerObject.getString("delinquent") == String("true") {
+                delinquent = true;
+            } else {
+                delinquent = false;
+            }
+            customer = SrdRef[Customer](). {
+                alloc()~init(customerObject.getString("id"),
+                    address,
+                    stringTofloat(customerObject.getString("balance")),
+                    stringToInt(customerObject.getString("created")),
+                    customerObject.getString("currency"),
+                    customerObject.getString("default_source"),
+                    delinquent,
+                    customerObject.getString("description"),
+                    customerObject.getString("email"),
+                    customerObject.getString("invoice_prefix"),
+                    customerObject.getString("name"),
+                    stringToInt(customerObject.getString("nextInvoiceSequence")),
+                    customerObject.getString("phone"),
+                    prfLoc,
+                    customerObject.getString("shipping"),
+                    customerObject.getString("tax_exempt"),
+                    customerObject.getString("test_clock"),)
+            }
+            customerArray.add(customer);
+            prfLoc.clear();
+
+            Memory.free(data);
+        } else {
+            Console.print("error\n");
+        }
+
+        return customerArray
+    }
+}
+
