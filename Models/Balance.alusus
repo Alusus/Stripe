@@ -1,0 +1,27 @@
+@merge module Stripe {
+    class Balance {
+        def amount: float = 0;
+        def currency: String = "usd";
+        def sourceType: Array[SrdRef[Source]];
+        def balanceType: String = "";
+
+        handler this~init() {
+        }
+
+        handler this~init(amount: float, currency: String, sourceType: Array[SrdRef[Source]], balanceType: String) {
+            this.amount = amount;
+            this.currency = currency;
+            this.sourceType = sourceType;
+            this.balanceType = balanceType;
+        }
+
+        handler this.print() {
+            Console.print("\ntype : %s\tcurrency : %s\tamount:%f \n\t\t\tdetailed source : \n", this.balanceType.buf, this.currency.buf, this.amount);
+            def i: int = 0;
+            for i = 0, i < this.sourceType.getLength(), i++ {
+                Console.print("\nsource type : %s \t source amount : %f\n", this.sourceType(i).sourceType.buf, this.sourceType(i).amount)
+            }
+        }
+    }
+}
+
