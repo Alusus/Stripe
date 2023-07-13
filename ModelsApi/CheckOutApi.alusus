@@ -1,0 +1,74 @@
+@merge module Stripe {
+    func getCheckOuts(key: String): Array[SrdRef[CheckOut]] {
+        def checkOutArray: Array[SrdRef[CheckOut]];
+        def networkObject: Net.Request(String("https://api.stripe.com/v1/checkout/sessions"), key, String("Bearer"));
+        networkObject.get();
+        def checkoutObject: Json = networkObject.responseBody.buf;
+        def i: int = 0;
+        def j: int = 0;
+        def checkout: SrdRef[CheckOut];
+        for i = 0, i < checkoutObject.getObject("data").getLength(), i += 1 {
+            checkout = SrdRef[CheckOut]().{
+                alloc()~init(checkoutObject.getObject("data")
+                    .getObject(i).getString("id"),
+                    checkoutObject.getObject("data")
+                    .getObject(i).getString("client_reference_id"),
+                    checkoutObject.getObject("data")
+                    .getObject(i).getString("cancel_url"),
+                    checkoutObject.getObject("data")
+                    .getObject(i).getString("success_url"),
+                    checkoutObject.getObject("data")
+                    .getObject(i).getString("url"),
+                    checkoutObject.getObject("data")
+                    .getObject(i).getString("currency"),
+                    checkoutObject.getObject("data")
+                    .getObject(i).getString("customer"),
+                    checkoutObject.getObject("data")
+                    .getObject(i).getString("line_items"),
+                    checkoutObject.getObject("data")
+                    .getObject(i).getString("mode"),
+                    checkoutObject.getObject("data")
+                    .getObject(i).getString("payment_status"),
+                    checkoutObject.getObject("data")
+                    .getObject(i).getString("status"),
+                    checkoutObject.getObject("data")
+                    .getObject(i).getString("amount_total"))
+            }
+            checkOutArray.add(checkout);
+        }
+
+        return checkOutArray;
+    }
+
+    func getCheckOut(key: String, checkOutId: String): Array[SrdRef[CheckOut]] {
+        def networkObject: Net.Request(String.format("https://api.stripe.com/v1/checkout/sessions/%s", checkOutId.buf), key, String("Bearer"));
+        networkObject.get();
+        def checkoutObject: Json = networkObject.responseBody.buf;
+        def checkout: SrdRef[CheckOut];
+        checkout = SrdRef[CheckOut]().{
+            alloc()~init(checkoutObject.getString("id"),
+                checkoutObject.getString("client_reference_id"),
+                checkoutObject.getString("cancel_url"),
+                checkoutObjec.getString("success_url"),
+                checkoutObject.getString("url"),
+                checkoutObject.getString("currency"),
+                checkoutObject.getString("customer"),
+                checkoutObject.getString("line_items"),
+                checkoutObject.getString("mode"),
+                checkoutObject.getString("payment_status"),
+                checkoutObject.getString("status"),
+                checkoutObject.getString("amount_total"))
+        }
+        return checkout;
+    }
+
+    func postCheckOutSession(key: String, parameters: String): String {
+        def checkOutSessionId: String = "";
+        def networkObject: Net.Request(String("https://api.stripe.com/v1/checkout/sessions"), key, String("Bearer"), String("application/x-www-form-urlencoded"));
+        networkObject.post(parameters.buf);
+        def checkOutSessionObject: Json = networkObject.responseBody.buf;
+        checkOutSessionId = checkOutSessionObject.getString("id");
+        return checkOutSessionId;
+    }
+}
+
