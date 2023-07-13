@@ -1,0 +1,17 @@
+class Source{
+    def amount : float =0;
+    def sourceType : String="card";
+
+    handler this~init(){
+    }
+
+    handler this~init(amount : float , sourceType : String ){
+        this. amount = amount;
+        this.sourceType = sourceType;
+
+    }
+
+
+
+}
+

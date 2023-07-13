@@ -1,0 +1,31 @@
+import "Apm";
+Apm.importFile("Alusus/Json");
+import "Srl/Net";
+import "Srl/Array";
+import "Srl/String";
+import "Srl/System";
+import "Srl/Fs";
+import "Srl/refs";
+import "Srl/Console";
+Apm.importFile("Alusus/ExtendedNet");
+import "Models/Source.alusus";
+import "Models/Balance.alusus";
+import "Models/BalanceTransaction.alusus";
+import "Models/Address.alusus";
+import "Models/Customer.alusus";
+import "Models/CheckOut.alusus";
+import "Models/Charge.alusus";
+import "ModelsApi/CustomerApi.alusus";
+import "ModelsApi/BalanceTransactionApi.alusus";
+import "ModelsApi/BalanceApi.alusus";
+import "ModelsApi/CheckOutApi.alusus";
+@merge module Stripe {
+    use Srl;
+    def stringToInt: @expname[atoi] function (string: ptr[array[Char]]) => Int;
+    def stringToFloat: @expname[atof] function (string: ptr[array[Char]]) => float;
+}
+
+
+
+
+

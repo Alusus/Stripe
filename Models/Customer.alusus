@@ -1,0 +1,63 @@
+@merge module Stripe {
+    class Customer {
+        def id: String;
+        def address: SrdRef[Address];
+        def balance: float = 0;
+        def defaultSourceId: String;
+        def delinquent: bool;
+        def created: int;
+        def email: String;
+        def invoicePrefix: String;
+        def preferredLocales: Array[String];
+        def name: String;
+        def phone: String;
+        def shipping: String;
+        def taxExempt: String;
+        def testClock: String;
+        def nextInvoiceSequence: int;
+        def currency: String = "usd";
+        def description: String;
+
+
+        handler this~init() {
+        }
+
+        handler this~init(id: String, email: String, name: String, preferredLocales: Array[String]) {
+            this.id = id;
+            this.email = email;
+            this.name = name;
+            this.preferredLocales = preferredLocales;
+        }
+
+        handler this~init(id: String, address: SrdRef[Address], balance: float, created: int
+            , currency: String, defaultSourceId: String, delinquent: bool
+            , description: String, email: String, invoicePrefix: String, name: String
+            , nextInvoiceSequence: int, phone: String, preferredLocales: Array[String]
+            , shipping: String, taxExempt: String, testClock: String) {
+            this.id = id;
+            this.address = address;
+            this.balance = balance;
+            this.defaultSourceId = defaultSourceId;
+            this.delinquent = delinquent;
+            this.created = created;
+            this.email = email;
+            this.invoicePrefix = invoicePrefix;
+            this.preferredLocales = preferredLocales;
+            this.name = name;
+            this.phone = phone;
+            this.shipping = shipping;
+            this.taxExempt = taxExempt;
+            this.testClock = testClock;
+            this.nextInvoiceSequence = nextInvoiceSequence;
+            this.currency = currency;
+            this.description = description;
+        }
+
+        handler this.print() {
+            Console.print("\nid : %s\tname : %s\temail : %s "
+                " \n\t\t", this.id.buf
+                , this.name.buf, this.email.buf);
+        }
+    }
+}
+
