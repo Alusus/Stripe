@@ -1,28 +1,34 @@
 @merge module Stripe {
-    class Address {
-        def city: String;
-        def country: String;
-        def line1: String;
-        def line2: String;
-        def postalCode: String;
-        def state: String;
+class Address{
+    def city : String ;
+    def country : String;
+    def line1 : String;
+    def line2 : String;
+    def postalCode : String;
+    def state : String;
 
-        handler this~init() {
-        }
+    handler this~init(){
 
-        handler this~init(city: String, country: String, line1: String, line2: String, postalCode: String, state: String) {
-            this.city = city;
-            this.country = country;
-            this.line1 = line1;
-            this.line2 = line2;
-            this.postalCode = postalCode;
-            this.state = state;
-        }
-
-        handler this.print() {
-            Console.print("\ncity : %s\t country : %s\t line1:%s \t line2 : String \t postalCode : %s \t state : %s \n"
-                , this.city.buf, this.country.buf, this.line1.buf, this.line2.buf, this.postalCode.buf, this.state.buf);
-        }
     }
+
+    handler this~init(city : String , country : String , line1 : String , line2 : String , postalCode: String ,  state: String){
+        this. city = city;
+        this.country = country;
+        this.line1 = line1;
+        this.line2 = line2;
+        this.postalCode = postalCode;
+        this.state = state;
+    }
+    handler this.print(){
+        Console.print("\ncity : %s\t country : %s\t line1:%s \t line2 : String \t postalCode : %s \t state : %s \n"
+                        ,this.city.buf,this.country.buf,this.line1.buf,this.line2.buf , this.postalCode.buf ,this.state.buf);
+
+    }
+
+
+
 }
 
+
+
+}
