@@ -13,13 +13,16 @@ import "Models/Balance.alusus";
 import "Models/BalanceTransaction.alusus";
 import "Models/Address.alusus";
 import "Models/Customer.alusus";
+import "Models/CheckOut.alusus";
+import "Models/Charge.alusus";
 import "ModelsApi/CustomerApi.alusus";
 import "ModelsApi/BalanceTransactionApi.alusus";
 import "ModelsApi/BalanceApi.alusus";
+import "ModelsApi/CheckOutApi.alusus";
 @merge module Stripe {
     use Srl;
     def stringToInt: @expname[atoi] function (string: ptr[array[Char]]) => Int;
-    def stringTofloat: @expname[atof] function (string: ptr[array[Char]]) => float;
+    def stringToFloat: @expname[atof] function (string: ptr[array[Char]]) => float;
 }
 
 
