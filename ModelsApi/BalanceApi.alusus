@@ -1,64 +1,53 @@
 @merge module Stripe {
     func getBalance(key: String): Array[SrdRef[Balance]] {
-        def data: ptr;
-        def size: Int;
         def balanceArray: Array[SrdRef[Balance]];
         def sourceArray: Array[SrdRef[Source]];
-        if Net2.get("https:/api.stripe.com/v1/balance", data~ptr, size~ptr, key.buf) {
-            def balanceString: String;
-            balanceString = String.format("%s", data);
-            def balanceObject: Json = balanceString.buf;
-            //Console.print("%s\n", data);
-            def i: int = 0;
-            def j: int = 0;
-            def source: SrdRef[Source];
-            def balance: SrdRef[Balance];
-            Console.print("currency : %s\n", balanceObject.getObject("available").getObject(0).
-                getObject("source_types").keys(0).buf);
-            for i = 0, i < balanceObject.getObject("available").getLength(), i += 1 {
-                for j = 0, j < balanceObject.getObject("available").getObject(i).getObject("source_types").getLength(), j++ {
-                    source = SrdRef[Source]().{
-                        alloc()~init(stringTofloat(balanceObject.getObject("available")
-                            .getObject(i).getObject("source_types").values(j))
-                            , balanceObject.getObject("available")
-                            .getObject(i).getObject("source_types").keys(j))
-                    }
-                    sourceArray.add(source);
+        def networkObject: Net.Request(String("https:/api.stripe.com/v1/balance"), key, String("Bearer"));
+        networkObject.get();
+        def balanceObject: Json = networkObject.responseBody.buf;
+        def i: int = 0;
+        def j: int = 0;
+        def source: SrdRef[Source];
+        def balance: SrdRef[Balance];
+        for i = 0, i < balanceObject.getObject("available").getLength(), i += 1 {
+            for j = 0, j < balanceObject.getObject("available").getObject(i).getObject("source_types").getLength(), j++ {
+                source = SrdRef[Source]().{
+                    alloc()~init(stringToFloat(balanceObject.getObject("available")
+                        .getObject(i).getObject("source_types").values(j))
+                        , balanceObject.getObject("available")
+                        .getObject(i).getObject("source_types").keys(j))
                 }
-                balance = SrdRef[Balance](). {
-                    alloc()~init(stringTofloat(balanceObject.getObject("available")
-                        .getObject(i).getString("amount")),
-                        balanceObject.getObject("available").getObject(i).getString("currency"),
-                        sourceArray, String("available"))
-                }
-                balanceArray.add(balance);
-                sourceArray.clear();
+                sourceArray.add(source);
             }
-            for i = 0, i < balanceObject.getObject("pending").getLength(), i += 1 {
-                for j = 0, j < balanceObject.getObject("pending").getObject(i).getObject("source_types").getLength(), j++ {
-                    source = SrdRef[Source]().{
-                        alloc()~init(stringTofloat(balanceObject.getObject("pending")
-                            .getObject(i).getObject("source_types").values(j))
-                            , balanceObject.getObject("pending")
-                            .getObject(i).getObject("source_types").keys(j))
-                    };
-                    sourceArray.add(source);
-                }
-                balance = SrdRef[Balance](). {
-                    alloc()~init(stringTofloat(balanceObject.getObject("available")
-                        .getObject(i).getString("amount")),
-                        balanceObject.getObject("available").getObject(i).getString("currency"),
-                        sourceArray, String("pending"))
-                }
-                balanceArray.add(balance);
-                sourceArray.clear();
+            balance = SrdRef[Balance](). {
+                alloc()~init(stringToFloat(balanceObject.getObject("available")
+                    .getObject(i).getString("amount")),
+                    balanceObject.getObject("available").getObject(i).getString("currency"),
+                    sourceArray, String("available"))
             }
-            Console.print("currency : %f\n", stringTofloat(balanceObject.getObject("available").getObject(0).getObject("source_types").values(0)));
-            Memory.free(data);
-        } else {
-            Console.print("error\n");
+            balanceArray.add(balance);
+            sourceArray.clear();
         }
-        return balanceArray
+        for i = 0, i < balanceObject.getObject("pending").getLength(), i += 1 {
+            for j = 0, j < balanceObject.getObject("pending").getObject(i).getObject("source_types").getLength(), j++ {
+                source = SrdRef[Source]().{
+                    alloc()~init(stringToFloat(balanceObject.getObject("pending")
+                        .getObject(i).getObject("source_types").values(j))
+                        , balanceObject.getObject("pending")
+                        .getObject(i).getObject("source_types").keys(j))
+                }
+                sourceArray.add(source);
+            }
+            balance = SrdRef[Balance](). {
+                alloc()~init(stringToFloat(balanceObject.getObject("available")
+                    .getObject(i).getString("amount")),
+                    balanceObject.getObject("available").getObject(i).getString("currency"),
+                    sourceArray, String("pending"))
+            }
+            balanceArray.add(balance);
+            sourceArray.clear();
+        }
+        return balanceArray;
     }
 }
 
