@@ -50,7 +50,7 @@ some of this class properties
 `phone` the phone of the customer object from stripe.
 
 ```
-func getCustomer(key: String): Array[SrdRef[Customer]]
+func getCustomers(key: String): Array[SrdRef[Customer]]
 ```
 
 This function get customers array from Stripe Api.
@@ -72,6 +72,28 @@ This function does the same work as the previous function but it get one custome
 Returns customer object.
 
 ```
+func getCustomers(key: String): Array[SrdRef[Customer]]
+```
+
+This function get customers array from Stripe Api.
+
+`key` the secret key from stripe website.
+
+Returns customers Array.
+
+```
+func postCustomer(key: String, parameters: String): String
+```
+
+This function post a customer object to Stripe.
+
+`key` the secret key from stripe website.
+
+`parameters` the parametes of customer object in the form "email=super211@gmail.com&name=sonicmrah".
+
+Returns customer id.
+
+
 
 ### Balance class
 
@@ -100,7 +122,7 @@ This function get Balances array from Stripe Api.
 
 Returns Balances Array.
 
-```
+
 
 ### BalanceTransaction class
 
@@ -138,10 +160,60 @@ This function does the same work as the previous function but it get one Balance
 
 `key` the secret key from stripe website.
 
-`id` the getBalanceTranasaction id.
+`id` the BalanceTranasaction id.
 
 Returns BalanceTranasaction object.
 
+
+
+### checkOut class
+
+This class hold the json object of checkOut object from Stripe Api.
+
+```
+some of this class properties
 ```
 
+`id` the id of the checkOut object from stripe.
 
+`amountTotal` the amount of the transaction.
+
+`url` the checkOut url.
+
+`successUrl` the url if the checkOut success .
+
+`cancelUrl` the url if the checkOut cancel.
+
+```
+func getCheckOuts(key: String): Array[SrdRef[CheckOut]] 
+```
+
+This function get CheckOuts array from Stripe Api.
+
+`key` the secret key from stripe website.
+
+Returns CheckOuts Array.
+
+```
+func getCheckOut(key: String, checkOutId: String): Array[SrdRef[CheckOut]]
+```
+
+This function does the same work as the previous function but it get one CheckOut.
+
+`key` the secret key from stripe website.
+
+`id` the CheckOut id.
+
+Returns CheckOut object.
+
+```
+func postCheckOutSession(key: String, parameters: String): String
+```
+
+This function post a CheckOutSession object to Stripe.
+
+`key` the secret key from stripe website.
+
+`parameters` the parametes of CheckOutSession object in the form "customer=customerID&line_items=planID".
+
+Returns CheckOutSession id.
