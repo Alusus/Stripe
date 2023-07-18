@@ -1,5 +1,3 @@
-import "Apm";
-Apm.importFile("Alusus/Json");
 import "Srl/Net";
 import "Srl/Array";
 import "Srl/String";
@@ -7,25 +5,75 @@ import "Srl/System";
 import "Srl/Fs";
 import "Srl/refs";
 import "Srl/Console";
+
+import "Apm";
+Apm.importFile("Alusus/Json");
 Apm.importFile("Alusus/ExtendedNet");
+
 import "Models/Source.alusus";
 import "Models/Balance.alusus";
 import "Models/BalanceTransaction.alusus";
 import "Models/Address.alusus";
 import "Models/Customer.alusus";
-import "Models/CheckOut.alusus";
-import "Models/Charge.alusus";
-import "ModelsApi/CustomerApi.alusus";
-import "ModelsApi/BalanceTransactionApi.alusus";
-import "ModelsApi/BalanceApi.alusus";
-import "ModelsApi/CheckOutApi.alusus";
+import "Models/CheckoutSession.alusus";
+import "Apis/customer.alusus";
+import "Apis/checkout.alusus";
+import "Apis/balance_transaction.alusus";
+import "Apis/balance.alusus";
+
 @merge module Stripe {
     use Srl;
-    def stringToInt: @expname[atoi] function (string: ptr[array[Char]]) => Int;
-    def stringToFloat: @expname[atof] function (string: ptr[array[Char]]) => float;
+
+    class Client {
+        def key: String;
+        def verbose: Bool = true;
+
+        handler this~init(k: String) {
+            this.key = k;
+        }
+
+        // Customer APIs
+
+        handler this.getCustomers(): Array[SrdRef[Customer]] {
+            return Stripe.getCustomers(this.key, this.verbose);
+        }
+
+        handler this.getCustomer(customerId: String): SrdRef[Customer] {
+            return Stripe.getCustomer(this.key, customerId, this.verbose);
+        }
+
+        handler this.createCustomer(parameters: String): String {
+            return Stripe.createCustomer(this.key, parameters, this.verbose);
+        }
+
+        // Chekcout APIs
+
+        handler this.getCheckoutSessions(): Array[SrdRef[CheckoutSession]] {
+            return Stripe.getCheckoutSessions(this.key, this.verbose);
+        }
+
+        handler this.getCheckoutSession(sessionId: String): SrdRef[CheckoutSession] {
+            return Stripe.getCheckoutSession(this.key, sessionId, this.verbose);
+        }
+
+        handler this.createCheckoutSession(parameters: String): String {
+            return Stripe.createCheckoutSession(this.key, parameters, this.verbose);
+        }
+
+        // Balance APIs
+
+        handler this.getBalance(): Array[SrdRef[Balance]] {
+            return Stripe.getBalance(this.key, this.verbose);
+        }
+
+        // Balance Transaction APIs
+
+        handler this.getBalanceTranasactions(): Array[SrdRef[BalanceTransaction]] {
+            return Stripe.getBalanceTranasactions(this.key, this.verbose);
+        }
+
+        handler this.getBalanceTranasaction(id: String): SrdRef[BalanceTransaction] {
+            return Stripe.getBalanceTranasaction(this.key, id, this.verbose);
+        }
+    }
 }
-
-
-
-
-

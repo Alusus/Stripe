@@ -1,0 +1,42 @@
+import "Srl/System";
+import "Apm";
+Apm.importFile("Alusus/Stripe");
+use Srl;
+
+def client: Stripe.Client(String(System.getEnv("STRIPE_KEY")));
+client.verbose = false;
+
+Console.print("Create Customer...\n");
+def customerId: String = client.createCustomer(String("email=super211@gmail.com&name=sonicmrah"));
+Console.print("Created customer's ID: %s\n", customerId.buf);
+Console.print("Done creating customer.\n\n");
+
+Console.print("Current Customers:\n");
+def customers: Array[SrdRef[Stripe.Customer]];
+customers = client.getCustomers();
+def i: Int;
+for i = 0, i < customers.getLength(), i++ {
+    Console.print(
+        "id: %s\n\tname: %s\n\temail: %s\n\n",
+        customers(i).id.buf, customers(i).name.buf, customers(i).email.buf
+    );
+}
+
+Console.print("Balance Array:\n");
+def balanceArray : Array[SrdRef[Stripe.Balance]];
+balanceArray = client.getBalance();
+def j: Int;
+for j = 0, j < balanceArray.getLength(), j++ {
+    Console.print(
+        "type: %s\ncurrency: %s\namount: %f\nsources:\n",
+        balanceArray(j).balanceType.buf, balanceArray(j).currency.buf, balanceArray(j).amount
+    );
+    def i: Int = 0;
+    for i = 0, i < balanceArray(j).sources.getLength(), i++ {
+        Console.print(
+            "\tsource type: %s\n\tsource amount: %f\n",
+            balanceArray(j).sources(i).sourceType.buf, balanceArray(j).sources(i).amount
+        )
+    }
+    Console.print("\n");
+}

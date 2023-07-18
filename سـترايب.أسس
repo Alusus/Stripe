@@ -1,0 +1,97 @@
+اشمل "Stripe"؛
+
+عرف سـترايب: لقب Stripe؛
+@دمج وحدة سـترايب {
+    عرف عـنوان: لقب Address؛
+    @دمج صنف عـنوان {
+        عرف المدينة: لقب city؛
+        عرف الدولة: لقب country؛
+        عرف السطر1: لقب line1؛
+        عرف السطر2: لقب line2؛
+        عرف الرمز_البريدي: لقب postalCode؛
+        عرف الولاية: لقب state؛
+    }
+
+    عرف رصـيد: لقب Balance؛
+    @دمج صنف رصـيد {
+        عرف المبلغ: لقب amount؛
+        عرف العملة: لقب currency؛
+        عرف المصادر: لقب sources؛
+        عرف نوع_الرصيد: لقب balanceType؛
+    }
+
+    عرف عـملية_رصيد: لقب BalanceTransaction؛
+    @دمج صنف عـملية_رصيد {
+        عرف المعرف: لقب id؛
+        عرف المبلغ: لقب amount؛
+        عرف زمن_التوفر: لقب availableOn؛
+        عرف زمن_الإنشاء: لقب created؛
+        عرف العملة: لقب currency؛
+        عرف الوصف: لقب description؛
+        عرف سعر_الصرف: لقب exchangeRate؛
+        عرف الرسوم: لقب fee؛
+        عرف تفاصيل_الرسوم: لقب feeDetails؛
+        عرف المبلغ_الكلي: لقب net؛
+        عرف فئة_التبليغ: لقب reportingCategory؛
+        عرف المصدر: لقب source؛
+        عرف الحالة: لقب status؛
+        عرف نوع_المصدر: لقب sourceType؛
+    }
+
+    عرف جـلسة_شراء: لقب CheckoutSession؛
+    @دمج صنف جـلسة_شراء {
+        عرف المعرف: لقب id؛
+        عرف رابط_الإلغاء: لقب cancelUrl؛
+        عرف المعرف_الفريد: لقب uniqeId؛
+        عرف العملة: لقب currency؛
+        عرف معرف_الزبون: لقب customerId؛
+        عرف العناصر: لقب lineItems؛
+        عرف النمط: لقب mode؛
+        عرف حالة_الدفع: لقب paymentStatus؛
+        عرف الحالة: لقب status؛
+        عرف رابط_النجاح: لقب successUrl؛
+        عرف الرابط: لقب url؛
+        عرف المبلغ_الكلي: لقب amountTotal؛
+    }
+
+    عرف زبـون: لقب Customer؛
+    @دمج صنف زبـون {
+        عرف المعرف: لقب id؛
+        عرف العنوان: لقب address؛
+        عرف الرصيد: لقب balance؛
+        عرف معرف_المصدر_المبدئي: لقب defaultSourceId؛
+        عرف مقصر: لقب delinquent؛
+        عرف زمن_الإنشاء: لقب created؛
+        عرف البريد_الإلكتروني: لقب email؛
+        عرف بادئة_الفاتورة: لقب invoicePrefix؛
+        عرف النسق_المفضلة: لقب preferredLocales؛
+        عرف الاسم: لقب name؛
+        عرف رقم_الهاتف: لقب phone؛
+        عرف الشحن: لقب shipping؛
+        عرف معفي_من_الضريبة: لقب taxExempt؛
+        عرف ساعة_اختبار: لقب testClock؛
+        عرف تسلسل_الفاتورة_التالي: لقب nextInvoiceSequence؛
+        عرف العملة: لقب currency؛
+        عرف الوصف: لقب description؛
+    }
+
+    عرف مـصدر: لقب Source؛
+    @دمج صنف مـصدر {
+        عرف المبلغ: لقب amount؛
+        عرف النوع: لقب sourceType؛
+    }
+
+    عرف وكـيل: لقب Client؛
+    @دمج صنف وكـيل {
+        عرف إطناب: لقب verbose؛
+        عرف هات_الزبائن: لقب getCustomers؛
+        عرف هات_زبونا: لقب getCustomer؛
+        عرف أنشئ_زبونا: لقب createCustomer؛
+        عرف هات_جلسات_إتمام_الشراء: لقب getCheckoutSessions؛
+        عرف هات_جلسة_إتمام_الشراء: لقب getCheckoutSession؛
+        عرف أنشئ_جلسة_إتمام_شراء: لقب createCheckoutSession؛
+        عرف هات_الرصيد: لقب getBalance؛
+        عرف هات_عمليات_الرصيد: لقب getBalanceTranasactions؛
+        عرف هات_عملية_رصيد: لقب getBalanceTranasaction؛
+    }
+}

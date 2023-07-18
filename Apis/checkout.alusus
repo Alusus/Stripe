@@ -1,14 +1,15 @@
 @merge module Stripe {
-    func getCheckOuts(key: String): Array[SrdRef[CheckOut]] {
-        def checkOutArray: Array[SrdRef[CheckOut]];
-        def networkObject: Net.Request(String("https://api.stripe.com/v1/checkout/sessions"), key, String("Bearer"));
-        networkObject.get();
-        def checkoutObject: Json = networkObject.responseBody.buf;
+    func getCheckoutSessions(key: String, verbose: Bool): Array[SrdRef[CheckoutSession]] {
+        def checkOutArray: Array[SrdRef[CheckoutSession]];
+        def request: Net.Request(String("https://api.stripe.com/v1/checkout/sessions"), key, String("Bearer"));
+        request.verbose = verbose;
+        request.get();
+        def checkoutObject: Json = request.responseBody.buf;
         def i: int = 0;
         def j: int = 0;
-        def checkout: SrdRef[CheckOut];
+        def checkout: SrdRef[CheckoutSession];
         for i = 0, i < checkoutObject.getObject("data").getLength(), i += 1 {
-            checkout = SrdRef[CheckOut]().{
+            checkout = SrdRef[CheckoutSession]().{
                 alloc()~init(checkoutObject.getObject("data")
                     .getObject(i).getString("id"),
                     checkoutObject.getObject("data")
@@ -40,12 +41,13 @@
         return checkOutArray;
     }
 
-    func getCheckOut(key: String, checkOutId: String): Array[SrdRef[CheckOut]] {
-        def networkObject: Net.Request(String.format("https://api.stripe.com/v1/checkout/sessions/%s", checkOutId.buf), key, String("Bearer"));
-        networkObject.get();
-        def checkoutObject: Json = networkObject.responseBody.buf;
-        def checkout: SrdRef[CheckOut];
-        checkout = SrdRef[CheckOut]().{
+    func getCheckoutSession(key: String, checkoutId: String, verbose: Bool): SrdRef[CheckoutSession] {
+        def request: Net.Request(String.format("https://api.stripe.com/v1/checkout/sessions/%s", checkoutId.buf), key, String("Bearer"));
+        request.verbose = verbose;
+        request.get();
+        def checkoutObject: Json = request.responseBody.buf;
+        def checkout: SrdRef[CheckoutSession];
+        checkout = SrdRef[CheckoutSession]().{
             alloc()~init(checkoutObject.getString("id"),
                 checkoutObject.getString("client_reference_id"),
                 checkoutObject.getString("cancel_url"),
@@ -62,11 +64,16 @@
         return checkout;
     }
 
-    func postCheckOutSession(key: String, parameters: String): String {
-        def checkOutSessionId: String = "";
-        def networkObject: Net.Request(String("https://api.stripe.com/v1/checkout/sessions"), key, String("Bearer"), String("application/x-www-form-urlencoded"));
-        networkObject.post(parameters.buf);
-        def checkOutSessionObject: Json = networkObject.responseBody.buf;
+    func createCheckoutSession(key: String, parameters: String, verbose: Bool): String {
+        def checkOutSessionId: String;
+        def request: Net.Request(
+            String("https://api.stripe.com/v1/checkout/sessions"),
+            key, String("Bearer"),
+            String("application/x-www-form-urlencoded")
+        );
+        request.verbose = verbose;
+        request.post(parameters.buf);
+        def checkOutSessionObject: Json = request.responseBody.buf;
         checkOutSessionId = checkOutSessionObject.getString("id");
         return checkOutSessionId;
     }

@@ -1,15 +1,15 @@
 @merge module Stripe {
     class BalanceTransaction {
         def id: String;
-        def amount: float = 0;
-        def availableOn: int;
-        def created: int;
+        def amount: Float = 0;
+        def availableOn: Int[64];
+        def created: Int[64];
         def currency: String = "usd";
         def description: String;
-        def exchangeRate: float;
-        def fee: float;
+        def exchangeRate: Float;
+        def fee: Float;
         def feeDetails: Array[String];
-        def net: float = 0;
+        def net: Float = 0;
         def reportingCategory: String;
         def source: String;
         def status: String;
@@ -19,10 +19,12 @@
         handler this~init() {
         }
 
-        handler this~init(id: String, amount: float, availableOn: int, created: int
-            , currency: String, description: String, exchangeRate: float, fee: float
-            , feeDetails: Array[String], net: float, reportingCategory: String
-            , source: String, status: String, sourceType: String) {
+        handler this~init(
+            id: String, amount: Float, availableOn: Int[64], created: Int[64],
+            currency: String, description: String, exchangeRate: Float, fee: Float,
+            feeDetails: Array[String], net: Float, reportingCategory: String,
+            source: String, status: String, sourceType: String
+        ) {
             this.id = id;
             this.amount = amount;
             this.availableOn = availableOn;
@@ -37,19 +39,6 @@
             this.source = source;
             this.status = status;
             this.sourceType = sourceType;
-        }
-
-        handler this.print() {
-            Console.print("\nid : %s\tcurrency : %s\tamount:%f \t availableOn : %i \t created : %i \n"
-                " description : %s \t net : %f \t fee : %f \t exchangeRate : %f \t reportingCategory : %s \t source : %s \n"
-                " status : %s \t sourceType : %s \n\t\t\tdetailed fee : \n", this.id.buf
-                , this.currency.buf, this.amount, this.availableOn, this.created, this.description.buf
-                , this.net, this.fee, this.exchangeRate, this.reportingCategory.buf, this.source.buf
-                , this.status.buf, this.sourceType.buf);
-            def i: int = 0;
-            for i = 0, i < this.feeDetails.getLength(), i++ {
-                Console.print("\n %s", this.feeDetails(i).buf)
-            }
         }
     }
 }
