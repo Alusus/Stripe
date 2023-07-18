@@ -7,7 +7,7 @@ def client: Stripe.Client(String(System.getEnv("STRIPE_KEY")));
 client.verbose = false;
 
 Console.print("Create Customer...\n");
-def customerId: String = client.createCustomer(String("email=super211@gmail.com&name=sonicmrah"));
+def customerId: String = client.createCustomer(String("email=user123@example.com&name=john"));
 Console.print("Created customer's ID: %s\n", customerId.buf);
 Console.print("Done creating customer.\n\n");
 

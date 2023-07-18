@@ -486,7 +486,7 @@ handler this.createCustomer(parameters: String): String
 
 تنشئ قيد زبون.
 
-`معطيات` (`parameters`) معطيات الزبون بالصيغة التالية: "email=super211@gmail.com&name=sonicmrah".
+`معطيات` (`parameters`) معطيات الزبون بالصيغة التالية: "email=user123@example.com&name=john".
 
 تُرجع معرف الزبون.
 

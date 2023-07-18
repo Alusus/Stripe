@@ -259,7 +259,7 @@ handler this.createCustomer(parameters: String): String
 
 Creates a customer entry.
 
-`parameters` the parametes of customer object in the form "email=super211@gmail.com&name=sonicmrah".
+`parameters` the parametes of customer object in the form "email=user123@example.com&name=john".
 
 Returns the customer's id.
 
