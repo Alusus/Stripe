@@ -1,8 +1,8 @@
 @merge module Stripe {
-    class CheckOut {
+    class CheckoutSession {
         def id: String;
-        def cancelUrl: String = "";
-        def uniqeId: String = "";
+        def cancelUrl: String;
+        def uniqeId: String;
         def currency: String = "usd";
         def customerId: String;
         def lineItems: String;
@@ -17,9 +17,11 @@
         handler this~init() {
         }
 
-        handler this~init(id: String, uniqeId: String, cancelUrl: String, successUrl: String, url: String
-            , currency: String, customerId: String, lineItems: String
-            , mode: String, paymentStatus: String, status: String, amountTotal: String) {
+        handler this~init(
+            id: String, uniqeId: String, cancelUrl: String, successUrl: String, url: String,
+            currency: String, customerId: String, lineItems: String,
+            mode: String, paymentStatus: String, status: String, amountTotal: String
+        ) {
             this.id = id;
             this.uniqeId = uniqeId;
             this.cancelUrl = cancelUrl;
@@ -32,15 +34,6 @@
             this.paymentStatus = paymentStatus;
             this.status = status;
             this.amountTotal = amountTotal;
-        }
-
-        handler this.print() {
-            Console.print("\nid : %s\tcurrency : %s\tamount:%s  \n"
-                " url : %s \t paymentStatus : %s \t mode : %s \n"
-                " status : %s \t customerId : %s \n", this.id.buf
-                , this.currency.buf, this.amountTotal.buf, this.url.buf
-                , this.paymentStatus.buf, this.mode.buf
-                , this.status.buf, this.customerId.buf);
         }
     }
 }

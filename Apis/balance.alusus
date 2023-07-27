@@ -1,0 +1,68 @@
+@merge module Stripe {
+    func getBalance(key: String, verbose: Bool): Possible[Array[SrdRef[Balance]]] {
+        def balanceArray: Array[SrdRef[Balance]];
+        def sourceArray: Array[SrdRef[Source]];
+        def request: Net.Request(String("https:/api.stripe.com/v1/balance"), key, String("Bearer"));
+        request.verbose = verbose;
+        request.get();
+        if request.responseHttpStatus == 401 {
+            return Possible[Array[SrdRef[Balance]]].failure(Errors.unauthenticated());
+        } else if request.responseHttpStatus == 0 {
+            return Possible[Array[SrdRef[Balance]]].failure(Errors.connection());
+        } else if request.responseHttpStatus != 200 {
+            return Possible[Array[SrdRef[Balance]]].failure(Errors.unexpected());
+        }
+        def balanceObject: Json = request.responseBody;
+        def i: int = 0;
+        def j: int = 0;
+        def source: SrdRef[Source];
+        def balance: SrdRef[Balance];
+        for i = 0, i < balanceObject.getObject("available").getLength(), i += 1 {
+            for j = 0, j < balanceObject.getObject("available").getObject(i).getObject("source_types").getLength(), j++ {
+                source = SrdRef[Source]().{
+                    alloc()~init(
+                        String.parseFloat(
+                            balanceObject.getObject("available").getObject(i).getObject("source_types").values(j)
+                        ),
+                        balanceObject.getObject("available").getObject(i).getObject("source_types").keys(j)
+                    )
+                }
+                sourceArray.add(source);
+            }
+            balance = SrdRef[Balance](). {
+                alloc()~init(
+                    String.parseFloat(
+                        balanceObject.getObject("available").getObject(i).getString("amount")
+                    ),
+                    balanceObject.getObject("available").getObject(i).getString("currency"),
+                    sourceArray, String("available")
+                )
+            }
+            balanceArray.add(balance);
+            sourceArray.clear();
+        }
+        for i = 0, i < balanceObject.getObject("pending").getLength(), i += 1 {
+            for j = 0, j < balanceObject.getObject("pending").getObject(i).getObject("source_types").getLength(), j++ {
+                source = SrdRef[Source]().{
+                    alloc()~init(
+                        String.parseFloat(
+                            balanceObject.getObject("pending").getObject(i).getObject("source_types").values(j)
+                        ),
+                        balanceObject.getObject("pending").getObject(i).getObject("source_types").keys(j)
+                    )
+                }
+                sourceArray.add(source);
+            }
+            balance = SrdRef[Balance](). {
+                alloc()~init(String.parseFloat(balanceObject.getObject("available")
+                    .getObject(i).getString("amount")),
+                    balanceObject.getObject("available").getObject(i).getString("currency"),
+                    sourceArray, String("pending"))
+            }
+            balanceArray.add(balance);
+            sourceArray.clear();
+        }
+        return Possible[Array[SrdRef[Balance]]].success(balanceArray);
+    }
+}
+

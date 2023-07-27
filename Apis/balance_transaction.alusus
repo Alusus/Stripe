@@ -1,0 +1,93 @@
+@merge module Stripe {
+    func getBalanceTranasactions(key: String, verbose: Bool): Possible[Array[SrdRef[BalanceTransaction]]] {
+        def balanceTransactionArray: Array[SrdRef[BalanceTransaction]];
+        def request: Net.Request(String("https:/api.stripe.com/v1/balance_transactions"), key, String("Bearer"));
+        request.verbose = verbose;
+        request.get();
+        if request.responseHttpStatus == 401 {
+            return Possible[Array[SrdRef[BalanceTransaction]]].failure(Errors.unauthenticated());
+        } else if request.responseHttpStatus == 0 {
+            return Possible[Array[SrdRef[BalanceTransaction]]].failure(Errors.connection());
+        } else if request.responseHttpStatus != 200 {
+            return Possible[Array[SrdRef[BalanceTransaction]]].failure(Errors.unexpected());
+        }
+        def balanceObject: Json = request.responseBody;
+        def i: int = 0;
+        def j: int = 0;
+        def balanceTransaction: SrdRef[BalanceTransaction];
+        def feeDetails: Array[String];
+        def feeDetail: String;
+        for i = 0, i < balanceObject.getObject("data").getLength(), i += 1 {
+            for j = 0, j < balanceObject.getObject("data").getObject(i).getObject("fee_details").getLength(), j++ {
+                feeDetail = balanceObject.getObject("data").getObject(i).getObject("fee_details").getString(i);
+                feeDetails.add(feeDetail);
+            }
+            balanceTransaction = SrdRef[BalanceTransaction](). {
+                alloc()~init(balanceObject.getObject("data").getObject(i).getString("id"),
+                    String.parseFloat(balanceObject.getObject("data").getObject(i).getString("amount")),
+                    String.parseInt(balanceObject.getObject("data").getObject(i).getString("available_on")),
+                    String.parseInt(balanceObject.getObject("data").getObject(i).getString("created")),
+                    balanceObject.getObject("data").getObject(i).getString("currency"),
+                    balanceObject.getObject("data").getObject(i).getString("description"),
+                    String.parseFloat(balanceObject.getObject("data").getObject(i).getString("exchange_rate")),
+                    String.parseFloat(balanceObject.getObject("data").getObject(i).getString("fee")),
+                    feeDetails,
+                    String.parseFloat(balanceObject.getObject("data").getObject(i).getString("net")),
+                    balanceObject.getObject("data").getObject(i).getString("reporting_category"),
+                    balanceObject.getObject("data").getObject(i).getString("source"),
+                    balanceObject.getObject("data").getObject(i).getString("status"),
+                    balanceObject.getObject("data").getObject(i).getString("type"),)
+            }
+            balanceTransactionArray.add(balanceTransaction);
+            feeDetails.clear();
+        }
+
+
+        return Possible[Array[SrdRef[BalanceTransaction]]].success(balanceTransactionArray);
+    }
+
+    func getBalanceTranasaction(key: String, id: String, verbose: Bool): SrdRef[BalanceTransaction] {
+        def request: Net.Request(
+            String.format("https:/api.stripe.com/v1/balance_transactions%s", id.buf),
+            key,
+            String("Bearer")
+        );
+        request.verbose = verbose;
+        request.get();
+        if request.responseHttpStatus == 401 {
+            return Possible[SrdRef[BalanceTransaction]].failure(Errors.unauthenticated());
+        } else if request.responseHttpStatus == 404 {
+            return Possible[SrdRef[BalanceTransaction]].failure(Errors.notFound());
+        } else if request.responseHttpStatus == 0 {
+            return Possible[SrdRef[BalanceTransaction]].failure(Errors.connection());
+        } else if request.responseHttpStatus != 200 {
+            return Possible[SrdRef[BalanceTransaction]].failure(Errors.unexpected());
+        }
+        def balanceObject: Json = request.responseBody.buf;
+        def i: int = 0;
+        def feeDetails: Array[String];
+        def feeDetail: String;
+
+        for i = 0, i < balanceObject.getObject("fee_details").getLength(), i++ {
+            feeDetail = balanceObject.getObject("fee_details").getString(i);
+            feeDetails.add(feeDetail);
+        }
+        balanceTransaction = SrdRef[balanceTransaction](). {
+            alloc()~init(balanceObject.getString("id"),
+                String.parseFloat(balanceObject.getString("amount")),
+                String.parseInt(balanceObject.getString("available_on")),
+                String.parseInt(balanceObject.getString("created")),
+                balanceObject.getString("currency"),
+                balanceObject.getString("description"),
+                String.parseFloat(balanceObject.getString("exchange_rate")),
+                String.parseFloat(balanceObject.getString("fee")),
+                feeDetails,
+                String.parseFloat(balanceObject.getString("net")),
+                balanceObject.getString("reporting_category"),
+                balanceObject.getString("source"),
+                balanceObject.getString("status"),
+                balanceObject.getString("type"),)
+        }
+        return Possible[SrdRef[BalanceTransaction]].success(balanceTransaction);
+    }
+}

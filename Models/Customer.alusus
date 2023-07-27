@@ -2,10 +2,10 @@
     class Customer {
         def id: String;
         def address: SrdRef[Address];
-        def balance: float = 0;
+        def balance: Float = 0;
         def defaultSourceId: String;
-        def delinquent: bool;
-        def created: int;
+        def delinquent: Bool;
+        def created: Int[64];
         def email: String;
         def invoicePrefix: String;
         def preferredLocales: Array[String];
@@ -14,7 +14,7 @@
         def shipping: String;
         def taxExempt: String;
         def testClock: String;
-        def nextInvoiceSequence: int;
+        def nextInvoiceSequence: Int;
         def currency: String = "usd";
         def description: String;
 
@@ -29,11 +29,13 @@
             this.preferredLocales = preferredLocales;
         }
 
-        handler this~init(id: String, address: SrdRef[Address], balance: float, created: int
-            , currency: String, defaultSourceId: String, delinquent: bool
-            , description: String, email: String, invoicePrefix: String, name: String
-            , nextInvoiceSequence: int, phone: String, preferredLocales: Array[String]
-            , shipping: String, taxExempt: String, testClock: String) {
+        handler this~init(
+            id: String, address: SrdRef[Address], balance: Float, created: Int[64],
+            currency: String, defaultSourceId: String, delinquent: Bool,
+            description: String, email: String, invoicePrefix: String, name: String,
+            nextInvoiceSequence: Int, phone: String, preferredLocales: Array[String],
+            shipping: String, taxExempt: String, testClock: String
+        ) {
             this.id = id;
             this.address = address;
             this.balance = balance;
@@ -52,12 +54,5 @@
             this.currency = currency;
             this.description = description;
         }
-
-        handler this.print() {
-            Console.print("\nid : %s\tname : %s\temail : %s "
-                " \n\t\t", this.id.buf
-                , this.name.buf, this.email.buf);
-        }
     }
 }
-

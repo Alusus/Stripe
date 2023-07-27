@@ -1,31 +1,86 @@
-import "Apm";
-Apm.importFile("Alusus/Json");
 import "Srl/Net";
 import "Srl/Array";
+import "Srl/Map";
 import "Srl/String";
 import "Srl/System";
 import "Srl/Fs";
 import "Srl/refs";
 import "Srl/Console";
+import "Srl/Possible";
+
+import "Apm";
+Apm.importFile("Alusus/Json");
 Apm.importFile("Alusus/ExtendedNet");
-import "Models/Source.alusus";
-import "Models/Balance.alusus";
-import "Models/BalanceTransaction.alusus";
-import "Models/Address.alusus";
-import "Models/Customer.alusus";
-import "Models/CheckOut.alusus";
-import "Models/Charge.alusus";
-import "ModelsApi/CustomerApi.alusus";
-import "ModelsApi/BalanceTransactionApi.alusus";
-import "ModelsApi/BalanceApi.alusus";
-import "ModelsApi/CheckOutApi.alusus";
+
+import "Models/Source";
+import "Models/Balance";
+import "Models/BalanceTransaction";
+import "Models/Address";
+import "Models/Customer";
+import "Models/CheckoutSession";
+import "Apis/customer";
+import "Apis/checkout";
+import "Apis/balance_transaction";
+import "Apis/balance";
+import "Errors";
+
 @merge module Stripe {
     use Srl;
-    def stringToInt: @expname[atoi] function (string: ptr[array[Char]]) => Int;
-    def stringToFloat: @expname[atof] function (string: ptr[array[Char]]) => float;
+
+    class Client {
+        def key: String;
+        def verbose: Bool = true;
+
+        handler this~init(k: String) {
+            this.key = k;
+        }
+
+        // Customer APIs
+
+        handler this.getCustomers(): Possible[Array[SrdRef[Customer]]] {
+            return Stripe.getCustomers(this.key, this.verbose);
+        }
+
+        handler this.getCustomer(customerId: String): Possible[SrdRef[Customer]] {
+            return Stripe.getCustomer(this.key, customerId, this.verbose);
+        }
+
+        handler this.createCustomer(parameters: String): Possible[String] {
+            return Stripe.createCustomer(this.key, parameters, this.verbose);
+        }
+
+        // Chekcout APIs
+
+        handler this.getCheckoutSessions(): Possible[Array[SrdRef[CheckoutSession]]] {
+            return Stripe.getCheckoutSessions(this.key, this.verbose);
+        }
+
+        handler this.getCheckoutSession(sessionId: String): Possible[SrdRef[CheckoutSession]] {
+            return Stripe.getCheckoutSession(this.key, sessionId, this.verbose);
+        }
+
+        handler this.createCheckoutSession(parameters: String): Possible[String] {
+            return Stripe.createCheckoutSession(this.key, parameters, this.verbose);
+        }
+
+        handler this.createCheckoutSession(items: Map[String, Int], successUrl: CharsPtr): Possible[String] {
+            return Stripe.createCheckoutSession(this.key, items, successUrl, this.verbose);
+        }
+
+        // Balance APIs
+
+        handler this.getBalance(): Possible[Array[SrdRef[Balance]]] {
+            return Stripe.getBalance(this.key, this.verbose);
+        }
+
+        // Balance Transaction APIs
+
+        handler this.getBalanceTranasactions(): Possible[Array[SrdRef[BalanceTransaction]]] {
+            return Stripe.getBalanceTranasactions(this.key, this.verbose);
+        }
+
+        handler this.getBalanceTranasaction(id: String): Possible[SrdRef[BalanceTransaction]] {
+            return Stripe.getBalanceTranasaction(this.key, id, this.verbose);
+        }
+    }
 }
-
-
-
-
-
