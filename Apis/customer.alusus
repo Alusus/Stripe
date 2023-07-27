@@ -1,12 +1,19 @@
 @merge module Stripe {
-    func getCustomers(key: String, verbose: Bool): Array[SrdRef[Customer]] {
+    func getCustomers(key: String, verbose: Bool): Possible[Array[SrdRef[Customer]]] {
         def customerArray: Array[SrdRef[Customer]];
         def loc: String;
         def prfLoc: Array[String];
         def request: Net.Request(String("https://api.stripe.com/v1/customers"), key, String("Bearer"));
         request.verbose = verbose;
         request.get();
-        def customerObject: Json = request.responseBody.buf;
+        if request.responseHttpStatus == 401 {
+            return Possible[Array[SrdRef[Customer]]].failure(Errors.unauthenticated());
+        } else if request.responseHttpStatus == 0 {
+            return Possible[Array[SrdRef[Customer]]].failure(Errors.connection());
+        } else if request.responseHttpStatus != 200 {
+            return Possible[Array[SrdRef[Customer]]].failure(Errors.unexpected());
+        }
+        def customerObject: Json = request.responseBody;
         def i: int = 0;
         def j: int = 0;
         def customer: SrdRef[Customer];
@@ -59,10 +66,10 @@
             customerArray.add(customer);
             prfLoc.clear();
         }
-        return customerArray;
+        return Possible[Array[SrdRef[Customer]]].success(customerArray);
     }
 
-    func getCustomer(key: String, customerId: String, verbose: Bool): SrdRef[Customer] {
+    func getCustomer(key: String, customerId: String, verbose: Bool): Possible[SrdRef[Customer]] {
         def loc: String;
         def prfLoc: Array[String];
         def request: Net.Request(
@@ -70,7 +77,16 @@
         );
         request.verbose = verbose;
         request.get();
-        def customerObject: Json = request.responseBody.buf;
+        if request.responseHttpStatus == 401 {
+            return Possible[SrdRef[Customer]].failure(Errors.unauthenticated());
+        } else if request.responseHttpStatus == 404 {
+            return Possible[SrdRef[Customer]].failure(Errors.notFound());
+        } else if request.responseHttpStatus == 0 {
+            return Possible[SrdRef[Customer]].failure(Errors.connection());
+        } else if request.responseHttpStatus != 200 {
+            return Possible[SrdRef[Customer]].failure(Errors.unexpected());
+        }
+        def customerObject: Json = request.responseBody;
         def i: int = 0;
         def customer: SrdRef[Customer];
         def address: SrdRef[Address];
@@ -119,10 +135,10 @@
                 customerObject.getString("tax_exempt"),
                 customerObject.getString("test_clock"),)
         }
-        return customer;
+        return Possible[SrdRef[Customer]].success(customer);
     }
 
-    func createCustomer(key: String, parameters: String, verbose: Bool): String {
+    func createCustomer(key: String, parameters: String, verbose: Bool): Possible[String] {
         def b: bool = true;
         def customerId: String;
         def request: Net.Request(
@@ -133,9 +149,17 @@
         );
         request.verbose = verbose;
         request.post(parameters.buf);
-        def customerObject: Json = request.responseBody.buf;
+        if request.responseHttpStatus == 401 {
+            return Possible[String].failure(Errors.unauthenticated());
+        } else if request.responseHttpStatus == 400 {
+            return Possible[String].failure(Errors.invalidParams());
+        } else if request.responseHttpStatus == 0 {
+            return Possible[String].failure(Errors.connection());
+        } else if request.responseHttpStatus != 200 {
+            return Possible[String].failure(Errors.unexpected());
+        }
+        def customerObject: Json = request.responseBody;
         customerId = customerObject.getString("id");
-        return customerId;
+        return Possible[String].success(customerId);
     }
 }
-

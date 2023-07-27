@@ -1,10 +1,17 @@
 @merge module Stripe {
-    func getCheckoutSessions(key: String, verbose: Bool): Array[SrdRef[CheckoutSession]] {
+    func getCheckoutSessions(key: String, verbose: Bool): Possible[Array[SrdRef[CheckoutSession]]] {
         def checkOutArray: Array[SrdRef[CheckoutSession]];
         def request: Net.Request(String("https://api.stripe.com/v1/checkout/sessions"), key, String("Bearer"));
         request.verbose = verbose;
         request.get();
-        def checkoutObject: Json = request.responseBody.buf;
+        if request.responseHttpStatus == 401 {
+            return Possible[Array[SrdRef[CheckoutSession]]].failure(Errors.unauthenticated());
+        } else if request.responseHttpStatus == 0 {
+            return Possible[Array[SrdRef[CheckoutSession]]].failure(Errors.connection());
+        } else if request.responseHttpStatus != 200 {
+            return Possible[Array[SrdRef[CheckoutSession]]].failure(Errors.unexpected());
+        }
+        def checkoutObject: Json = request.responseBody;
         def i: int = 0;
         def j: int = 0;
         def checkout: SrdRef[CheckoutSession];
@@ -38,20 +45,29 @@
             checkOutArray.add(checkout);
         }
 
-        return checkOutArray;
+        return Possible[Array[SrdRef[CheckoutSession]]].success(checkOutArray);
     }
 
-    func getCheckoutSession(key: String, checkoutId: String, verbose: Bool): SrdRef[CheckoutSession] {
+    func getCheckoutSession(key: String, checkoutId: String, verbose: Bool): Possible[SrdRef[CheckoutSession]] {
         def request: Net.Request(String.format("https://api.stripe.com/v1/checkout/sessions/%s", checkoutId.buf), key, String("Bearer"));
         request.verbose = verbose;
         request.get();
-        def checkoutObject: Json = request.responseBody.buf;
+        if request.responseHttpStatus == 401 {
+            return Possible[SrdRef[CheckoutSession]].failure(Errors.unauthenticated());
+        } else if request.responseHttpStatus == 404 {
+            return Possible[SrdRef[CheckoutSession]].failure(Errors.notFound());
+        } else if request.responseHttpStatus == 0 {
+            return Possible[SrdRef[CheckoutSession]].failure(Errors.connection());
+        } else if request.responseHttpStatus != 200 {
+            return Possible[SrdRef[CheckoutSession]].failure(Errors.unexpected());
+        }
+        def checkoutObject: Json = request.responseBody;
         def checkout: SrdRef[CheckoutSession];
         checkout = SrdRef[CheckoutSession]().{
             alloc()~init(checkoutObject.getString("id"),
                 checkoutObject.getString("client_reference_id"),
                 checkoutObject.getString("cancel_url"),
-                checkoutObjec.getString("success_url"),
+                checkoutObject.getString("success_url"),
                 checkoutObject.getString("url"),
                 checkoutObject.getString("currency"),
                 checkoutObject.getString("customer"),
@@ -61,10 +77,10 @@
                 checkoutObject.getString("status"),
                 checkoutObject.getString("amount_total"))
         }
-        return checkout;
+        return Possible[SrdRef[CheckoutSession]].success(checkout);
     }
 
-    func createCheckoutSession(key: String, parameters: String, verbose: Bool): String {
+    func createCheckoutSession(key: String, parameters: String, verbose: Bool): Possible[String] {
         def checkOutSessionId: String;
         def request: Net.Request(
             String("https://api.stripe.com/v1/checkout/sessions"),
@@ -73,9 +89,34 @@
         );
         request.verbose = verbose;
         request.post(parameters.buf);
-        def checkOutSessionObject: Json = request.responseBody.buf;
+        if request.responseHttpStatus == 401 {
+            return Possible[String].failure(Errors.unauthenticated());
+        } else if request.responseHttpStatus == 400 {
+            return Possible[String].failure(Errors.invalidParams());
+        } else if request.responseHttpStatus == 0 {
+            return Possible[String].failure(Errors.connection());
+        } else if request.responseHttpStatus != 200 {
+            return Possible[String].failure(Errors.unexpected());
+        }
+        def checkOutSessionObject: Json = request.responseBody;
         checkOutSessionId = checkOutSessionObject.getString("id");
-        return checkOutSessionId;
+        return Possible[String].success(checkOutSessionId);
+    }
+
+    func createCheckoutSession(
+        key: String, items: Map[String, Int], successUrl: CharsPtr, verbose: Bool
+    ): Possible[String] {
+        if items.getLength() == 0 {
+            return Possible[String].failure(Errors.invalidParams());
+        }
+        def parameters: String = String.format("mode=payment&success_url=%s"، Net.uriEncode(successUrl).buf);
+        def i: Int;
+        for i = 0, i < items.getLength(), ++i {
+            parameters += String.format(
+                "&line_items[%i][price]=%s&line_items[%i][quantity]=%i"،
+                i, Net.uriEncode(items.keyAt(i)).buf, i, items.valAt(i)
+            );
+        }
+        return createCheckoutSession(key, parameters, verbose);
     }
 }
-

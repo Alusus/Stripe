@@ -1,10 +1,17 @@
 @merge module Stripe {
-    func getBalanceTranasactions(key: String, verbose: Bool): Array[SrdRef[BalanceTransaction]] {
+    func getBalanceTranasactions(key: String, verbose: Bool): Possible[Array[SrdRef[BalanceTransaction]]] {
         def balanceTransactionArray: Array[SrdRef[BalanceTransaction]];
         def request: Net.Request(String("https:/api.stripe.com/v1/balance_transactions"), key, String("Bearer"));
         request.verbose = verbose;
         request.get();
-        def balanceObject: Json = request.responseBody.buf;
+        if request.responseHttpStatus == 401 {
+            return Possible[Array[SrdRef[BalanceTransaction]]].failure(Errors.unauthenticated());
+        } else if request.responseHttpStatus == 0 {
+            return Possible[Array[SrdRef[BalanceTransaction]]].failure(Errors.connection());
+        } else if request.responseHttpStatus != 200 {
+            return Possible[Array[SrdRef[BalanceTransaction]]].failure(Errors.unexpected());
+        }
+        def balanceObject: Json = request.responseBody;
         def i: int = 0;
         def j: int = 0;
         def balanceTransaction: SrdRef[BalanceTransaction];
@@ -36,13 +43,26 @@
         }
 
 
-        return balanceTransactionArray;
+        return Possible[Array[SrdRef[BalanceTransaction]]].success(balanceTransactionArray);
     }
 
     func getBalanceTranasaction(key: String, id: String, verbose: Bool): SrdRef[BalanceTransaction] {
-        def request: Net.Request(String("https:/api.stripe.com/v1/balance_transactions"), key, String("Bearer"));
+        def request: Net.Request(
+            String.format("https:/api.stripe.com/v1/balance_transactions%s", id.buf),
+            key,
+            String("Bearer")
+        );
         request.verbose = verbose;
         request.get();
+        if request.responseHttpStatus == 401 {
+            return Possible[SrdRef[BalanceTransaction]].failure(Errors.unauthenticated());
+        } else if request.responseHttpStatus == 404 {
+            return Possible[SrdRef[BalanceTransaction]].failure(Errors.notFound());
+        } else if request.responseHttpStatus == 0 {
+            return Possible[SrdRef[BalanceTransaction]].failure(Errors.connection());
+        } else if request.responseHttpStatus != 200 {
+            return Possible[SrdRef[BalanceTransaction]].failure(Errors.unexpected());
+        }
         def balanceObject: Json = request.responseBody.buf;
         def i: int = 0;
         def feeDetails: Array[String];
@@ -68,7 +88,6 @@
                 balanceObject.getString("status"),
                 balanceObject.getString("type"),)
         }
-        return balanceTransaction;
+        return Possible[SrdRef[BalanceTransaction]].success(balanceTransaction);
     }
 }
-

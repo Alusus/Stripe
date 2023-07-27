@@ -1,0 +1,33 @@
+@merge module Stripe {
+    module Errors {
+        def UNAUTHENTICATED: "stripe_unauthenticated";
+        def UNAUTHENTICATED_MSG: "Authentication error";
+        func unauthenticated(): SrdRef[GenericError] {
+            return GenericError.new(UNAUTHENTICATED, UNAUTHENTICATED_MSG);
+        }
+
+        def CONNECTION: "stripe_connection";
+        def CONNECTION_MSG: "Connection error";
+        func connection(): SrdRef[GenericError] {
+            return GenericError.new(CONNECTION, CONNECTION_MSG);
+        }
+
+        def UNEXPECTED: "stripe_unexpected";
+        def UNEXPECTED_MSG: "Unexpected error";
+        func unexpected(): SrdRef[GenericError] {
+            return GenericError.new(UNEXPECTED, UNEXPECTED_MSG);
+        }
+
+        def NOT_FOUND: "stripe_not_found";
+        def NOT_FOUND_MSG: "Requested item is not found";
+        func notFound(): SrdRef[GenericError] {
+            return GenericError.new(NOT_FOUND, NOT_FOUND_MSG);
+        }
+
+        def INVALID_PARAMS: "stripe_invalid_params";
+        def INVALID_PARAMS_MSG: "Invalid request parameters";
+        func invalidParams(): SrdRef[GenericError] {
+            return GenericError.new(INVALID_PARAMS, INVALID_PARAMS_MSG);
+        }
+    }
+}

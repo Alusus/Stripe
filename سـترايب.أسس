@@ -94,4 +94,12 @@
         عرف هات_عمليات_الرصيد: لقب getBalanceTranasactions؛
         عرف هات_عملية_رصيد: لقب getBalanceTranasaction؛
     }
+
+    عرف أخـطاء: لقب Errors؛
+    @دمج وحدة أخـطاء {
+        عرف _غير_موثق_: لقب UNAUTHENTICATED؛
+        عرف _اتصال_: لقب CONNECTION؛
+        عرف _غير_متوقع_: لقب UNEXPECTED؛
+        عرف _غير_موجود_: لقب NOT_FOUND؛
+    }
 }

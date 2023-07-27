@@ -1,11 +1,18 @@
 @merge module Stripe {
-    func getBalance(key: String, verbose: Bool): Array[SrdRef[Balance]] {
+    func getBalance(key: String, verbose: Bool): Possible[Array[SrdRef[Balance]]] {
         def balanceArray: Array[SrdRef[Balance]];
         def sourceArray: Array[SrdRef[Source]];
         def request: Net.Request(String("https:/api.stripe.com/v1/balance"), key, String("Bearer"));
         request.verbose = verbose;
         request.get();
-        def balanceObject: Json = request.responseBody.buf;
+        if request.responseHttpStatus == 401 {
+            return Possible[Array[SrdRef[Balance]]].failure(Errors.unauthenticated());
+        } else if request.responseHttpStatus == 0 {
+            return Possible[Array[SrdRef[Balance]]].failure(Errors.connection());
+        } else if request.responseHttpStatus != 200 {
+            return Possible[Array[SrdRef[Balance]]].failure(Errors.unexpected());
+        }
+        def balanceObject: Json = request.responseBody;
         def i: int = 0;
         def j: int = 0;
         def source: SrdRef[Source];
@@ -55,7 +62,7 @@
             balanceArray.add(balance);
             sourceArray.clear();
         }
-        return balanceArray;
+        return Possible[Array[SrdRef[Balance]]].success(balanceArray);
     }
 }
 

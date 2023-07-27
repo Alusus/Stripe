@@ -238,7 +238,7 @@ It has the following methods:
 #### getCustomers
 
 ```
-handler this.getCustomers(): Array[SrdRef[Customer]]
+handler this.getCustomers(): Possible[Array[SrdRef[Customer]]]
 ```
 
 Returns all customers.
@@ -246,7 +246,7 @@ Returns all customers.
 #### getCustomer
 
 ```
-handler this.getCustomer(id: String): SrdRef[Customer]
+handler this.getCustomer(id: String): Possible[SrdRef[Customer]]
 ```
 
 Returns a specific customer by its ID.
@@ -254,7 +254,7 @@ Returns a specific customer by its ID.
 #### createCustomer
 
 ```
-handler this.createCustomer(parameters: String): String
+handler this.createCustomer(parameters: String): Possible[String]
 ```
 
 Creates a customer entry.
@@ -266,7 +266,7 @@ Returns the customer's id.
 #### getBalance
 
 ```
-handler this.getBalance(): Array[SrdRef[Balance]]
+handler this.getBalance(): Possible[Array[SrdRef[Balance]]]
 ```
 
 Returns the balance of all the accounts owned by the API key.
@@ -274,7 +274,7 @@ Returns the balance of all the accounts owned by the API key.
 #### getBalanceTranasactions
 
 ```
-handler this.getBalanceTranasactions(): Array[SrdRef[BalanceTranasaction]]
+handler this.getBalanceTranasactions(): Possible[Array[SrdRef[BalanceTranasaction]]]
 ```
 
 Returns a list of transactions that have contributed to the Stripe account balance (e.g., charges,
@@ -283,7 +283,7 @@ transfers, and so forth).
 #### getBalanceTranasaction
 
 ```
-handler this.getBalanceTranasaction(id: String): SrdRef[BalanceTranasaction]
+handler this.getBalanceTranasaction(id: String): Possible[SrdRef[BalanceTranasaction]]
 ```
 
 Retrieves the balance transaction with the given ID.
@@ -291,7 +291,7 @@ Retrieves the balance transaction with the given ID.
 #### getCheckoutSessions
 
 ```
-handler this.getCheckoutSessions(): Array[SrdRef[CheckoutSession]] 
+handler this.getCheckoutSessions(): Possible[Array[SrdRef[CheckoutSession]]] 
 ```
 
 Returns a list of Checkout Sessions.
@@ -299,7 +299,7 @@ Returns a list of Checkout Sessions.
 #### getCheckoutSession
 
 ```
-handler this.getCheckoutSession(sessionId: String): SrdRef[CheckoutSession]
+handler this.getCheckoutSession(sessionId: String): Possible[SrdRef[CheckoutSession]]
 ```
 
 Gets a specific checkout session by its ID.
@@ -307,7 +307,7 @@ Gets a specific checkout session by its ID.
 #### createCheckoutSession
 
 ```
-handler this.createCheckoutSession(parameters: String): String
+handler this.createCheckoutSession(parameters: String): Possible[String]
 ```
 
 Creates a checkout session.
@@ -315,4 +315,28 @@ Creates a checkout session.
 `parameters` The parametes of the checkout session in the form: "customer=customerID&line_items=planID".
 
 Returns CheckoutSession id.
+
+```
+handler this.createCheckoutSession(
+    items: Map[String, Int],
+    successUrl: CharsPtr
+): Possible[String]
+```
+
+This version of `createCheckoutSession` receives detailed parameters instead of the raw `parameters` string
+in the previous version.
+
+`items`: A map whose key is the price ID from Stripe, and whose value is the quantity wanted for that price ID.
+`successUrl`: The URL to redirect the user to after successful payment.
+
+Returns CheckoutSession id.
+
+### Errors
+
+The `Errors` submodule contains error codes for all errors that can be returned by this library.
+
+* `Errors.UNAUTHENTICATED`: Returned when calling Stripe with an invalid key.
+* `Errors.CONNECTION`: Returned when connection fails.
+* `Errors.UNEXPECTED`: Returned when receiving unexpected response from Stripe.
+* `Errors.NOT_FOUND`: Returned when the requested record is not found.
 

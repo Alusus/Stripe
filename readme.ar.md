@@ -441,13 +441,13 @@ handler this~init(key: String);
 #### هات_الزبائن (getCustomers)
 
 ```
-عملية هذا.هات_الزبائن(): مـصفوفة[سـندنا[زبـون]]
+عملية هذا.هات_الزبائن(): لـا_مضمون[مـصفوفة[سـندنا[زبـون]]]
 ```
 
 <div dir=ltr>
 
 ```
-handler this.getCustomers(): Array[SrdRef[Customer]]
+handler this.getCustomers(): Possible[Array[SrdRef[Customer]]]
 ```
 
 </div>
@@ -457,13 +457,13 @@ handler this.getCustomers(): Array[SrdRef[Customer]]
 #### هات_زبونا (getCustomer)
 
 ```
-عملية هذا.هات_زبونا(معرف: نـص): سـندنا[زبـون]
+عملية هذا.هات_زبونا(معرف: نـص): لـا_مضمون[سـندنا[زبـون]]
 ```
 
 <div dir=ltr>
 
 ```
-handler this.getCustomer(id: String): SrdRef[Customer]
+handler this.getCustomer(id: String): Possible[SrdRef[Customer]]
 ```
 
 </div>
@@ -473,13 +473,13 @@ handler this.getCustomer(id: String): SrdRef[Customer]
 #### أنش_زبونا (createCustomer)
 
 ```
-عملية هذا.أنشئ_زبونا(معطيات: نـص): نـص
+عملية هذا.أنشئ_زبونا(معطيات: نـص): لـا_مضمون[نـص]
 ```
 
 <div dir=ltr>
 
 ```
-handler this.createCustomer(parameters: String): String
+handler this.createCustomer(parameters: String): Possible[String]
 ```
 
 </div>
@@ -493,13 +493,13 @@ handler this.createCustomer(parameters: String): String
 #### هات_الرصيد (getBalance)
 
 ```
-عملية هذا.هات_الرصيد(): مـصفوفة[سـندنا[رصـيد]]
+عملية هذا.هات_الرصيد(): لـا_مضمون[مـصفوفة[سـندنا[رصـيد]]]
 ```
 
 <div dir=ltr>
 
 ```
-handler this.getBalance(): Array[SrdRef[Balance]]
+handler this.getBalance(): Possible[Array[SrdRef[Balance]]]
 ```
 
 </div>
@@ -509,13 +509,13 @@ handler this.getBalance(): Array[SrdRef[Balance]]
 #### هات_عمليات_الرصيد (getBalanceTranasactions)
 
 ```
-عملية هذا.هات_عمليات_الرصيد(): مـصفوفة[سـندنا[عـملية_رصيد]]
+عملية هذا.هات_عمليات_الرصيد(): لـا_مضمون[مـصفوفة[سـندنا[عـملية_رصيد]]]
 ```
 
 <div dir=ltr>
 
 ```
-handler this.getBalanceTranasactions(): Array[SrdRef[BalanceTranasaction]]
+handler this.getBalanceTranasactions(): Possible[Array[SrdRef[BalanceTranasaction]]]
 ```
 
 </div>
@@ -525,13 +525,13 @@ handler this.getBalanceTranasactions(): Array[SrdRef[BalanceTranasaction]]
 #### هات_عملية_رصيد (getBalanceTranasaction)
 
 ```
-عملية هذا.هات_عملية_رصيد(معرف: نـص): سـندنا[عـملية_رصيد]
+عملية هذا.هات_عملية_رصيد(معرف: نـص): لـا_مضمون[سـندنا[عـملية_رصيد]]
 ```
 
 <div dir=ltr>
 
 ```
-handler this.getBalanceTranasaction(id: String): SrdRef[BalanceTranasaction]
+handler this.getBalanceTranasaction(id: String): Possible[SrdRef[BalanceTranasaction]]
 ```
 
 </div>
@@ -541,13 +541,13 @@ handler this.getBalanceTranasaction(id: String): SrdRef[BalanceTranasaction]
 #### هات_جلسات_إتمام_الشراء (getCheckoutSessions)
 
 ```
-عملية هذا.هات_جلسات_إتمام_الشراء(): مـصفوفة[سـندنا[جـلسة_شراء]]
+عملية هذا.هات_جلسات_إتمام_الشراء(): لـا_مضمون[مـصفوفة[سـندنا[جـلسة_شراء]]]
 ```
 
 <div dir=ltr>
 
 ```
-handler this.getCheckoutSessions(): Array[SrdRef[CheckoutSession]] 
+handler this.getCheckoutSessions(): Possible[Array[SrdRef[CheckoutSession]]]
 ```
 
 </div>
@@ -557,13 +557,13 @@ handler this.getCheckoutSessions(): Array[SrdRef[CheckoutSession]]
 #### هات_جلسة_إتمام_الشراء (getCheckoutSession)
 
 ```
-عملية هذا.هات_جلسة_إتمام_الشراء(معرف_الجلسة: نـص): سـندنا[جـلسة_شراء]
+عملية هذا.هات_جلسة_إتمام_الشراء(معرف_الجلسة: نـص): لـا_مضمون[سـندنا[جـلسة_شراء]]
 ```
 
 <div dir=ltr>
 
 ```
-handler this.getCheckoutSession(sessionId: String): SrdRef[CheckoutSession]
+handler this.getCheckoutSession(sessionId: String): Possible[SrdRef[CheckoutSession]]
 ```
 
 </div>
@@ -573,13 +573,13 @@ handler this.getCheckoutSession(sessionId: String): SrdRef[CheckoutSession]
 #### أنشئ_جلسة_إتمام_شراء (createCheckoutSession)
 
 ```
-عملية هذا.أنشئ_جلسة_إتمام_شراء(معطيات: نـص): نـص
+عملية هذا.أنشئ_جلسة_إتمام_شراء(معطيات: نـص): لـا_مضمون[نـص]
 ```
 
 <div dir=ltr>
 
 ```
-handler this.createCheckoutSession(parameters: String): String
+handler this.createCheckoutSession(parameters: String): Possible[String]
 ```
 
 </div>
@@ -589,6 +589,42 @@ handler this.createCheckoutSession(parameters: String): String
 `معطيات` (`parameters`) معطيات الجلسة المطلوبة بالصيغة التالية: "customer=customerID&line_items=planID".
 
 تُرجع معرف الجلسة المُنشأة.
+
+```
+عملية هذا.أنشئ_جلسة_إتمام_شراء(
+    العناصر: تـطبيق[نـص، صـحيح]،
+    رابط_النجاح: مـؤشر_محارف
+): لـا_مضمون[نـص]
+```
+
+<div dir=ltr>
+
+```
+handler this.createCheckoutSession(
+    items: Map[String, Int],
+    successUrl: CharsPtr
+): Possible[String]
+```
+
+</div>
+
+هذه النسخة من دالة `أنشئ_جلسة_إتمام_شراء` تستلم متعطيات مفصلة بدل معطى خام كما في النسخة السابقة.
+
+`العناصر` (`items`): تطبيق يمثل مفتاحه معرف السعر من سترايب (price ID) بينما تمثل قيمته عدد العناصر
+المطلوبة.
+
+`رابط_النجاح` (`successUrl`): الرابط الذي سيُحول إليه المستخدم بعد نجاح عملية الشراء.
+
+تُرجع معرف الجلسة المُنشأة.
+
+### أخـطاء (Errors)
+
+الوحدة الفرعية `أخـطاء` تحتوي تعريفات لرموز الأخطاء التي يمكن لمكتبة سـترايب إرجاعها.
+
+* `أخـطاء._غير_موثق_` (`Errors.UNAUTHENTICATED`): تُرجع عند استدعاء سترايب بمفتاح خاطئ.
+* `أخـطاء._اتصال_` (`Errors.CONNECTION`): تُرجع عند فشل الاتصال بخوادم سترايب.
+* `أخـطاء._غير_متوقع_` (`Errors.UNEXPECTED`): تُرجع عند استلام رد غير متوقع من سترايب.
+* `أخـطاء._غير_موجود_` (`Errors.NOT_FOUND`): تُرجع عند الفشل في العثور على القيد ذي المعرف المعطى.
 
 </div>
 
