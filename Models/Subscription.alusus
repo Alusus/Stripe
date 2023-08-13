@@ -1,0 +1,55 @@
+@merge module Stripe {
+    class Subscription {
+        def id: String;
+        def application: String;
+        def automaticTax: bool;
+        def billingCycleAnchor : int;
+        def created : int;
+        def collectionMethod : String;
+        def startDate : int;
+        def cancelAtPeriodEnd : bool;
+        def currentPeriodEnd : int;
+        def currentPeriodStart : int;
+        def description : String;
+        def status : String;
+
+        def trial_end : int;
+
+
+        def currency: String = "usd";
+        def customerId: String;
+
+        def collection_method : String;
+
+
+
+
+        handler this~init() {
+        }
+
+        handler this~init(
+            id: String,  automaticTax: bool, billingCycleAnchor: int, created: int,
+            collectionMethod: String, startDate: int, cancelAtPeriodEnd: bool,
+            currentPeriodEnd: int, currentPeriodStart: int, description: String, status: String,
+            trialEnd : int ,customerId:String,currency: String
+        ) {
+            this.id = id;
+
+            this.automaticTax = automaticTax;
+            this.billingCycleAnchor = billingCycleAnchor;
+            this.created = created;
+            this.collectionMethod = collectionMethod;
+            this.startDate = startDate;
+            this.cancelAtPeriodEnd = cancelAtPeriodEnd;
+            this.currentPeriodEnd = currentPeriodEnd;
+            this.currentPeriodStart = currentPeriodStart;
+            this.description = description;
+            this.status = status;
+            this.trialEnd = trialEnd;
+            this.customerId = customerId;
+            this.currency = currency;
+
+        }
+    }
+}
+

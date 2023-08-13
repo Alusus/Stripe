@@ -1,0 +1,32 @@
+@merge module Stripe {
+    class BillingPortalSession {
+        def id: String;
+        def configuration: String;
+        def locale: String;
+        def returnUrl : String;
+        def url : String;
+        def onBehalfOf : String;
+        def created : int;
+        def customerId: String;
+
+        handler this~init() {
+        }
+
+        handler this~init(
+            id: String,  configuration: String, locale: String, created: int,
+            returnUrl: String, url: String, onBehalfOf: String,customerId:String
+        ) {
+            this.id = id;
+            this.configuration = configuration;
+            this.locale = locale;
+            this.created = created;
+            this.returnUrl = returnUrl;
+            this.url = url;
+            this.onBehalfOf = onBehalfOf;
+            this.customerId = customerId;
+
+
+        }
+    }
+}
+
