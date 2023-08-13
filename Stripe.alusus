@@ -82,5 +82,36 @@ import "Errors";
         handler this.getBalanceTranasaction(id: String): Possible[SrdRef[BalanceTransaction]] {
             return Stripe.getBalanceTranasaction(this.key, id, this.verbose);
         }
+
+        // billingPortalSession APIs
+
+
+
+        handler this.createBillingPortalSession(parameters: String): Possible[String] {
+            return Stripe.createBillingPortalSession(this.key, parameters, this.verbose);
+        }
+
+        handler this.createBillingPortalSession(customerId:String, returnUrl: CharsPtr): Possible[String] {
+            return Stripe.createBillingPortalSession(this.key,customerId , returnUrl, this.verbose);
+        }
+
+        // Subscription APIs
+
+        handler this.getSubscriptions(): Possible[Array[SrdRef[Subscription]]] {
+            return Stripe.getSubscriptions(this.key, this.verbose);
+        }
+
+        handler this.getSubscription(subscriptionId: String): Possible[SrdRef[Subscription]] {
+            return Stripe.getSubscription(this.key, sessionId, this.verbose);
+        }
+
+
+        handler this.createSubscription(parameters: String): Possible[String] {
+            return Stripe.createBillingPortalSession(this.key, parameters, this.verbose);
+        }
+
+        handler this.createSubscription(items: Map[String, Int],customerId:String): Possible[String] {
+            return Stripe.createBillingPortalSession(this.key, items,customerId , this.verbose);
+        }
     }
 }
