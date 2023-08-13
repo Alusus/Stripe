@@ -1,0 +1,172 @@
+@merge module Stripe {
+    func getSubscriptions(key: String, verbose: Bool): Possible[Array[SrdRef[Subscription]]] {
+        def subscriptionArray: Array[SrdRef[Subscription]];
+        def request: Net.Request(String("https://api.stripe.com/v1/subscriptions"), key, String("Bearer"));
+        request.verbose = verbose;
+        request.get();
+        if request.responseHttpStatus == 401 {
+            return Possible[Array[SrdRef[Subscription]]].failure(Errors.unauthenticated());
+        } else if request.responseHttpStatus == 0 {
+            return Possible[Array[SrdRef[Subscription]]].failure(Errors.connection());
+        } else if request.responseHttpStatus != 200 {
+            return Possible[Array[SrdRef[Subscription]]].failure(Errors.unexpected());
+        }
+        def subscriptionObject: Json = request.responseBody;
+        def i: int = 0;
+        def j: int = 0;
+        def subscription: SrdRef[Subscription];
+
+
+
+
+        def automaticTax:bool=false;
+        def cancelAtPeriodEnd:bool=false;
+        for i = 0, i < subscriptionObject.getObject("data").getLength(), i += 1 {
+            if(subscriptionObject.getObject("data")
+                    .getObject(i).getObject("automatic_tax").getString("enabled")==String("true"))
+                    automaticTax=true;
+            if(subscriptionObject.getObject("data")
+                    .getObject(i).getString("cancel_at_period_end")==String("true"))
+                    cancelAtPeriodEnd=true;
+
+            subscription = SrdRef[Subscription]().{
+
+                alloc()~init(subscriptionObject.getObject("data")
+                    .getObject(i).getString("id"),
+                    automaticTax,
+                    String.parseInt(subscriptionObject.getObject("data")
+                    .getObject(i).getString("billing_cycle_anchor")),
+                    String.parseInt(subscriptionObject.getObject("data")
+                    .getObject(i).getString("created")),
+                    subscriptionObject.getObject("data")
+                    .getObject(i).getString("collection_method"),
+                    String.parseInt(subscriptionObject.getObject("data")
+                    .getObject(i).getString("start_date")),
+                    cancelAtPeriodEnd,
+                     String.parseInt(subscriptionObject.getObject("data")
+                    .getObject(i).getString("current_period_end")),
+                    String.parseInt(subscriptionObject.getObject("data")
+                    .getObject(i).getString("current_period_start")),
+                    subscriptionObject.getObject("data")
+                    .getObject(i).getString("description"),
+                    subscriptionObject.getObject("data")
+                    .getObject(i).getString("status"),
+                    String.parseInt(subscriptionObject.getObject("data")
+                    .getObject(i).getString("trial_end")),
+                    subscriptionObject.getObject("data")
+                    .getObject(i).getString("customer"),
+                    subscriptionObject.getObject("data")
+                    .getObject(i).getString("currency"))
+            }
+            subscriptionArray.add(subscription);
+        }
+
+        return Possible[Array[SrdRef[Subscription]]].success(subscriptionArray);
+    }
+
+    func getSubscription(key: String, checkoutId: String, verbose: Bool): Possible[SrdRef[Subscription]] {
+        def request: Net.Request(String.format("https://api.stripe.com/v1/subscriptions/%s", checkoutId.buf), key, String("Bearer"));
+        request.verbose = verbose;
+        request.get();
+        if request.responseHttpStatus == 401 {
+            return Possible[SrdRef[Subscription]].failure(Errors.unauthenticated());
+        } else if request.responseHttpStatus == 404 {
+            return Possible[SrdRef[Subscription]].failure(Errors.notFound());
+        } else if request.responseHttpStatus == 0 {
+            return Possible[SrdRef[Subscription]].failure(Errors.connection());
+        } else if request.responseHttpStatus != 200 {
+            return Possible[SrdRef[Subscription]].failure(Errors.unexpected());
+        }
+        def subscriptionObject: Json = request.responseBody;
+        def i: int = 0;
+        def j: int = 0;
+        def subscription: SrdRef[Subscription];
+
+
+
+
+        def automaticTax:bool=false;
+        def cancelAtPeriodEnd:bool=false;
+
+            if(subscriptionObject.getObject("data")
+                    .getObject("automatic_tax").getString("enabled")==String("true"))
+                    automaticTax=true;
+            if(subscriptionObject.getObject("data")
+                    .getString("cancel_at_period_end")==String("true"))
+                    cancelAtPeriodEnd=true;
+
+            subscription = SrdRef[Subscription]().{
+
+                alloc()~init(subscriptionObject.getObject("data")
+                    .getString("id"),
+                    automaticTax,
+                    String.parseInt(subscriptionObject.getObject("data")
+                    .getString("billing_cycle_anchor")),
+                    String.parseInt(subscriptionObject.getObject("data")
+                    .getString("created")),
+                    subscriptionObject.getObject("data")
+                    .getString("collection_method"),
+                    String.parseInt(subscriptionObject.getObject("data")
+                    .getString("start_date")),
+                    cancelAtPeriodEnd,
+                     String.parseInt(subscriptionObject.getObject("data")
+                    .getString("current_period_end")),
+                    String.parseInt(subscriptionObject.getObject("data")
+                    .getString("current_period_start")),
+                    subscriptionObject.getObject("data")
+                    .getString("description"),
+                    subscriptionObject.getObject("data")
+                    .getString("status"),
+                    String.parseInt(subscriptionObject.getObject("data")
+                    .getString("trial_end")),
+                    subscriptionObject.getObject("data")
+                    .getString("customer"),
+                    subscriptionObject.getObject("data")
+                    .getString("currency"))
+            }
+
+
+
+        return Possible[SrdRef[Subscription]].success(subscription);
+    }
+
+    func createSubscription(key: String, parameters: String, verbose: Bool): Possible[String] {
+        def subscriptionId: String;
+        def request: Net.Request(
+            String("https://api.stripe.com/v1/subscriptions"),
+            key, String("Bearer"),
+            String("application/x-www-form-urlencoded")
+        );
+        request.verbose = verbose;
+        request.post(parameters.buf);
+        if request.responseHttpStatus == 401 {
+            return Possible[String].failure(Errors.unauthenticated());
+        } else if request.responseHttpStatus == 400 {
+            return Possible[String].failure(Errors.invalidParams());
+        } else if request.responseHttpStatus == 0 {
+            return Possible[String].failure(Errors.connection());
+        } else if request.responseHttpStatus != 200 {
+            return Possible[String].failure(Errors.unexpected());
+        }
+        def subscriptionObject: Json = request.responseBody;
+        subscriptionId = subscriptionObject.getString("id");
+        return Possible[String].success(subscriptionId);
+    }
+
+    func createSubscription(
+        key: String, items: Map[String, Int],customerId:String, verbose: Bool
+    ): Possible[String] {
+        if items.getLength() == 0 {
+            return Possible[String].failure(Errors.invalidParams());
+        }
+        def parameters: String = String.format("customer=%s",customerId.buf);
+        def i: Int;
+        for i = 0, i < items.getLength(), ++i {
+            parameters += String.format(
+                "&line_items[%i][price]=%s&line_items[%i][quantity]=%i"،
+                i, Net.uriEncode(items.keyAt(i)).buf, i, items.valAt(i)
+            );
+        }
+        return createSubscription(key, parameters, verbose);
+    }
+}
