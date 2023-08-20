@@ -63,8 +63,8 @@ import "Errors";
             return Stripe.createCheckoutSession(this.key, parameters, this.verbose);
         }
 
-        handler this.createCheckoutSession(items: Map[String, Int], successUrl: CharsPtr): Possible[String] {
-            return Stripe.createCheckoutSession(this.key, items, successUrl, this.verbose);
+        handler this.createCheckoutSession(items: Map[String, Int], successUrl: CharsPtr,customerId : String): Possible[String] {
+            return Stripe.createCheckoutSession(this.key, items, customerId,successUrl, this.verbose);
         }
 
         // Balance APIs

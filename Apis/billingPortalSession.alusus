@@ -1,9 +1,4 @@
 @merge module Stripe {
-
-
-
-
-
     func createBillingPortalSession(key: String, parameters: String, verbose: Bool): Possible[String] {
         def subscriptionId: String;
         def request: Net.Request(

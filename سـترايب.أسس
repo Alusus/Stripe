@@ -37,6 +37,17 @@
         عرف الحالة: لقب status؛
         عرف نوع_المصدر: لقب sourceType؛
     }
+    عرف جـلسة_بوابة_فاتورة: لقب BillingPortalSession؛
+    @دمج صنف جـلسة_بوابة_فاتورة {
+        عرف المعرف: لقب id؛
+        عرف الاعدادات: لقب configuration؛
+        عرف الموقع: لقب locale؛
+        عرف زمن_الإنشاء: لقب created؛
+        عرف الرابط: لقب url؛
+        عرف رابط_العودة: لقب returnUrl؛
+        عرف معرف_الزبون: لقب customerId؛
+        عرف بالنيابة_عن: لقب onBehalfOf؛
+    }
 
     عرف جـلسة_شراء: لقب CheckoutSession؛
     @دمج صنف جـلسة_شراء {
@@ -81,6 +92,25 @@
         عرف النوع: لقب sourceType؛
     }
 
+    عرف اشـتراك: لقب Subscription؛
+    @دمج صنف اشـتراك {
+        عرف المعرف: لقب id؛
+        عرف الطلب: لقب application؛
+        عرف ضريبة_تلقائية: لقب automaticTax؛
+        عرف زمن_بدء_دورة_الفاتورة: لقب billingCycleAnchor؛
+        عرف زمن_الإنشاء: لقب created؛
+        عرف زمن_البدء: لقب startDate؛
+        عرف الألغاء_عند_انتهاء_الاشتراك: لقب cancelAtPeriodEnd؛
+        عرف زمن_انتهاء_الفترة_الحالية: لقب currentPeriodEnd؛
+        عرف زمن_بدء_الفترة_الحالية: لقب currentPeriodStart؛
+        عرف الوصف: لقب description؛
+        عرف الحالة: لقب status؛
+        عرف زمن_انتهاء_الفترة_التجريبية: لقب trial_end؛
+        عرف العملة: لقب currency؛
+        عرف معرف_الزبون: لقب customerId؛
+        عرف طريقة_الجمع: لقب collection_method؛
+    }
+
     عرف وكـيل: لقب Client؛
     @دمج صنف وكـيل {
         عرف إطناب: لقب verbose؛
@@ -93,6 +123,10 @@
         عرف هات_الرصيد: لقب getBalance؛
         عرف هات_عمليات_الرصيد: لقب getBalanceTranasactions؛
         عرف هات_عملية_رصيد: لقب getBalanceTranasaction؛
+        عرف أنشئ_جلسة_بوابة_فاتورة: لقب createBillingPortalSession؛
+        عرف هات_اشتراكات: لقب getSubscriptions؛
+        عرف هات_اشتراك: لقب getSubscription؛
+        عرف أنشئ_اشتراك: لقب createSubscription؛
     }
 
     عرف أخـطاء: لقب Errors؛

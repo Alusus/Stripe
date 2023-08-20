@@ -12,13 +12,9 @@
         def currentPeriodStart : int;
         def description : String;
         def status : String;
-
         def trial_end : int;
-
-
         def currency: String = "usd";
         def customerId: String;
-
         def collection_method : String;
 
 

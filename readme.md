@@ -170,6 +170,39 @@ class BalanceTransaction {
 
 `exchangeRate` The exchange rate of the transaction.
 
+### BillingPortalSession
+
+This class holds the properties of a BillingPortalSession object from Stripe API.
+
+```
+class BillingPortalSession {
+    def id: String;
+    def configuration: String;
+    def locale: String;
+    def returnUrl : String;
+    def url : String;
+    def onBehalfOf : String;
+    def created : int;
+    def customerId: String;
+
+
+    handler this~init();
+
+    handler this~init(
+        id: String,  configuration: String, locale: String, created: int,
+            returnUrl: String, url: String, onBehalfOf: String,customerId:String
+    );
+}
+```
+
+`id` The ID of the BillingPortalSession object from Stripe.
+
+`configuration` The saved configuration for  of the Billing Portal.
+
+`url` The BillingPortalSession url.
+
+`returnUrl` The url to redirect to if the BillingPortalSession is over.
+
 ### CheckoutSession
 
 This class holds the properties of a checkout object from Stripe API.
@@ -224,6 +257,53 @@ class Source {
     handler this~init(amount: Float, sourceType: String);
 }
 ```
+
+### Subscription
+
+This class holds the properties of a Subscription object from Stripe API.
+
+```
+class Subscription {
+    def id: String;
+    def application: String;
+    def automaticTax: bool;
+    def billingCycleAnchor : int;
+    def created : int;
+    def collectionMethod : String;
+    def startDate : int;
+    def cancelAtPeriodEnd : bool;
+    def currentPeriodEnd : int;
+    def currentPeriodStart : int;
+    def description : String;
+    def status : String;
+    def trial_end : int;
+    def currency: String = "usd";
+    def customerId: String;
+    def collection_method : String;
+
+
+    handler this~init();
+
+    handler this~init(
+        id: String,  automaticTax: bool, billingCycleAnchor: int, created: int,
+        collectionMethod: String, startDate: int, cancelAtPeriodEnd: bool,
+        currentPeriodEnd: int, currentPeriodStart: int, description: String, status: String,
+        trialEnd : int ,customerId:String,currency: String
+    );
+}
+```
+
+`id` The id of the Subscription object from Stripe.
+
+`created` The timestamp  of the creation date.
+
+`startDate` The timestamp  of the subscription start date.
+
+`cancelAtPeriodEnd` end the subscription when the current invice end. 
+
+`status` The status of the subscription.
+
+'trialEnd' The timestamp  of the subscription trail period end.
 
 ### Client
 
@@ -319,7 +399,8 @@ Returns CheckoutSession id.
 ```
 handler this.createCheckoutSession(
     items: Map[String, Int],
-    successUrl: CharsPtr
+    successUrl: CharsPtr,
+    customerId: String
 ): Possible[String]
 ```
 
@@ -328,8 +409,81 @@ in the previous version.
 
 `items`: A map whose key is the price ID from Stripe, and whose value is the quantity wanted for that price ID.
 `successUrl`: The URL to redirect the user to after successful payment.
+`customerId`: The id of the customer.
 
 Returns CheckoutSession id.
+
+#### getSubscriptions
+
+```
+handler this.getSubscriptions(): Possible[Array[SrdRef[Subscription]]] 
+```
+
+Returns a list of Subscriptions.
+
+#### getSubscription
+
+```
+handler this.getSubscription(subscriptionId: String): Possible[SrdRef[Subscription]]
+```
+
+Gets a specific Subscription by its ID.
+
+#### createSubscription
+
+```
+handler this.createSubscription(parameters: String): Possible[String]
+```
+
+Creates a subscription.
+
+`parameters` The parametes of the subscription in the form: "customer=customerID&line_items=planID".
+
+Returns Subscription id.
+
+```
+handler this.createSubscription(
+    items: Map[String, Int],
+    customerId: String
+): Possible[String]
+```
+
+This version of `createSubscription` receives detailed parameters instead of the raw `parameters` string
+in the previous version.
+
+`items`: A map whose key is the price ID from Stripe, and whose value is the quantity wanted for that price ID.
+`customerId`: The id of the customer.
+
+Returns subscription id.
+
+###test#####
+
+#### createBillingPortalSession
+
+```
+handler this.createBillingPortalSession(parameters: String): Possible[String]
+```
+
+Creates a subscription.
+
+`parameters` The parametes of the billing portal session in the form: "customer=customerID&return_url=returnUrl".
+
+Returns customer account  url.
+
+```
+handler this.createBillingPortalSession(
+    customerId:String, 
+    returnUrl: CharsPtr
+): Possible[String]
+```
+
+This version of `createBillingPortalSession` receives detailed parameters instead of the raw `parameters` string
+in the previous version.
+
+`customerId`: The id of the customer.
+`returnUrl`:  The URL to redirect the user to after close the portal session .
+
+Returns customer account  url.
 
 ### Errors
 
