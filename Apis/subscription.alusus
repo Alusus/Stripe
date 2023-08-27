@@ -1,4 +1,27 @@
 @merge module Stripe {
+    func getSubscriptionObject(subscriptionObject : Json): SrdRef[Subscription]{
+        if(subscriptionObject.getObject("automatic_tax").getString("enabled")==String("true"))
+                automaticTax=true;
+        if(subscriptionObject.getString("cancel_at_period_end")==String("true"))
+                cancelAtPeriodEnd=true;
+        def subscription : SrdRef[Subscription]=SrdRef[Subscription]().{
+            alloc()~init(subscriptionObject.getString("id"),
+                automaticTax,
+                String.parseInt(subscriptionObject.getString("billing_cycle_anchor")),
+                String.parseInt(subscriptionObject.getString("created")),
+                subscriptionObject.getString("collection_method"),
+                String.parseInt(subscriptionObject.getString("start_date")),
+                cancelAtPeriodEnd,
+                 String.parseInt(subscriptionObject.getString("current_period_end")),
+                String.parseInt(subscriptionObject.getString("current_period_start")),
+                subscriptionObject.getString("description"),
+                subscriptionObject.getString("status"),
+                String.parseInt(subscriptionObject.getString("trial_end")),
+                subscriptionObject.getString("customer"),
+                subscriptionObject.getString("currency"))
+        }
+        return subscription;
+    }
     func getSubscriptions(key: String, verbose: Bool): Possible[Array[SrdRef[Subscription]]] {
         def subscriptionArray: Array[SrdRef[Subscription]];
         def request: Net.Request(String("https://api.stripe.com/v1/subscriptions"), key, String("Bearer"));
@@ -15,49 +38,10 @@
         def i: int = 0;
         def j: int = 0;
         def subscription: SrdRef[Subscription];
-
-
-
-
         def automaticTax:bool=false;
         def cancelAtPeriodEnd:bool=false;
         for i = 0, i < subscriptionObject.getObject("data").getLength(), i += 1 {
-            if(subscriptionObject.getObject("data")
-                    .getObject(i).getObject("automatic_tax").getString("enabled")==String("true"))
-                    automaticTax=true;
-            if(subscriptionObject.getObject("data")
-                    .getObject(i).getString("cancel_at_period_end")==String("true"))
-                    cancelAtPeriodEnd=true;
-
-            subscription = SrdRef[Subscription]().{
-
-                alloc()~init(subscriptionObject.getObject("data")
-                    .getObject(i).getString("id"),
-                    automaticTax,
-                    String.parseInt(subscriptionObject.getObject("data")
-                    .getObject(i).getString("billing_cycle_anchor")),
-                    String.parseInt(subscriptionObject.getObject("data")
-                    .getObject(i).getString("created")),
-                    subscriptionObject.getObject("data")
-                    .getObject(i).getString("collection_method"),
-                    String.parseInt(subscriptionObject.getObject("data")
-                    .getObject(i).getString("start_date")),
-                    cancelAtPeriodEnd,
-                     String.parseInt(subscriptionObject.getObject("data")
-                    .getObject(i).getString("current_period_end")),
-                    String.parseInt(subscriptionObject.getObject("data")
-                    .getObject(i).getString("current_period_start")),
-                    subscriptionObject.getObject("data")
-                    .getObject(i).getString("description"),
-                    subscriptionObject.getObject("data")
-                    .getObject(i).getString("status"),
-                    String.parseInt(subscriptionObject.getObject("data")
-                    .getObject(i).getString("trial_end")),
-                    subscriptionObject.getObject("data")
-                    .getObject(i).getString("customer"),
-                    subscriptionObject.getObject("data")
-                    .getObject(i).getString("currency"))
-            }
+            subscription =getSubscriptionObject(subscriptionObject.getObject("data").getObject(i));
             subscriptionArray.add(subscription);
         }
 
@@ -81,52 +65,7 @@
         def i: int = 0;
         def j: int = 0;
         def subscription: SrdRef[Subscription];
-
-
-
-
-        def automaticTax:bool=false;
-        def cancelAtPeriodEnd:bool=false;
-
-            if(subscriptionObject.getObject("data")
-                    .getObject("automatic_tax").getString("enabled")==String("true"))
-                    automaticTax=true;
-            if(subscriptionObject.getObject("data")
-                    .getString("cancel_at_period_end")==String("true"))
-                    cancelAtPeriodEnd=true;
-
-            subscription = SrdRef[Subscription]().{
-
-                alloc()~init(subscriptionObject.getObject("data")
-                    .getString("id"),
-                    automaticTax,
-                    String.parseInt(subscriptionObject.getObject("data")
-                    .getString("billing_cycle_anchor")),
-                    String.parseInt(subscriptionObject.getObject("data")
-                    .getString("created")),
-                    subscriptionObject.getObject("data")
-                    .getString("collection_method"),
-                    String.parseInt(subscriptionObject.getObject("data")
-                    .getString("start_date")),
-                    cancelAtPeriodEnd,
-                     String.parseInt(subscriptionObject.getObject("data")
-                    .getString("current_period_end")),
-                    String.parseInt(subscriptionObject.getObject("data")
-                    .getString("current_period_start")),
-                    subscriptionObject.getObject("data")
-                    .getString("description"),
-                    subscriptionObject.getObject("data")
-                    .getString("status"),
-                    String.parseInt(subscriptionObject.getObject("data")
-                    .getString("trial_end")),
-                    subscriptionObject.getObject("data")
-                    .getString("customer"),
-                    subscriptionObject.getObject("data")
-                    .getString("currency"))
-            }
-
-
-
+        subscription=getSubscriptionObject(subscriptionObject);
         return Possible[SrdRef[Subscription]].success(subscription);
     }
 

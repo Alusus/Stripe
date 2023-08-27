@@ -37,11 +37,11 @@
         عرف الحالة: لقب status؛
         عرف نوع_المصدر: لقب sourceType؛
     }
-    عرف جـلسة_بوابة_فاتورة: لقب BillingPortalSession؛
-    @دمج صنف جـلسة_بوابة_فاتورة {
+    عرف جـلسة_تحكم_بالفوترة: لقب BillingPortalSession؛
+    @دمج صنف جـلسة_تحكم_بالفوترة {
         عرف المعرف: لقب id؛
         عرف الاعدادات: لقب configuration؛
-        عرف الموقع: لقب locale؛
+        عرف النسق : لقب locale؛
         عرف زمن_الإنشاء: لقب created؛
         عرف الرابط: لقب url؛
         عرف رابط_العودة: لقب returnUrl؛
@@ -123,8 +123,8 @@
         عرف هات_الرصيد: لقب getBalance؛
         عرف هات_عمليات_الرصيد: لقب getBalanceTranasactions؛
         عرف هات_عملية_رصيد: لقب getBalanceTranasaction؛
-        عرف أنشئ_جلسة_بوابة_فاتورة: لقب createBillingPortalSession؛
-        عرف هات_اشتراكات: لقب getSubscriptions؛
+        عرف أنشئ_جلسة_تحكم_بالفوترة: لقب createBillingPortalSession؛
+        عرف هات_الاشتراكات: لقب getSubscriptions؛
         عرف هات_اشتراك: لقب getSubscription؛
         عرف أنشئ_اشتراك: لقب createSubscription؛
     }
