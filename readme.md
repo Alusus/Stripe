@@ -71,7 +71,6 @@ class Customer {
     def currency: String;
     def description: String;
 
-
     handler this~init();
 
     handler this~init(id: String, email: String, name: String, preferredLocales: Array[String]);
@@ -148,7 +147,6 @@ class BalanceTransaction {
     def status: String;
     def sourceType: String;
 
-
     handler this~init();
 
     handler this~init(
@@ -170,39 +168,6 @@ class BalanceTransaction {
 
 `exchangeRate` The exchange rate of the transaction.
 
-### BillingPortalSession
-
-This class holds the properties of a BillingPortalSession object from Stripe API.
-
-```
-class BillingPortalSession {
-    def id: String;
-    def configuration: String;
-    def locale: String;
-    def returnUrl : String;
-    def url : String;
-    def onBehalfOf : String;
-    def created : int;
-    def customerId: String;
-
-
-    handler this~init();
-
-    handler this~init(
-        id: String,  configuration: String, locale: String, created: int,
-            returnUrl: String, url: String, onBehalfOf: String,customerId:String
-    );
-}
-```
-
-`id` The ID of the BillingPortalSession object from Stripe.
-
-`configuration` The saved configuration for  of the Billing Portal.
-
-`url` The BillingPortalSession url.
-
-`returnUrl` The url to redirect to if the BillingPortalSession is over.
-
 ### CheckoutSession
 
 This class holds the properties of a checkout object from Stripe API.
@@ -221,7 +186,6 @@ class CheckoutSession {
     def successUrl: String;
     def url: String;
     def amountTotal: String;
-
 
     handler this~init();
 
@@ -266,29 +230,27 @@ This class holds the properties of a Subscription object from Stripe API.
 class Subscription {
     def id: String;
     def application: String;
-    def automaticTax: bool;
-    def billingCycleAnchor : int;
-    def created : int;
-    def collectionMethod : String;
-    def startDate : int;
-    def cancelAtPeriodEnd : bool;
-    def currentPeriodEnd : int;
-    def currentPeriodStart : int;
-    def description : String;
-    def status : String;
-    def trial_end : int;
+    def automaticTax: Bool;
+    def billingCycleAnchor: Int[64];
+    def created: Int[64];
+    def startDate: Int[64];
+    def currentPeriodStart: Int[64];
+    def currentPeriodEnd: Int[64];
+    def cancelAtPeriodEnd: Bool;
+    def description: String;
+    def status: String;
+    def trialEnd: Int[64];
     def currency: String = "usd";
     def customerId: String;
-    def collection_method : String;
-
+    def collectionMethod: String;
 
     handler this~init();
 
     handler this~init(
-        id: String,  automaticTax: bool, billingCycleAnchor: int, created: int,
-        collectionMethod: String, startDate: int, cancelAtPeriodEnd: bool,
-        currentPeriodEnd: int, currentPeriodStart: int, description: String, status: String,
-        trialEnd : int ,customerId:String,currency: String
+        id: String, automaticTax: Bool, billingCycleAnchor: Int[64], created: Int[64],
+        collectionMethod: String, startDate: Int[64], cancelAtPeriodEnd: Bool,
+        currentPeriodEnd: Int[64], currentPeriodStart: Int[64], description: String, status: String,
+        trialEnd: Int[64], customerId: String, currency: String
     );
 }
 ```
@@ -303,7 +265,7 @@ class Subscription {
 
 `status` The status of the subscription.
 
-'trialEnd' The timestamp  of the subscription trail period end.
+`trialEnd` The timestamp  of the subscription trail period end.
 
 ### Client
 
@@ -399,17 +361,24 @@ Returns CheckoutSession id.
 ```
 handler this.createCheckoutSession(
     items: Map[String, Int],
-    successUrl: CharsPtr,
-    customerId: String
+    successUrl: CharsPtr
 ): Possible[String]
 ```
 
-This version of `createCheckoutSession` receives detailed parameters instead of the raw `parameters` string
+```
+handler this.createCheckoutSession(
+    items: Map[String, Int],
+    customerId: String,
+    successUrl: CharsPtr
+): Possible[String]
+```
+
+These two version of `createCheckoutSession` receives detailed parameters instead of the raw `parameters` string
 in the previous version.
 
 `items`: A map whose key is the price ID from Stripe, and whose value is the quantity wanted for that price ID.
-`successUrl`: The URL to redirect the user to after successful payment.
 `customerId`: The id of the customer.
+`successUrl`: The URL to redirect the user to after successful payment.
 
 Returns CheckoutSession id.
 
@@ -419,7 +388,7 @@ Returns CheckoutSession id.
 handler this.getSubscriptions(): Possible[Array[SrdRef[Subscription]]] 
 ```
 
-Returns a list of Subscriptions.
+Returns the list of subscriptions.
 
 #### getSubscription
 
@@ -427,7 +396,7 @@ Returns a list of Subscriptions.
 handler this.getSubscription(subscriptionId: String): Possible[SrdRef[Subscription]]
 ```
 
-Gets a specific Subscription by its ID.
+Gets a specific subscription by its ID.
 
 #### createSubscription
 
@@ -456,15 +425,13 @@ in the previous version.
 
 Returns subscription id.
 
-###test#####
-
 #### createBillingPortalSession
 
 ```
 handler this.createBillingPortalSession(parameters: String): Possible[String]
 ```
 
-Creates a subscription.
+Creates a billing portal session.
 
 `parameters` The parametes of the billing portal session in the form: "customer=customerID&return_url=returnUrl".
 

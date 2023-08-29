@@ -1,6 +1,5 @@
 @merge module Stripe {
     func createBillingPortalSession(key: String, parameters: String, verbose: Bool): Possible[String] {
-        def subscriptionId: String;
         def request: Net.Request(
             String("https://api.stripe.com/v1/billing_portal/sessions"),
             key, String("Bearer"),
@@ -17,9 +16,8 @@
         } else if request.responseHttpStatus != 200 {
             return Possible[String].failure(Errors.unexpected());
         }
-        def billingPortalSessionObject: Json = request.responseBody;
-        subscriptionId = billingPortalSessionObject.getString("url");
-        return Possible[String].success(subscriptionId);
+        def sessionJson: Json = request.responseBody;
+        return Possible[String].success(sessionJson.getString("url"));
     }
 
     func createBillingPortalSession(
@@ -28,9 +26,11 @@
         if items.getLength() == 0 {
             return Possible[String].failure(Errors.invalidParams());
         }
-        def parameters: String = String.format("customer=%s&return_url=%s"،customerId.buf ,Net.uriEncode(returnUrl).buf);
-
-
+        def parameters: String = String.format(
+            "customer=%s&return_url=%s"،
+            customerId.buf,
+            Net.uriEncode(returnUrl).buf
+        );
         return createBillingPortalSession(key, parameters, verbose);
     }
 }

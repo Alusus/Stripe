@@ -52,7 +52,6 @@
         def request: Net.Request(String.format("https://api.stripe.com/v1/checkout/sessions/%s", checkoutId.buf), key, String("Bearer"));
         request.verbose = verbose;
         request.get();
-
         if request.responseHttpStatus == 401 {
             return Possible[SrdRef[CheckoutSession]].failure(Errors.unauthenticated());
         } else if request.responseHttpStatus == 404 {
@@ -83,7 +82,6 @@
 
     func createCheckoutSession(key: String, parameters: String, verbose: Bool): Possible[String] {
         def checkOutSessionId: String;
-
         def request: Net.Request(
             String("https://api.stripe.com/v1/checkout/sessions"),
             key, String("Bearer"),
@@ -91,7 +89,6 @@
         );
         request.verbose = verbose;
         request.post(parameters.buf);
-
         if request.responseHttpStatus == 401 {
             return Possible[String].failure(Errors.unauthenticated());
         } else if request.responseHttpStatus == 400 {
@@ -107,17 +104,18 @@
     }
 
     func createCheckoutSession(
-        key: String, items: Map[String, Int],customerId : String, successUrl: CharsPtr, verbose: Bool
+        key: String, items: Map[String, Int], customerId: String, successUrl: CharsPtr, verbose: Bool
     ): Possible[String] {
         if items.getLength() == 0 {
             return Possible[String].failure(Errors.invalidParams());
         }
         def parameters: String;
-        if customerId !=String(""){
-         parameters= String.format("mode=payment&customer=%s&success_url=%s"، customerId.buf,Net.uriEncode(successUrl).buf);
-        }
-        else{
-            parameters= String.format("mode=payment&success_url=%s",Net.uriEncode(successUrl).buf);
+        if customerId != String() {
+            parameters = String.format(
+                "mode=payment&customer=%s&success_url=%s"، customerId.buf, Net.uriEncode(successUrl).buf
+            );
+        } else {
+            parameters = String.format("mode=payment&success_url=%s", Net.uriEncode(successUrl).buf);
         }
         def i: Int;
         for i = 0, i < items.getLength(), ++i {
@@ -127,10 +125,5 @@
             );
         }
         return createCheckoutSession(key, parameters, verbose);
-    }
-    func createCheckoutSession(
-        key: String, items: Map[String, Int], successUrl: CharsPtr, verbose: Bool
-    ): Possible[String]{
-        return createCheckoutSession(key,items,String(""),successUrl,verbose)
     }
 }

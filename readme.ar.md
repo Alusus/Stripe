@@ -322,62 +322,6 @@ class BalanceTransaction {
 
 `سعر_الصرف` (`exchangeRate`) سعر الصرف المتبع في العملية.
 
-### جـلسة_بوابة_فاتورة (BillingPortalSession)
-
-يحمل خصائص جلسة بوابة فاتورة واحدة.
-
-```
-صنف جـلسة_بوابة_فاتورة {
-    عرف المعرف: نص؛
-    عرف الاعدادات: نص؛
-    عرف الموقع: نص؛
-    عرف زمن_التوفر: صحيح؛
-    عرف زمن_الإنشاء: صحيح؛
-    عرف الرابط: نص؛
-    عرف رابط_العودة: نص؛
-    عرف معرف_الزبون: نص؛
-    عرف بالنيابة_عن: صحيح؛
-    
-    عملية هذا~هيئ()؛
-    عملية هذا~هيئ(
-        المعرف: نـص، الاعدادات: نـص، الموقع: نـص، زمن_الإنشاء: صحيح، رابط_العودة: نـص،
-        الرابط: نـص، بالنيابة_عن: نـص، معرف_الزبون: نـص
-    )؛
-}
-```
-
-<div dir=ltr>
-
-```
-class BillingPortalSession {
-    def id: String;
-    def configuration: String;
-    def locale: String;
-    def returnUrl : String;
-    def url : String;
-    def onBehalfOf : String;
-    def created : int;
-    def customerId: String;
-
-    handler this~init();
-
-    handler this~init(
-        id: String,  configuration: String, locale: String, created: int,
-            returnUrl: String, url: String, onBehalfOf: String,customerId:String
-    );
-}
-```
-
-</div>
-
-`المعرف` (`id`) معرف قيد بوابة الفاتورة في سترايب.
-
-`الاعدادات` (`configuration`) اعدادات صفحة بوابة الفاتورة.
-
-`الرابط` (`url`) رابط بوابة الفاتورة.
-
-`رابط_العودة` (`returnUrl`) الرابط الذي يُرسل المستخدم إليه في حال انهاء بوابة الدفع.
-
 ### جـلسة_شراء (CheckoutSession)
 
 يحمل خصائص عملية إتمام شراء واحدة.
@@ -482,29 +426,29 @@ class Source {
 
 ```
 صنف اشـتراك {
-    عرف المعرف: نص؛
-    عرف الطلب: نص؛
-    عرف ضريبة_تلقائية: ثنائي ؛
-    عرف زمن_بدء_دورة_الفاتورة: صحيح ؛
-    عرف زمن_الإنشاء: صحيح ؛
-    عرف زمن_البدء: صحيح ؛
-    عرف الألغاء_عند_انتهاء_الاشتراك: ثنائي ؛
-    عرف زمن_انتهاء_الفترة_الحالية: صحيح ؛
-    عرف زمن_بدء_الفترة_الحالية: صحيح؛
-    عرف الوصف: نص؛
-    عرف الحالة: نص؛
-    عرف زمن_انتهاء_الفترة_التجريبية: صحيح؛
-    عرف العملة: نص؛
-    عرف معرف_الزبون: نص؛
-    عرف طريقة_الجمع: نص؛
+    عرف المعرف: نـص؛
+    عرف معرف_التطبيق: نـص؛
+    عرف ضريبة_تلقائية: ثنائي؛
+    عرف زمن_بدء_دورة_الفاتورة: صـحيح[64]؛
+    عرف زمن_الإنشاء: صـحيح[64]؛
+    عرف زمن_البدء: صـحيح[64]؛
+    عرف زمن_بدء_الفترة_الحالية: صـحيح[64]؛
+    عرف زمن_انتهاء_الفترة_الحالية: صـحيح[64]؛
+    عرف الإلغاء_عند_انتهاء_الاشتراك: ثنائي؛
+    عرف الوصف: نـص؛
+    عرف الحالة: نـص؛
+    عرف زمن_انتهاء_الفترة_التجريبية: صـحيح[64]؛
+    عرف العملة: نـص؛
+    عرف معرف_الزبون: نـص؛
+    عرف طريقة_الجمع: نـص؛
     
     عملية هذا~هيئ()؛
     
     عملية هذا~هيئ(
-        المعرف: نـص، ضريبة_تلقائية: ثنائي، زمن_بدء_دورة_الفاتورة: صحيح، زمن_الإنشاء: صحيح، طريقة_الجمع: نـص،
-        زمن_البدء: صحيح، الألغاء_عند_انتهاء_الاشتراك: ثنائي، زمن_انتهاء_الفترة_الحالية: صحيح،
-         زمن_بدء_الفترة_الحالية: صحيح، الوصف: نـص، الحالة: نـص، زمن_انتهاء_الفترة_التجريبية: صحيح،
-          معرف_الزبون: نص، العملة: نص 
+        المعرف: نـص، ضريبة_تلقائية: ثنائي، زمن_بدء_دورة_الفاتورة: صـحيح[64]، زمن_الإنشاء: صـحيح[64]، طريقة_الجمع: نـص،
+        زمن_البدء: صـحيح[64]، الألغاء_عند_انتهاء_الاشتراك: ثنائي، زمن_انتهاء_الفترة_الحالية: صـحيح[64]،
+         زمن_بدء_الفترة_الحالية: صـحيح[64]، الوصف: نـص، الحالة: نـص، زمن_انتهاء_الفترة_التجريبية: صـحيح[64]،
+          معرف_الزبون: نـص، العملة: نـص 
     )؛
 }
 ```
@@ -515,28 +459,27 @@ class Source {
 class Subscription {
     def id: String;
     def application: String;
-    def automaticTax: bool;
-    def billingCycleAnchor : int;
-    def created : int;
-    def collectionMethod : String;
-    def startDate : int;
-    def cancelAtPeriodEnd : bool;
-    def currentPeriodEnd : int;
-    def currentPeriodStart : int;
-    def description : String;
-    def status : String;
-    def trial_end : int;
+    def automaticTax: Bool;
+    def billingCycleAnchor: Int[64];
+    def created: Int[64];
+    def startDate: Int[64];
+    def currentPeriodStart: Int[64];
+    def currentPeriodEnd: Int[64];
+    def cancelAtPeriodEnd: Bool;
+    def description: String;
+    def status: String;
+    def trialEnd: Int[64];
     def currency: String = "usd";
     def customerId: String;
-    def collection_method : String;
+    def collectionMethod: String;
 
     handler this~init();
 
     handler this~init(
-        id: String,  automaticTax: bool, billingCycleAnchor: int, created: int,
-        collectionMethod: String, startDate: int, cancelAtPeriodEnd: bool,
-        currentPeriodEnd: int, currentPeriodStart: int, description: String, status: String,
-        trialEnd : int ,customerId:String,currency: String
+        id: String, automaticTax: Bool, billingCycleAnchor: Int[64], created: Int[64],
+        collectionMethod: String, startDate: Int[64], cancelAtPeriodEnd: Bool,
+        currentPeriodEnd: Int[64], currentPeriodStart: Int[64], description: String, status: String,
+        trialEnd: Int[64], customerId: String, currency: String
     );
 }
 ```
@@ -672,10 +615,10 @@ handler this.getBalanceTranasaction(id: String): Possible[SrdRef[BalanceTranasac
 
 ترجع عملية الرصيد ذات المعرف المحدد.
 
-#### أنشئ_جلسة_بوابة_فاتورة (createBillingPortalSession)
+#### أنشئ_جلسة_تحكم_بالفوترة (createBillingPortalSession)
 
 ```
-عملية هذا.أنشئ_جلسة_بوابة_فاتورة(معطيات: نـص): لـا_مضمون[نـص]
+عملية هذا.أنشئ_جلسة_تحكم_بالفوترة(معطيات: نـص): لـا_مضمون[نـص]
 ```
 
 <div dir=ltr>
@@ -686,14 +629,14 @@ handler this.createBillingPortalSession(parameters: String): Possible[String]
 
 </div>
 
-تنشئ جلسة بوابة دفع جديدة.
+تنشئ جلسة جديدة للتحكم بالدفع.
 
 `معطيات` (`parameters`) معطيات الاشتراك المطلوبة بالصيغة التالية: "customer=customerID&returnUrl=returnUrl".
 
 تُرجع رابط جلسة بوابة الدفع.
 
 ```
-عملية هذا.أنشئ_جلسة_بوابة_فاتورة(
+عملية هذا.أنشئ_جلسة_تحكم_بالفوترة(
     العناصر: تـطبيق[نـص، صـحيح]،
     معرف_الزبون: نص،
     رابط_الرجوع: مـؤشر_محارف
@@ -711,7 +654,7 @@ handler this.createBillingPortalSession(
 
 </div>
 
-هذه النسخة من دالة `أنشئ_جلسة_بوابة_فاتورة` تستلم متعطيات مفصلة بدل معطى خام كما في النسخة السابقة.
+هذه النسخة من دالة `أنشئ_جلسة_تحكم_بالفوترة` تستلم معطيات مفصلة بدل معطى خام كما في النسخة السابقة.
 
 `معرف_الزبون` (`customerId`): معرف قيد الزبون لفتح جلسة بوابة فاتورة خاصة به.
 
@@ -775,10 +718,25 @@ handler this.createCheckoutSession(parameters: String): Possible[String]
 عملية هذا.أنشئ_جلسة_إتمام_شراء(
     العناصر: تـطبيق[نـص، صـحيح]،
     رابط_النجاح: مـؤشر_محارف
+): لـا_مضمون[نـص]؛
+```
+
+```
+عملية هذا.أنشئ_جلسة_إتمام_شراء(
+    العناصر: تـطبيق[نـص، صـحيح]،
+    معرف_الزبون: نـص،
+    رابط_النجاح: مـؤشر_محارف
 ): لـا_مضمون[نـص]
 ```
 
 <div dir=ltr>
+
+```
+handler this.createCheckoutSession(
+    items: Map[String, Int],
+    successUrl: CharsPtr
+): Possible[String]
+```
 
 ```
 handler this.createCheckoutSession(
@@ -790,7 +748,7 @@ handler this.createCheckoutSession(
 
 </div>
 
-هذه النسخة من دالة `أنشئ_جلسة_إتمام_شراء` تستلم متعطيات مفصلة بدل معطى خام كما في النسخة السابقة.
+هاتان النسخنان من دالة `أنشئ_جلسة_إتمام_شراء` تستلمان معطيات مفصلة بدل معطى خام كما في النسخة السابقة.
 
 `العناصر` (`items`): تطبيق يمثل مفتاحه معرف السعر من سترايب (price ID) بينما تمثل قيمته عدد العناصر
 المطلوبة.
@@ -801,10 +759,10 @@ handler this.createCheckoutSession(
 
 تُرجع معرف الجلسة المُنشأة.
 
-#### هات_اشتراكات (getSubscriptions)
+#### هات_الاشتراكات (getSubscriptions)
 
 ```
-عملية هذا.هات_اشتراكات(): لـا_مضمون[مـصفوفة[سـندنا[اشتراك]]]
+عملية هذا.هات_الاشتراكات(): لـا_مضمون[مـصفوفة[سـندنا[اشتراك]]]
 ```
 
 <div dir=ltr>
@@ -817,10 +775,10 @@ handler this.getSubscriptions(): Possible[Array[SrdRef[Subscription]]]
 
 ترجع قائمة الاشتراكات.
 
-#### هات_اشتراك (getSubscription)
+#### هات_اشتراكا (getSubscription)
 
 ```
-عملية هذا.هات_اشتراك(معرف_الاشتراك: نـص): لـا_مضمون[سـندنا[اشتراك]]
+عملية هذا.هات_اشتراكا(معرف_الاشتراك: نـص): لـا_مضمون[سـندنا[اشتراك]]
 ```
 
 <div dir=ltr>
@@ -831,12 +789,12 @@ handler this.getSubscription(sessionId: String): Possible[SrdRef[Subscription]]
 
 </div>
 
-ترجع الاشتراك ذو المعرف المعطى.
+ترجع الاشتراك ذا المعرف المعطى.
 
-#### أنشئ_اشتراك (createSubscription)
+#### أنشئ_اشتراكا (createSubscription)
 
 ```
-عملية هذا.أنشئ_اشتراك(معطيات: نـص): لـا_مضمون[نـص]
+عملية هذا.أنشئ_اشتراكا(معطيات: نـص): لـا_مضمون[نـص]
 ```
 
 <div dir=ltr>
@@ -847,14 +805,14 @@ handler this.createSubscription(parameters: String): Possible[String]
 
 </div>
 
-تنشئ اشتراك جديد.
+تنشئ اشتراكا جديدا.
 
 `معطيات` (`parameters`) معطيات الاشتراك المطلوبة بالصيغة التالية: "customer=customerID&line_items=planID".
 
 تُرجع معرف الاشتراك المُنشأ.
 
 ```
-عملية هذا.أنشئ_اشتراك(
+عملية هذا.أنشئ_اشتراكا(
     العناصر: تـطبيق[نـص، صـحيح]،
     معرف_الزبون: نص
 ): لـا_مضمون[نـص]
@@ -871,7 +829,7 @@ handler this.createSubscription(
 
 </div>
 
-هذه النسخة من دالة `أنشئ_اشتراك` تستلم متعطيات مفصلة بدل معطى خام كما في النسخة السابقة.
+هذه النسخة من دالة `أنشئ_اشتراكا` تستلم متعطيات مفصلة بدل معطى خام كما في النسخة السابقة.
 
 `العناصر` (`items`): تطبيق يمثل مفتاحه معرف السعر من سترايب (price ID) بينما تمثل قيمته عدد العناصر
 المطلوبة.

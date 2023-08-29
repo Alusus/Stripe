@@ -37,17 +37,6 @@
         عرف الحالة: لقب status؛
         عرف نوع_المصدر: لقب sourceType؛
     }
-    عرف جـلسة_تحكم_بالفوترة: لقب BillingPortalSession؛
-    @دمج صنف جـلسة_تحكم_بالفوترة {
-        عرف المعرف: لقب id؛
-        عرف الاعدادات: لقب configuration؛
-        عرف النسق : لقب locale؛
-        عرف زمن_الإنشاء: لقب created؛
-        عرف الرابط: لقب url؛
-        عرف رابط_العودة: لقب returnUrl؛
-        عرف معرف_الزبون: لقب customerId؛
-        عرف بالنيابة_عن: لقب onBehalfOf؛
-    }
 
     عرف جـلسة_شراء: لقب CheckoutSession؛
     @دمج صنف جـلسة_شراء {
@@ -95,20 +84,20 @@
     عرف اشـتراك: لقب Subscription؛
     @دمج صنف اشـتراك {
         عرف المعرف: لقب id؛
-        عرف الطلب: لقب application؛
+        عرف معرف_التطبيق: لقب application؛
         عرف ضريبة_تلقائية: لقب automaticTax؛
         عرف زمن_بدء_دورة_الفاتورة: لقب billingCycleAnchor؛
         عرف زمن_الإنشاء: لقب created؛
         عرف زمن_البدء: لقب startDate؛
-        عرف الألغاء_عند_انتهاء_الاشتراك: لقب cancelAtPeriodEnd؛
-        عرف زمن_انتهاء_الفترة_الحالية: لقب currentPeriodEnd؛
+        عرف الإلغاء_عند_انتهاء_الاشتراك: لقب cancelAtPeriodEnd؛
         عرف زمن_بدء_الفترة_الحالية: لقب currentPeriodStart؛
+        عرف زمن_انتهاء_الفترة_الحالية: لقب currentPeriodEnd؛
         عرف الوصف: لقب description؛
         عرف الحالة: لقب status؛
-        عرف زمن_انتهاء_الفترة_التجريبية: لقب trial_end؛
+        عرف زمن_انتهاء_الفترة_التجريبية: لقب trialEnd؛
         عرف العملة: لقب currency؛
         عرف معرف_الزبون: لقب customerId؛
-        عرف طريقة_الجمع: لقب collection_method؛
+        عرف طريقة_الجمع: لقب collectionMethod؛
     }
 
     عرف وكـيل: لقب Client؛
@@ -125,8 +114,8 @@
         عرف هات_عملية_رصيد: لقب getBalanceTranasaction؛
         عرف أنشئ_جلسة_تحكم_بالفوترة: لقب createBillingPortalSession؛
         عرف هات_الاشتراكات: لقب getSubscriptions؛
-        عرف هات_اشتراك: لقب getSubscription؛
-        عرف أنشئ_اشتراك: لقب createSubscription؛
+        عرف هات_اشتراكا: لقب getSubscription؛
+        عرف أنشئ_اشتراكا: لقب createSubscription؛
     }
 
     عرف أخـطاء: لقب Errors؛
