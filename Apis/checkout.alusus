@@ -104,12 +104,19 @@
     }
 
     func createCheckoutSession(
-        key: String, items: Map[String, Int], successUrl: CharsPtr, verbose: Bool
+        key: String, items: Map[String, Int], customerId: String, successUrl: CharsPtr, verbose: Bool
     ): Possible[String] {
         if items.getLength() == 0 {
             return Possible[String].failure(Errors.invalidParams());
         }
-        def parameters: String = String.format("mode=payment&success_url=%s"، Net.uriEncode(successUrl).buf);
+        def parameters: String;
+        if customerId != String() {
+            parameters = String.format(
+                "mode=payment&customer=%s&success_url=%s"، customerId.buf, Net.uriEncode(successUrl).buf
+            );
+        } else {
+            parameters = String.format("mode=payment&success_url=%s", Net.uriEncode(successUrl).buf);
+        }
         def i: Int;
         for i = 0, i < items.getLength(), ++i {
             parameters += String.format(

@@ -382,7 +382,7 @@ class CheckoutSession {
 
 `المعرف` (`id`) معرف قيد إتمام الشراء في سترايب.
 
-`المبلغ_الكلي` (`amountTotal`) المبل الكلي لعملية الشراء.
+`المبلغ_الكلي` (`amountTotal`) المبلغ الكلي لعملية الشراء.
 
 `الرابط` (`url`) رابط إتمام عملية الشراء.
 
@@ -419,6 +419,83 @@ class Source {
 ```
 
 </div>
+
+### اشـتراك (Subscription)
+
+يحمل خصائص اشتراك واحد.
+
+```
+صنف اشـتراك {
+    عرف المعرف: نـص؛
+    عرف معرف_التطبيق: نـص؛
+    عرف ضريبة_تلقائية: ثنائي؛
+    عرف زمن_بدء_دورة_الفاتورة: صـحيح[64]؛
+    عرف زمن_الإنشاء: صـحيح[64]؛
+    عرف زمن_البدء: صـحيح[64]؛
+    عرف زمن_بدء_الفترة_الحالية: صـحيح[64]؛
+    عرف زمن_انتهاء_الفترة_الحالية: صـحيح[64]؛
+    عرف الإلغاء_عند_انتهاء_الاشتراك: ثنائي؛
+    عرف الوصف: نـص؛
+    عرف الحالة: نـص؛
+    عرف زمن_انتهاء_الفترة_التجريبية: صـحيح[64]؛
+    عرف العملة: نـص؛
+    عرف معرف_الزبون: نـص؛
+    عرف طريقة_الجمع: نـص؛
+    
+    عملية هذا~هيئ()؛
+    
+    عملية هذا~هيئ(
+        المعرف: نـص، ضريبة_تلقائية: ثنائي، زمن_بدء_دورة_الفاتورة: صـحيح[64]، زمن_الإنشاء: صـحيح[64]، طريقة_الجمع: نـص،
+        زمن_البدء: صـحيح[64]، الألغاء_عند_انتهاء_الاشتراك: ثنائي، زمن_انتهاء_الفترة_الحالية: صـحيح[64]،
+         زمن_بدء_الفترة_الحالية: صـحيح[64]، الوصف: نـص، الحالة: نـص، زمن_انتهاء_الفترة_التجريبية: صـحيح[64]،
+          معرف_الزبون: نـص، العملة: نـص 
+    )؛
+}
+```
+
+<div dir=ltr>
+
+```
+class Subscription {
+    def id: String;
+    def application: String;
+    def automaticTax: Bool;
+    def billingCycleAnchor: Int[64];
+    def created: Int[64];
+    def startDate: Int[64];
+    def currentPeriodStart: Int[64];
+    def currentPeriodEnd: Int[64];
+    def cancelAtPeriodEnd: Bool;
+    def description: String;
+    def status: String;
+    def trialEnd: Int[64];
+    def currency: String = "usd";
+    def customerId: String;
+    def collectionMethod: String;
+
+    handler this~init();
+
+    handler this~init(
+        id: String, automaticTax: Bool, billingCycleAnchor: Int[64], created: Int[64],
+        collectionMethod: String, startDate: Int[64], cancelAtPeriodEnd: Bool,
+        currentPeriodEnd: Int[64], currentPeriodStart: Int[64], description: String, status: String,
+        trialEnd: Int[64], customerId: String, currency: String
+    );
+}
+```
+
+</div>
+
+`المعرف` (`id`) معرف قيد عملية اشتراك في سترايب.
+
+`زمن_البدء` (`startDate`) زمن بدء الاشتراك.
+
+`الحالة` (`status`) حالة الاشتراك.
+
+`زمن_انتهاء_الفترة_التجريبية` (`trialEnd`) زمن انتهاء الفترة التجريبية.
+
+`معرف_الزبون` (`customerId`) معرف الزبون الخاص بعملية الاشتراك.
+
 
 ### وكـيل (Client)
 
@@ -538,6 +615,53 @@ handler this.getBalanceTranasaction(id: String): Possible[SrdRef[BalanceTranasac
 
 ترجع عملية الرصيد ذات المعرف المحدد.
 
+#### أنشئ_جلسة_تحكم_بالفوترة (createBillingPortalSession)
+
+```
+عملية هذا.أنشئ_جلسة_تحكم_بالفوترة(معطيات: نـص): لـا_مضمون[نـص]
+```
+
+<div dir=ltr>
+
+```
+handler this.createBillingPortalSession(parameters: String): Possible[String]
+```
+
+</div>
+
+تنشئ جلسة جديدة للتحكم بالدفع.
+
+`معطيات` (`parameters`) معطيات الاشتراك المطلوبة بالصيغة التالية: "customer=customerID&returnUrl=returnUrl".
+
+تُرجع رابط جلسة بوابة الدفع.
+
+```
+عملية هذا.أنشئ_جلسة_تحكم_بالفوترة(
+    العناصر: تـطبيق[نـص، صـحيح]،
+    معرف_الزبون: نص،
+    رابط_الرجوع: مـؤشر_محارف
+): لـا_مضمون[نـص]
+```
+
+<div dir=ltr>
+
+```
+handler this.createBillingPortalSession(
+    customerId:String, 
+    returnUrl: CharsPtr
+): Possible[String]
+```
+
+</div>
+
+هذه النسخة من دالة `أنشئ_جلسة_تحكم_بالفوترة` تستلم معطيات مفصلة بدل معطى خام كما في النسخة السابقة.
+
+`معرف_الزبون` (`customerId`): معرف قيد الزبون لفتح جلسة بوابة فاتورة خاصة به.
+
+`رابط_الرجوع` (`returnUrl`): الرابط لاعادة توجيه الزبون اليه عند الانتهاء من بوابة الفاتورة.
+
+تُرجع رابط جلسة التحكم بالفوترة.
+
 #### هات_جلسات_إتمام_الشراء (getCheckoutSessions)
 
 ```
@@ -594,6 +718,14 @@ handler this.createCheckoutSession(parameters: String): Possible[String]
 عملية هذا.أنشئ_جلسة_إتمام_شراء(
     العناصر: تـطبيق[نـص، صـحيح]،
     رابط_النجاح: مـؤشر_محارف
+): لـا_مضمون[نـص]؛
+```
+
+```
+عملية هذا.أنشئ_جلسة_إتمام_شراء(
+    العناصر: تـطبيق[نـص، صـحيح]،
+    معرف_الزبون: نـص،
+    رابط_النجاح: مـؤشر_محارف
 ): لـا_مضمون[نـص]
 ```
 
@@ -606,16 +738,106 @@ handler this.createCheckoutSession(
 ): Possible[String]
 ```
 
+```
+handler this.createCheckoutSession(
+    items: Map[String, Int],
+    customerId: String,
+    successUrl: CharsPtr
+): Possible[String]
+```
+
 </div>
 
-هذه النسخة من دالة `أنشئ_جلسة_إتمام_شراء` تستلم متعطيات مفصلة بدل معطى خام كما في النسخة السابقة.
+هاتان النسخنان من دالة `أنشئ_جلسة_إتمام_شراء` تستلمان معطيات مفصلة بدل معطى خام كما في النسخة السابقة.
 
 `العناصر` (`items`): تطبيق يمثل مفتاحه معرف السعر من سترايب (price ID) بينما تمثل قيمته عدد العناصر
 المطلوبة.
 
+`معرف_الزبون` (`customerId`): معرف قيد الزبون الذي يقوم بعملية الشراء.
+
 `رابط_النجاح` (`successUrl`): الرابط الذي سيُحول إليه المستخدم بعد نجاح عملية الشراء.
 
 تُرجع معرف الجلسة المُنشأة.
+
+#### هات_الاشتراكات (getSubscriptions)
+
+```
+عملية هذا.هات_الاشتراكات(): لـا_مضمون[مـصفوفة[سـندنا[اشتراك]]]
+```
+
+<div dir=ltr>
+
+```
+handler this.getSubscriptions(): Possible[Array[SrdRef[Subscription]]]
+```
+
+</div>
+
+ترجع قائمة الاشتراكات.
+
+#### هات_اشتراكا (getSubscription)
+
+```
+عملية هذا.هات_اشتراكا(معرف_الاشتراك: نـص): لـا_مضمون[سـندنا[اشتراك]]
+```
+
+<div dir=ltr>
+
+```
+handler this.getSubscription(sessionId: String): Possible[SrdRef[Subscription]]
+```
+
+</div>
+
+ترجع الاشتراك ذا المعرف المعطى.
+
+#### أنشئ_اشتراكا (createSubscription)
+
+```
+عملية هذا.أنشئ_اشتراكا(معطيات: نـص): لـا_مضمون[نـص]
+```
+
+<div dir=ltr>
+
+```
+handler this.createSubscription(parameters: String): Possible[String]
+```
+
+</div>
+
+تنشئ اشتراكا جديدا.
+
+`معطيات` (`parameters`) معطيات الاشتراك المطلوبة بالصيغة التالية: "customer=customerID&line_items=planID".
+
+تُرجع معرف الاشتراك المُنشأ.
+
+```
+عملية هذا.أنشئ_اشتراكا(
+    العناصر: تـطبيق[نـص، صـحيح]،
+    معرف_الزبون: نص
+): لـا_مضمون[نـص]
+```
+
+<div dir=ltr>
+
+```
+handler this.createSubscription(
+    items: Map[String, Int],
+    customerId: String
+): Possible[String]
+```
+
+</div>
+
+هذه النسخة من دالة `أنشئ_اشتراكا` تستلم متعطيات مفصلة بدل معطى خام كما في النسخة السابقة.
+
+`العناصر` (`items`): تطبيق يمثل مفتاحه معرف السعر من سترايب (price ID) بينما تمثل قيمته عدد العناصر
+المطلوبة.
+
+`معرف_الزبون` (`customerId`): معرف قيد الزبون الذي يقوم  بالاشتراك.
+
+تُرجع معرف الاشتراك المُنشأ.
+
 
 ### أخـطاء (Errors)
 
@@ -627,4 +849,3 @@ handler this.createCheckoutSession(
 * `أخـطاء._غير_موجود_` (`Errors.NOT_FOUND`): تُرجع عند الفشل في العثور على القيد ذي المعرف المعطى.
 
 </div>
-

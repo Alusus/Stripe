@@ -18,10 +18,13 @@ import "Models/BalanceTransaction";
 import "Models/Address";
 import "Models/Customer";
 import "Models/CheckoutSession";
+import "Models/Subscription";
 import "Apis/customer";
 import "Apis/checkout";
 import "Apis/balance_transaction";
 import "Apis/balance";
+import "Apis/billing_portal_session";
+import "Apis/subscription";
 import "Errors";
 
 @merge module Stripe {
@@ -64,7 +67,13 @@ import "Errors";
         }
 
         handler this.createCheckoutSession(items: Map[String, Int], successUrl: CharsPtr): Possible[String] {
-            return Stripe.createCheckoutSession(this.key, items, successUrl, this.verbose);
+            return Stripe.createCheckoutSession(this.key, items, String(), successUrl, this.verbose);
+        }
+
+        handler this.createCheckoutSession(
+            items: Map[String, Int], customerId: String, successUrl: CharsPtr
+        ): Possible[String] {
+            return Stripe.createCheckoutSession(this.key, items, customerId, successUrl, this.verbose);
         }
 
         // Balance APIs
@@ -81,6 +90,34 @@ import "Errors";
 
         handler this.getBalanceTranasaction(id: String): Possible[SrdRef[BalanceTransaction]] {
             return Stripe.getBalanceTranasaction(this.key, id, this.verbose);
+        }
+
+        // Billing Portal Session APIs
+
+        handler this.createBillingPortalSession(parameters: String): Possible[String] {
+            return Stripe.createBillingPortalSession(this.key, parameters, this.verbose);
+        }
+
+        handler this.createBillingPortalSession(customerId:String, returnUrl: CharsPtr): Possible[String] {
+            return Stripe.createBillingPortalSession(this.key, customerId, returnUrl, this.verbose);
+        }
+
+        // Subscription APIs
+
+        handler this.getSubscriptions(): Possible[Array[SrdRef[Subscription]]] {
+            return Stripe.getSubscriptions(this.key, this.verbose);
+        }
+
+        handler this.getSubscription(subscriptionId: String): Possible[SrdRef[Subscription]] {
+            return Stripe.getSubscription(this.key, subscriptionId, this.verbose);
+        }
+
+        handler this.createSubscription(parameters: String): Possible[String] {
+            return Stripe.createSubscription(this.key, parameters, this.verbose);
+        }
+
+        handler this.createSubscription(items: Map[String, Int], customerId:String): Possible[String] {
+            return Stripe.createSubscription(this.key, items, customerId, this.verbose);
         }
     }
 }

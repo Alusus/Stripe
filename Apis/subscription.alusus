@@ -1,0 +1,106 @@
+@merge module Stripe {
+    func getSubscriptions(key: String, verbose: Bool): Possible[Array[SrdRef[Subscription]]] {
+        def request: Net.Request(String("https://api.stripe.com/v1/subscriptions"), key, String("Bearer"));
+        request.verbose = verbose;
+        request.get();
+        if request.responseHttpStatus == 401 {
+            return Possible[Array[SrdRef[Subscription]]].failure(Errors.unauthenticated());
+        } else if request.responseHttpStatus == 0 {
+            return Possible[Array[SrdRef[Subscription]]].failure(Errors.connection());
+        } else if request.responseHttpStatus != 200 {
+            return Possible[Array[SrdRef[Subscription]]].failure(Errors.unexpected());
+        }
+        def subscriptionsJson: Json = request.responseBody.getObject("data");
+        def subscriptions: Array[SrdRef[Subscription]];
+        def i: int = 0;
+        for i = 0, i < subscriptionsJson.getLength(), i += 1 {
+            subscriptions.add(convertToSubscription(subscriptionsJson.getObject(i)));
+        }
+        return Possible[Array[SrdRef[Subscription]]].success(subscriptions);
+    }
+
+    func getSubscription(key: String, checkoutId: String, verbose: Bool): Possible[SrdRef[Subscription]] {
+        def request: Net.Request(
+            String.format("https://api.stripe.com/v1/subscriptions/%s", checkoutId.buf),
+            key,
+            String("Bearer")
+        );
+        request.verbose = verbose;
+        request.get();
+        if request.responseHttpStatus == 401 {
+            return Possible[SrdRef[Subscription]].failure(Errors.unauthenticated());
+        } else if request.responseHttpStatus == 404 {
+            return Possible[SrdRef[Subscription]].failure(Errors.notFound());
+        } else if request.responseHttpStatus == 0 {
+            return Possible[SrdRef[Subscription]].failure(Errors.connection());
+        } else if request.responseHttpStatus != 200 {
+            return Possible[SrdRef[Subscription]].failure(Errors.unexpected());
+        }
+        def subscriptionJson: Json = request.responseBody;
+        return Possible[SrdRef[Subscription]].success(convertToSubscription(subscriptionJson));
+    }
+
+    func createSubscription(key: String, parameters: String, verbose: Bool): Possible[String] {
+        def request: Net.Request(
+            String("https://api.stripe.com/v1/subscriptions"),
+            key, String("Bearer"),
+            String("application/x-www-form-urlencoded")
+        );
+        request.verbose = verbose;
+        request.post(parameters.buf);
+        if request.responseHttpStatus == 401 {
+            return Possible[String].failure(Errors.unauthenticated());
+        } else if request.responseHttpStatus == 400 {
+            return Possible[String].failure(Errors.invalidParams());
+        } else if request.responseHttpStatus == 0 {
+            return Possible[String].failure(Errors.connection());
+        } else if request.responseHttpStatus != 200 {
+            return Possible[String].failure(Errors.unexpected());
+        }
+        def subscriptionJson: Json = request.responseBody;
+        return Possible[String].success(subscriptionJson.getString("id"));
+    }
+
+    func createSubscription(
+        key: String, items: Map[String, Int], customerId: String, verbose: Bool
+    ): Possible[String] {
+        if items.getLength() == 0 {
+            return Possible[String].failure(Errors.invalidParams());
+        }
+        def parameters: String = String.format("customer=%s", customerId.buf);
+        def i: Int;
+        for i = 0, i < items.getLength(), ++i {
+            parameters += String.format(
+                "&line_items[%i][price]=%s&line_items[%i][quantity]=%i"،
+                i, Net.uriEncode(items.keyAt(i)).buf, i, items.valAt(i)
+            );
+        }
+        return createSubscription(key, parameters, verbose);
+    }
+
+    func convertToSubscription(subscriptionJson: Json): SrdRef[Subscription] {
+        def automaticTax: bool = false;
+        def cancelAtPeriodEnd: Bool = false;
+        if subscriptionJson.getObject("automatic_tax").getBool("enabled") automaticTax = true;
+        if subscriptionJson.getBool("cancel_at_period_end") cancelAtPeriodEnd = true;
+        def subscription: SrdRef[Subscription] = SrdRef[Subscription]().{
+            alloc()~init(
+                subscriptionJson.getString("id"),
+                automaticTax,
+                subscriptionJson.getInt("billing_cycle_anchor"),
+                subscriptionJson.getInt("created"),
+                subscriptionJson.getString("collection_method"),
+                subscriptionJson.getInt("start_date"),
+                cancelAtPeriodEnd,
+                subscriptionJson.getInt("current_period_end"),
+                subscriptionJson.getInt("current_period_start"),
+                subscriptionJson.getString("description"),
+                subscriptionJson.getString("status"),
+                subscriptionJson.getInt("trial_end"),
+                subscriptionJson.getString("customer"),
+                subscriptionJson.getString("currency")
+            )
+        }
+        return subscription;
+    }
+}
