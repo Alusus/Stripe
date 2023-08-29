@@ -24,6 +24,7 @@ import "Apis/checkout";
 import "Apis/balance_transaction";
 import "Apis/balance";
 import "Apis/billing_portal_session";
+import "Apis/subscription";
 import "Errors";
 
 @merge module Stripe {
