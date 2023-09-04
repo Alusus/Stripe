@@ -17,6 +17,7 @@
         def nextInvoiceSequence: Int;
         def currency: String = "usd";
         def description: String;
+        def defaultPaymentMethod: String = "";
 
 
         handler this~init() {
@@ -34,7 +35,7 @@
             currency: String, defaultSourceId: String, delinquent: Bool,
             description: String, email: String, invoicePrefix: String, name: String,
             nextInvoiceSequence: Int, phone: String, preferredLocales: Array[String],
-            shipping: String, taxExempt: String, testClock: String
+            shipping: String, taxExempt: String, testClock: String, defaultPaymentMethod: String
         ) {
             this.id = id;
             this.address = address;
@@ -53,6 +54,8 @@
             this.nextInvoiceSequence = nextInvoiceSequence;
             this.currency = currency;
             this.description = description;
+            this.defaultPaymentMethod = defaultPaymentMethod;
         }
     }
 }
+
