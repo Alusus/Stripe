@@ -16,15 +16,18 @@ import "Models/Source";
 import "Models/Balance";
 import "Models/BalanceTransaction";
 import "Models/Address";
+import "Models/BillingDetails";
 import "Models/Customer";
 import "Models/CheckoutSession";
 import "Models/Subscription";
+import "Models/PaymentMethod";
 import "Apis/customer";
 import "Apis/checkout";
 import "Apis/balance_transaction";
 import "Apis/balance";
 import "Apis/billing_portal_session";
 import "Apis/subscription";
+import "Apis/paymentMethod";
 import "Errors";
 
 @merge module Stripe {
@@ -39,7 +42,6 @@ import "Errors";
         }
 
         // Customer APIs
-
         handler this.getCustomers(): Possible[Array[SrdRef[Customer]]] {
             return Stripe.getCustomers(this.key, this.verbose);
         }
@@ -52,8 +54,15 @@ import "Errors";
             return Stripe.createCustomer(this.key, parameters, this.verbose);
         }
 
-        // Chekcout APIs
+        handler this.customerHasDefaultPaymentMethod(customerId: String): bool {
+            return Stripe.customerHasDefaultPaymentMethod(this.key, customerId, this.verbose);
+        }
 
+        handler this.customerAddDefaultPaymentMethod(customerId: String, paymentMethodId: String): bool {
+            return Stripe.customerAddDefaultPaymentMethod(this.key, customerId, paymentMethodId, this.verbose);
+        }
+
+        // Chekcout APIs
         handler this.getCheckoutSessions(): Possible[Array[SrdRef[CheckoutSession]]] {
             return Stripe.getCheckoutSessions(this.key, this.verbose);
         }
@@ -77,13 +86,11 @@ import "Errors";
         }
 
         // Balance APIs
-
         handler this.getBalance(): Possible[Array[SrdRef[Balance]]] {
             return Stripe.getBalance(this.key, this.verbose);
         }
 
         // Balance Transaction APIs
-
         handler this.getBalanceTranasactions(): Possible[Array[SrdRef[BalanceTransaction]]] {
             return Stripe.getBalanceTranasactions(this.key, this.verbose);
         }
@@ -93,17 +100,15 @@ import "Errors";
         }
 
         // Billing Portal Session APIs
-
         handler this.createBillingPortalSession(parameters: String): Possible[String] {
             return Stripe.createBillingPortalSession(this.key, parameters, this.verbose);
         }
 
-        handler this.createBillingPortalSession(customerId:String, returnUrl: CharsPtr): Possible[String] {
+        handler this.createBillingPortalSession(customerId: String, returnUrl: CharsPtr): Possible[String] {
             return Stripe.createBillingPortalSession(this.key, customerId, returnUrl, this.verbose);
         }
 
         // Subscription APIs
-
         handler this.getSubscriptions(): Possible[Array[SrdRef[Subscription]]] {
             return Stripe.getSubscriptions(this.key, this.verbose);
         }
@@ -116,8 +121,18 @@ import "Errors";
             return Stripe.createSubscription(this.key, parameters, this.verbose);
         }
 
-        handler this.createSubscription(items: Map[String, Int], customerId:String): Possible[String] {
+        handler this.createSubscription(items: Map[String, Int], customerId: String): Possible[String] {
             return Stripe.createSubscription(this.key, items, customerId, this.verbose);
+        }
+
+        // PaymentMethod APIs
+        handler this.getPaymentMethods(customerId: String): Possible[Array[SrdRef[PaymentMethod]]] {
+            return Stripe.getPaymentMethods(this.key, customerId, this.verbose);
+        }
+
+        handler this.getPaymentMethod(paymentMethodId: String): Possible[SrdRef[PaymentMethod]] {
+            return Stripe.getPaymentMethod(this.key, paymentMethodId, this.verbose);
         }
     }
 }
+
