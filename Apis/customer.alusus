@@ -1,9 +1,11 @@
 @merge module Stripe {
     func getCustomers(key: String, verbose: Bool): Possible[Array[SrdRef[Customer]]] {
         def customerArray: Array[SrdRef[Customer]];
-        def loc: String;
-        def prfLoc: Array[String];
-        def request: Net.Request(String("https://api.stripe.com/v1/customers"), key, String("Bearer"));
+
+        def request: SrdRef[Net.Request]
+            request = SrdRef[Net.Request]().{
+            alloc()~init(String("https://api.stripe.com/v1/customers"), key, String("Bearer"));
+        }
         request.verbose = verbose;
         request.get();
         if request.responseHttpStatus == 401 {
@@ -14,57 +16,39 @@
             return Possible[Array[SrdRef[Customer]]].failure(Errors.unexpected());
         }
         def customerObject: Json = request.responseBody;
+
         def i: int = 0;
         def j: int = 0;
+        def loc: String;
+        def prfLoc: Array[String];
         def customer: SrdRef[Customer];
         def address: SrdRef[Address];
         def delinquent: bool;
-        for i = 0, i < customerObject.getObject("data").getLength(), i += 1 {
-            for j = 0, j < customerObject.getObject("data").getObject(i).getObject("preferred_locales").getLength(), j++ {
-                loc = customerObject.getObject("data")
-                    .getObject(i).getObject("preferred_locales").getString(j)
+        if customerObject.getString("object") != String("list") {
+            customerArray.add(convertToCustomer(customerObject));
+        } else {
+            for i = 0, i < customerObject.getObject("data").getLength(), i += 1 {
+                customerArray.add(convertToCustomer(customerObject.getObject("data").getObject(i)));
+            }
+            while customerObject.getString("has_more") == String("true") {
+                request = SrdRef[Net.Request]().{
+                    alloc()~init(String.format("https://api.stripe.com/v1/customers?starting_after=%s", customerArray(customerArray.getLength() - 1).id.buf), key, String("Bearer"));
+                }
+                request.verbose = verbose;
+                request.get();
+                if request.responseHttpStatus == 401 {
+                    return Possible[Array[SrdRef[Customer]]].failure(Errors.unauthenticated());
+                } else if request.responseHttpStatus == 0 {
+                    return Possible[Array[SrdRef[Customer]]].failure(Errors.connection());
+                } else if request.responseHttpStatus != 200 {
+                    return Possible[Array[SrdRef[Customer]]].failure(Errors.unexpected());
+                }
+                customerObject = request.responseBody;
 
-                prfLoc.add(loc);
+                for i = 0, i < customerObject.getObject("data").getLength(), i += 1 {
+                    customerArray.add(convertToCustomer(customerObject.getObject("data").getObject(i)));
+                }
             }
-            if customerObject.getObject("data").getObject(i).getString("address") != String("null") {
-                address = SrdRef[Address]().{
-                    alloc()~init(
-                        customerObject.getObject("data").getObject(i).getObject("address").getString("city"),
-                        customerObject.getObject("data").getObject(i).getObject("address").getString("country"),
-                        customerObject.getObject("data").getObject(i).getObject("address").getString("line1"),
-                        customerObject.getObject("data").getObject(i).getObject("address").getString("line2"),
-                        customerObject.getObject("data").getObject(i).getObject("address").getString("postalCode"),
-                        customerObject.getObject("data").getObject(i).getObject("address").getString("state")
-                    )
-                };
-            } else
-                address = SrdRef[Address](). {
-                alloc()~init()
-            };
-            delinquent = customerObject.getObject("data").getObject(i).getString("delinquent") == String("true");
-            customer = SrdRef[Customer]().{
-                alloc()~init(
-                    customerObject.getObject("data").getObject(i).getString("id"),
-                    address,
-                    String.parseFloat(customerObject.getObject("data").getObject(i).getString("balance")),
-                    String.parseInt(customerObject.getObject("data").getObject(i).getString("created")),
-                    customerObject.getObject("data").getObject(i).getString("currency"),
-                    customerObject.getObject("data").getObject(i).getString("default_source"),
-                    delinquent,
-                    customerObject.getObject("data").getObject(i).getString("description"),
-                    customerObject.getObject("data").getObject(i).getString("email"),
-                    customerObject.getObject("data").getObject(i).getString("invoice_prefix"),
-                    customerObject.getObject("data").getObject(i).getString("name"),
-                    String.parseInt(customerObject.getObject("data").getObject(i).getString("nextInvoiceSequence")),
-                    customerObject.getObject("data").getObject(i).getString("phone"),
-                    prfLoc,
-                    customerObject.getObject("data").getObject(i).getString("shipping"),
-                    customerObject.getObject("data").getObject(i).getString("tax_exempt"),
-                    customerObject.getObject("data").getObject(i).getString("test_clock")
-                )
-            }
-            customerArray.add(customer);
-            prfLoc.clear();
         }
         return Possible[Array[SrdRef[Customer]]].success(customerArray);
     }
@@ -73,7 +57,7 @@
         def loc: String;
         def prfLoc: Array[String];
         def request: Net.Request(
-            String.format("https://api.stripe.com/v1/customers/%s", customerId), key, String("Bearer")
+            String.format("https://api.stripe.com/v1/customers/%s", customerId.buf), key, String("Bearer")
         );
         request.verbose = verbose;
         request.get();
@@ -87,10 +71,41 @@
             return Possible[SrdRef[Customer]].failure(Errors.unexpected());
         }
         def customerObject: Json = request.responseBody;
-        def i: int = 0;
+        return Possible[SrdRef[Customer]].success(convertToCustomer(customerObject));
+    }
+
+    func createCustomer(key: String, parameters: String, verbose: Bool): Possible[String] {
+        def b: bool = true;
+        def customerId: String;
+        def request: Net.Request(
+            String("https://api.stripe.com/v1/customers"),
+            key,
+            String("Bearer"),
+            String("application/x-www-form-urlencoded")
+        );
+        request.verbose = verbose;
+        request.post(parameters.buf);
+        if request.responseHttpStatus == 401 {
+            return Possible[String].failure(Errors.unauthenticated());
+        } else if request.responseHttpStatus == 400 {
+            return Possible[String].failure(Errors.invalidParams());
+        } else if request.responseHttpStatus == 0 {
+            return Possible[String].failure(Errors.connection());
+        } else if request.responseHttpStatus != 200 {
+            return Possible[String].failure(Errors.unexpected());
+        }
+        def customerObject: Json = request.responseBody;
+        customerId = customerObject.getString("id");
+        return Possible[String].success(customerId);
+    }
+
+    func convertToCustomer(customerObject: Json): SrdRef[Customer] {
+        def loc: String;
+        def prfLoc: Array[String];
         def customer: SrdRef[Customer];
         def address: SrdRef[Address];
         def delinquent: bool;
+        def i: int = 0;
 
         for i = 0, i < customerObject.getObject("preferred_locales").getLength(), i++ {
             loc = customerObject.getObject("data")
@@ -133,16 +148,28 @@
                 prfLoc,
                 customerObject.getString("shipping"),
                 customerObject.getString("tax_exempt"),
-                customerObject.getString("test_clock"),)
+                customerObject.getString("test_clock"),
+                customerObject.getObject("invoice_settings").getString("default_payment_method"))
         }
-        return Possible[SrdRef[Customer]].success(customer);
+
+        return customer;
     }
 
-    func createCustomer(key: String, parameters: String, verbose: Bool): Possible[String] {
+    func customerHasDefaultPaymentMethod(key: String, customerId: String, verbose: Bool): bool {
+        def customer: SrdRef[Customer]
+            customer = getCustomer(key, customerId, verbose);
+        if customer.defaultPaymentMethod != String("null")
+            return true;
+        return false;
+    }
+
+    func customerAddDefaultPaymentMethod(key: String, customerId: String, paymentMethodId: String, verbose: Bool): bool {
+        def parameters: String = "invoice_settings[default_payment_method]=";
+        parameters = parameters + paymentID;
         def b: bool = true;
         def customerId: String;
         def request: Net.Request(
-            String("https://api.stripe.com/v1/customers"),
+            String.format("https://api.stripe.com/v1/customers/%s", customerId.buf),
             key,
             String("Bearer"),
             String("application/x-www-form-urlencoded")
@@ -150,16 +177,15 @@
         request.verbose = verbose;
         request.post(parameters.buf);
         if request.responseHttpStatus == 401 {
-            return Possible[String].failure(Errors.unauthenticated());
+            return false;
         } else if request.responseHttpStatus == 400 {
-            return Possible[String].failure(Errors.invalidParams());
+            return false;
         } else if request.responseHttpStatus == 0 {
-            return Possible[String].failure(Errors.connection());
+            return false;
         } else if request.responseHttpStatus != 200 {
-            return Possible[String].failure(Errors.unexpected());
+            return false;
         }
-        def customerObject: Json = request.responseBody;
-        customerId = customerObject.getString("id");
-        return Possible[String].success(customerId);
+        return true;
     }
 }
+
