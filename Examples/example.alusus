@@ -3,7 +3,7 @@ import "Apm";
 Apm.importFile("Alusus/Stripe");
 use Srl;
 
-def client: Stripe.Client(String(System.getEnv("STRIPE_KEY")));
+def client: Stripe.Client(String("your secret key"));
 client.verbose = false;
 
 Console.print("Create Customer...\n");
@@ -20,10 +20,39 @@ for i = 0, i < customers.getLength(), i++ {
         "id: %s\n\tname: %s\n\temail: %s\n\n",
         customers(i).id.buf, customers(i).name.buf, customers(i).email.buf
     );
+    if (client.customerHasDefaultPaymentMethod(customers(i).id) == true) {
+        Console.print("customer %s has default payment method\n", customers(i).name.buf);
+    }
 }
+def customer: SrdRef[Stripe.Customer];
+customer = client.getCustomer(String("cus_OHq9FA8fWA99EZ"));
+Console.print(
+    "sengel customer data id: %s\n\tname: %s\n\temail: %s\n\n",
+    customer.id.buf, customer.name.buf, customer.email.buf
+);
+def k: int = 0;
+for k = 0, k < customers.getLength(), k++ {
+    Console.print("Current PaymentMethods for %s:\n", customers(k).name.buf);
+    def paymentMethods: Array[SrdRef[Stripe.PaymentMethod]];
 
+    paymentMethods = client.getPaymentMethods(customers(k).id);
+    for i = 0, i < paymentMethods.getLength(), i++ {
+        Console.print(
+            "id: %s\n\tlast4: %s\texpYear : %i\n\n",
+            paymentMethods(i).id.buf, paymentMethods(i).last4.buf, paymentMethods(i).expYear
+        );
+    }
+}
+def paymentMethod: SrdRef[Stripe.PaymentMethod];
+
+paymentMethod = client.getPaymentMethod(String("pm_1NSNh3FH4SUr4KG6Dz5DcQ3L"));
+Console.print("Current PaymentMethod for PaymentMethod id : pm_1NSNh3FH4SUr4KG6Dz5DcQ3L\n");
+Console.print(
+    "id: %s\n\tlast4: %s\texpYear : %i\n\n",
+    paymentMethod.id.buf, paymentMethod.last4.buf, paymentMethod.expYear
+);
 Console.print("Balance Array:\n");
-def balanceArray : Array[SrdRef[Stripe.Balance]];
+def balanceArray: Array[SrdRef[Stripe.Balance]];
 balanceArray = client.getBalance();
 def j: Int;
 for j = 0, j < balanceArray.getLength(), j++ {
