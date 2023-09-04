@@ -1,0 +1,103 @@
+@merge module Stripe {
+    func getPaymentMethods(key: String, customerId: String, verbose: Bool): Possible[Array[SrdRef[PaymentMethod]]] {
+        def paymentMethodArray: Array[SrdRef[PaymentMethod]];
+        def request: Net.Request(String.format("https://api.stripe.com/v1/customers/%s/payment_methods", customerId.buf), key, String("Bearer"));
+        request.verbose = verbose;
+        request.get();
+        if request.responseHttpStatus == 401 {
+            return Possible[Array[SrdRef[PaymentMethod]]].failure(Errors.unauthenticated());
+        } else if request.responseHttpStatus == 0 {
+            return Possible[Array[SrdRef[PaymentMethod]]].failure(Errors.connection());
+        } else if request.responseHttpStatus != 200 {
+            return Possible[Array[SrdRef[PaymentMethod]]].failure(Errors.unexpected());
+        }
+        def paymentMethodObject: Json = request.responseBody;
+
+        def i: int = 0;
+        if paymentMethodObject.getString("object") != String("list") {
+            paymentMethodArray.add(convertToPaymentMethod(paymentMethodObject));
+        } else {
+            if paymentMethodObject.getObject("data").getLength() == 1 {
+                if paymentMethodObject.getObject("data").getObject(0).getString("id") == String("") {
+                    return Possible[Array[SrdRef[PaymentMethod]]].success(paymentMethodArray);
+                }
+            }
+            for i = 0, i < paymentMethodObject.getObject("data").getLength(), i += 1 {
+                paymentMethodArray.add(convertToPaymentMethod(paymentMethodObject.getObject("data").getObject(i)));
+            }
+        }
+        return Possible[Array[SrdRef[PaymentMethod]]].success(paymentMethodArray);
+    }
+
+    func getPaymentMethod(key: String, paymentMethodId: String, verbose: Bool): Possible[SrdRef[PaymentMethod]] {
+        def loc: String;
+        def prfLoc: Array[String];
+        def request: Net.Request(
+            String.format("https://api.stripe.com/v1/payment_methods/%s", paymentMethodId.buf), key, String("Bearer")
+        );
+        request.verbose = verbose;
+        request.get();
+        if request.responseHttpStatus == 401 {
+            return Possible[SrdRef[PaymentMethod]].failure(Errors.unauthenticated());
+        } else if request.responseHttpStatus == 404 {
+            return Possible[SrdRef[PaymentMethod]].failure(Errors.notFound());
+        } else if request.responseHttpStatus == 0 {
+            return Possible[SrdRef[PaymentMethod]].failure(Errors.connection());
+        } else if request.responseHttpStatus != 200 {
+            return Possible[SrdRef[PaymentMethod]].failure(Errors.unexpected());
+        }
+        def paymentMethodObject: Json = request.responseBody;
+
+        return Possible[SrdRef[PaymentMethod]].success(convertToPaymentMethod(paymentMethodObject));
+    }
+
+    func convertToPaymentMethod(paymentMethodObject: Json): SrdRef[PaymentMethod] {
+        def paymentMethod: SrdRef[PaymentMethod];
+        def address: SrdRef[Address];
+        def billingDetails: SrdRef[BillingDetails];
+        if paymentMethodObject.getString("billing_details") != String("null") {
+            if paymentMethodObject.getObject("billing_details").getString("address") != String("null") {
+                address = SrdRef[Address]().{
+                    alloc()~init(
+                        paymentMethodObject.getObject("billing_details").getObject("address").getString("city"),
+                        paymentMethodObject.getObject("billing_details").getObject("address").getString("country"),
+                        paymentMethodObject.getObject("billing_details").getObject("address").getString("line1"),
+                        paymentMethodObject.getObject("billing_details").getObject("address").getString("line2"),
+                        paymentMethodObject.getObject("billing_details").getObject("address").getString("postalCode"),
+                        paymentMethodObject.getObject("billing_details").getObject("address").getString("state")
+                    )
+                };
+            } else {
+                address = SrdRef[Address]().{
+                    alloc()~init()
+                };
+            }
+            billingDetails = SrdRef[BillingDetails](). {
+                alloc()~init(
+                    address,
+                    paymentMethodObject.getObject("billing_details").getString("email"),
+                    paymentMethodObject.getObject("billing_details").getString("name"),
+                    paymentMethodObject.getObject("billing_details").getString("phone")
+                )
+            };
+        } else {
+            billingDetails = SrdRef[BillingDetails]().{
+                alloc()~init()
+            };
+        }
+        paymentMethod = SrdRef[PaymentMethod](). {
+            alloc()~init(
+                paymentMethodObject.getString("id"),
+                billingDetails,
+                String.parseInt(paymentMethodObject.getString("created")),
+                String.parseInt(paymentMethodObject.getObject("card").getString("exp_year")),
+                String.parseInt(paymentMethodObject.getObject("card").getString("exp_month")),
+                paymentMethodObject.getString("currency"),
+                paymentMethodObject.getObject("card").getString("last4"),
+                paymentMethodObject.getString("type")
+            )
+        };
+        return paymentMethod;
+    }
+}
+
