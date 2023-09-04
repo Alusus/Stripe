@@ -1,0 +1,21 @@
+@merge module Stripe {
+    class BillingDetails {
+        def address: SrdRef[Address];
+        def email: String = "";
+        def name: String = "";
+        def phone: String = "";
+
+        handler this~init() {
+        }
+
+        handler this~init(
+            address: SrdRef[Address], email: String, name: String, phone: String
+        ) {
+            this.address = address;
+            this.email = email;
+            this.name = name;
+            this.phone = phone;
+        }
+    }
+}
+
