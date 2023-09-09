@@ -52,6 +52,7 @@
             key,
             String("Bearer")
         );
+        def balanceTransaction : SrdRef[balanceTransaction];
         request.verbose = verbose;
         request.get();
         if request.responseHttpStatus == 401 {
@@ -89,5 +90,32 @@
                 balanceObject.getString("type"),)
         }
         return Possible[SrdRef[BalanceTransaction]].success(balanceTransaction);
+    }
+    func convertToBalanceTranasaction(balanceTransactionObject: Json): SrdRef[CheckoutSession] {
+        def i: int = 0;
+        def balanceTransaction : SrdRef[balanceTransaction];
+        def feeDetails: Array[String];
+        def feeDetail: String;
+        for i = 0, i < balanceTransactionObject.getObject("fee_details").getLength(), i++ {
+            feeDetail = balanceTransactionObject.getObject("fee_details").getString(i);
+            feeDetails.add(feeDetail);
+        }
+        balanceTransaction = SrdRef[balanceTransaction](). {
+            alloc()~init(balanceTransactionObject.getString("id"),
+                String.parseFloat(balanceTransactionObject.getString("amount")),
+                String.parseInt(balanceTransactionObject.getString("available_on")),
+                String.parseInt(balanceTransactionObject.getString("created")),
+                balanceTransactionObject.getString("currency"),
+                balanceTransactionObject.getString("description"),
+                String.parseFloat(balanceTransactionObject.getString("exchange_rate")),
+                String.parseFloat(balanceTransactionObject.getString("fee")),
+                feeDetails,
+                String.parseFloat(balanceTransactionObject.getString("net")),
+                balanceTransactionObject.getString("reporting_category"),
+                balanceTransactionObject.getString("source"),
+                balanceTransactionObject.getString("status"),
+                balanceTransactionObject.getString("type"),)
+        }
+        return balanceTransaction;
     }
 }

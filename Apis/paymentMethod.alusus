@@ -12,7 +12,6 @@
             return Possible[Array[SrdRef[PaymentMethod]]].failure(Errors.unexpected());
         }
         def paymentMethodObject: Json = request.responseBody;
-
         def i: int = 0;
         if paymentMethodObject.getString("object") != String("list") {
             paymentMethodArray.add(convertToPaymentMethod(paymentMethodObject));
@@ -24,6 +23,25 @@
             }
             for i = 0, i < paymentMethodObject.getObject("data").getLength(), i += 1 {
                 paymentMethodArray.add(convertToPaymentMethod(paymentMethodObject.getObject("data").getObject(i)));
+            }
+            while paymentMethodObject.getString("has_more") == String("true") {
+                request = SrdRef[Net.Request]().{
+                    alloc()~init(String.format("https://api.stripe.com/v1/customers/%s/payment_methods?starting_after=%s", paymentMethodArray(paymentMethodArray.getLength() - 1).id.buf), key, String("Bearer"));
+                }
+                request.verbose = verbose;
+                request.get();
+                if request.responseHttpStatus == 401 {
+                    return Possible[Array[SrdRef[Customer]]].failure(Errors.unauthenticated());
+                } else if request.responseHttpStatus == 0 {
+                    return Possible[Array[SrdRef[Customer]]].failure(Errors.connection());
+                } else if request.responseHttpStatus != 200 {
+                    return Possible[Array[SrdRef[Customer]]].failure(Errors.unexpected());
+                }
+                paymentMethodObject = request.responseBody;
+
+                for i = 0, i < paymentMethodObject.getObject("data").getLength(), i += 1 {
+                    paymentMethodArray.add(convertToPaymentMethod(paymentMethodObject.getObject("data").getObject(i)));
+                }
             }
         }
         return Possible[Array[SrdRef[PaymentMethod]]].success(paymentMethodArray);

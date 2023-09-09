@@ -1,7 +1,6 @@
 @merge module Stripe {
     func getCustomers(key: String, verbose: Bool): Possible[Array[SrdRef[Customer]]] {
         def customerArray: Array[SrdRef[Customer]];
-
         def request: SrdRef[Net.Request]
             request = SrdRef[Net.Request]().{
             alloc()~init(String("https://api.stripe.com/v1/customers"), key, String("Bearer"));
@@ -151,7 +150,6 @@
                 customerObject.getString("test_clock"),
                 customerObject.getObject("invoice_settings").getString("default_payment_method"))
         }
-
         return customer;
     }
 
