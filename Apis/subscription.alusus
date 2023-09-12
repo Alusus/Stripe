@@ -10,11 +10,11 @@
         } else if request.responseHttpStatus != 200 {
             return Possible[Array[SrdRef[Subscription]]].failure(Errors.unexpected());
         }
-        def subscriptionsJson: Json = request.responseBody.getObject("data");
+        def subscriptionsJson: Json = request.responseBody("data");
         def subscriptions: Array[SrdRef[Subscription]];
         def i: int = 0;
         for i = 0, i < subscriptionsJson.getLength(), i += 1 {
-            subscriptions.add(convertToSubscription(subscriptionsJson.getObject(i)));
+            subscriptions.add(convertToSubscription(subscriptionsJson(i)));
         }
         return Possible[Array[SrdRef[Subscription]]].success(subscriptions);
     }
@@ -58,7 +58,7 @@
             return Possible[String].failure(Errors.unexpected());
         }
         def subscriptionJson: Json = request.responseBody;
-        return Possible[String].success(subscriptionJson.getString("id"));
+        return Possible[String].success(subscriptionJson("id"));
     }
 
     func createSubscription(
@@ -79,28 +79,23 @@
     }
 
     func convertToSubscription(subscriptionJson: Json): SrdRef[Subscription] {
-        def automaticTax: bool = false;
-        def cancelAtPeriodEnd: Bool = false;
-        if subscriptionJson.getObject("automatic_tax").getBool("enabled") automaticTax = true;
-        if subscriptionJson.getBool("cancel_at_period_end") cancelAtPeriodEnd = true;
-        def subscription: SrdRef[Subscription] = SrdRef[Subscription]().{
+        return SrdRef[Subscription]().{
             alloc()~init(
-                subscriptionJson.getString("id"),
-                automaticTax,
-                subscriptionJson.getInt("billing_cycle_anchor"),
-                subscriptionJson.getInt("created"),
-                subscriptionJson.getString("collection_method"),
-                subscriptionJson.getInt("start_date"),
-                cancelAtPeriodEnd,
-                subscriptionJson.getInt("current_period_end"),
-                subscriptionJson.getInt("current_period_start"),
-                subscriptionJson.getString("description"),
-                subscriptionJson.getString("status"),
-                subscriptionJson.getInt("trial_end"),
-                subscriptionJson.getString("customer"),
-                subscriptionJson.getString("currency")
+                subscriptionJson("id"),
+                subscriptionJson("automatic_tax")("enabled"),
+                subscriptionJson("billing_cycle_anchor"),
+                subscriptionJson("created"),
+                subscriptionJson("collection_method"),
+                subscriptionJson("start_date"),
+                subscriptionJson("cancel_at_period_end"),
+                subscriptionJson("current_period_end"),
+                subscriptionJson("current_period_start"),
+                subscriptionJson("description"),
+                subscriptionJson("status"),
+                subscriptionJson("trial_end"),
+                subscriptionJson("customer"),
+                subscriptionJson("currency")
             )
-        }
-        return subscription;
+        };
     }
 }

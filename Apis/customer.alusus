@@ -1,7 +1,6 @@
 @merge module Stripe {
     func getCustomers(key: String, verbose: Bool): Possible[Array[SrdRef[Customer]]] {
         def customerArray: Array[SrdRef[Customer]];
-        def loc: String;
         def prfLoc: Array[String];
         def request: Net.Request(String("https://api.stripe.com/v1/customers"), key, String("Bearer"));
         request.verbose = verbose;
@@ -18,49 +17,44 @@
         def j: int = 0;
         def customer: SrdRef[Customer];
         def address: SrdRef[Address];
-        def delinquent: bool;
-        for i = 0, i < customerObject.getObject("data").getLength(), i += 1 {
-            for j = 0, j < customerObject.getObject("data").getObject(i).getObject("preferred_locales").getLength(), j++ {
-                loc = customerObject.getObject("data")
-                    .getObject(i).getObject("preferred_locales").getString(j)
-
-                prfLoc.add(loc);
+        for i = 0, i < customerObject("data").getLength(), i += 1 {
+            for j = 0, j < customerObject("data")(i)("preferred_locales").getLength(), j++ {
+                prfLoc.add(customerObject("data")(i)("preferred_locales")(j));
             }
-            if customerObject.getObject("data").getObject(i).getString("address") != String("null") {
+            if not customerObject("data")(i)("address").isNull() {
                 address = SrdRef[Address]().{
                     alloc()~init(
-                        customerObject.getObject("data").getObject(i).getObject("address").getString("city"),
-                        customerObject.getObject("data").getObject(i).getObject("address").getString("country"),
-                        customerObject.getObject("data").getObject(i).getObject("address").getString("line1"),
-                        customerObject.getObject("data").getObject(i).getObject("address").getString("line2"),
-                        customerObject.getObject("data").getObject(i).getObject("address").getString("postalCode"),
-                        customerObject.getObject("data").getObject(i).getObject("address").getString("state")
+                        customerObject("data")(i)("address")("city"),
+                        customerObject("data")(i)("address")("country"),
+                        customerObject("data")(i)("address")("line1"),
+                        customerObject("data")(i)("address")("line2"),
+                        customerObject("data")(i)("address")("postalCode"),
+                        customerObject("data")(i)("address")("state")
                     )
                 };
             } else
                 address = SrdRef[Address](). {
                 alloc()~init()
             };
-            delinquent = customerObject.getObject("data").getObject(i).getString("delinquent") == String("true");
             customer = SrdRef[Customer]().{
                 alloc()~init(
-                    customerObject.getObject("data").getObject(i).getString("id"),
+                    customerObject("data")(i)("id"),
                     address,
-                    String.parseFloat(customerObject.getObject("data").getObject(i).getString("balance")),
-                    String.parseInt(customerObject.getObject("data").getObject(i).getString("created")),
-                    customerObject.getObject("data").getObject(i).getString("currency"),
-                    customerObject.getObject("data").getObject(i).getString("default_source"),
-                    delinquent,
-                    customerObject.getObject("data").getObject(i).getString("description"),
-                    customerObject.getObject("data").getObject(i).getString("email"),
-                    customerObject.getObject("data").getObject(i).getString("invoice_prefix"),
-                    customerObject.getObject("data").getObject(i).getString("name"),
-                    String.parseInt(customerObject.getObject("data").getObject(i).getString("nextInvoiceSequence")),
-                    customerObject.getObject("data").getObject(i).getString("phone"),
+                    customerObject("data")(i)("balance"),
+                    customerObject("data")(i)("created"),
+                    customerObject("data")(i)("currency"),
+                    customerObject("data")(i)("default_source"),
+                    customerObject("data")(i)("delinquent"),
+                    customerObject("data")(i)("description"),
+                    customerObject("data")(i)("email"),
+                    customerObject("data")(i)("invoice_prefix"),
+                    customerObject("data")(i)("name"),
+                    customerObject("data")(i)("nextInvoiceSequence"),
+                    customerObject("data")(i)("phone"),
                     prfLoc,
-                    customerObject.getObject("data").getObject(i).getString("shipping"),
-                    customerObject.getObject("data").getObject(i).getString("tax_exempt"),
-                    customerObject.getObject("data").getObject(i).getString("test_clock")
+                    customerObject("data")(i)("shipping"),
+                    customerObject("data")(i)("tax_exempt"),
+                    customerObject("data")(i)("test_clock")
                 )
             }
             customerArray.add(customer);
@@ -70,7 +64,6 @@
     }
 
     func getCustomer(key: String, customerId: String, verbose: Bool): Possible[SrdRef[Customer]] {
-        def loc: String;
         def prfLoc: Array[String];
         def request: Net.Request(
             String.format("https://api.stripe.com/v1/customers/%s", customerId), key, String("Bearer")
@@ -90,57 +83,51 @@
         def i: int = 0;
         def customer: SrdRef[Customer];
         def address: SrdRef[Address];
-        def delinquent: bool;
 
-        for i = 0, i < customerObject.getObject("preferred_locales").getLength(), i++ {
-            loc = customerObject.getObject("data")
-                .getObject(i).getObject("preferred_locales").getString(i)
-                prfLoc.add(loc);
+        for i = 0, i < customerObject("preferred_locales").getLength(), i++ {
+            prfLoc.add(customerObject("data")(i)("preferred_locales")(i));
         }
-        if customerObject.getString("address") != String("null") {
+        if not customerObject("address").isNull() {
             address = SrdRef[Address]().{
                 alloc()~init(
-                    customerObject.getObject("address").getString("city"),
-                    customerObject.getObject("address").getString("country"),
-                    customerObject.getObject("address").getString("line1"),
-                    customerObject.getObject("address").getString("line2"),
-                    customerObject.getObject("address").getString("postalCode"),
-                    customerObject.getObject("address").getString("state")
-                )
+                    customerObject("address")("city"),
+                    customerObject("address")("country"),
+                    customerObject("address")("line1"),
+                    customerObject("address")("line2"),
+                    customerObject("address")("postalCode"),
+                    customerObject("address")("state")
+                );
             };
         } else
             address = SrdRef[Address](). {
             alloc()~init()
         };
-        if customerObject.getString("delinquent") == String("true") {
-            delinquent = true;
-        } else
-            delinquent = false;
         customer = SrdRef[Customer]().{
-            alloc()~init(customerObject.getString("id"),
+            alloc()~init(
+                customerObject("id"),
                 address,
-                String.parseFloat(customerObject.getString("balance")),
-                String.parseInt(customerObject.getString("created")),
-                customerObject.getString("currency"),
-                customerObject.getString("default_source"),
-                delinquent,
-                customerObject.getString("description"),
-                customerObject.getString("email"),
-                customerObject.getString("invoice_prefix"),
-                customerObject.getString("name"),
-                String.parseInt(customerObject.getString("nextInvoiceSequence")),
-                customerObject.getString("phone"),
+                customerObject("balance"),
+                customerObject("created"),
+                customerObject("currency"),
+                customerObject("default_source"),
+                customerObject("delinquent"),
+                customerObject("description"),
+                customerObject("email"),
+                customerObject("invoice_prefix"),
+                customerObject("name"),
+                customerObject("nextInvoiceSequence"),
+                customerObject("phone"),
                 prfLoc,
-                customerObject.getString("shipping"),
-                customerObject.getString("tax_exempt"),
-                customerObject.getString("test_clock"),)
+                customerObject("shipping"),
+                customerObject("tax_exempt"),
+                customerObject("test_clock")
+            );
         }
         return Possible[SrdRef[Customer]].success(customer);
     }
 
     func createCustomer(key: String, parameters: String, verbose: Bool): Possible[String] {
-        def b: bool = true;
-        def customerId: String;
+        def b: Bool = true;
         def request: Net.Request(
             String("https://api.stripe.com/v1/customers"),
             key,
@@ -159,7 +146,6 @@
             return Possible[String].failure(Errors.unexpected());
         }
         def customerObject: Json = request.responseBody;
-        customerId = customerObject.getString("id");
-        return Possible[String].success(customerId);
+        return Possible[String].success(customerObject("id"));
     }
 }

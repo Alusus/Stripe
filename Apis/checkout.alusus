@@ -15,32 +15,22 @@
         def i: int = 0;
         def j: int = 0;
         def checkout: SrdRef[CheckoutSession];
-        for i = 0, i < checkoutObject.getObject("data").getLength(), i += 1 {
+        for i = 0, i < checkoutObject("data").getLength(), i += 1 {
             checkout = SrdRef[CheckoutSession]().{
-                alloc()~init(checkoutObject.getObject("data")
-                    .getObject(i).getString("id"),
-                    checkoutObject.getObject("data")
-                    .getObject(i).getString("client_reference_id"),
-                    checkoutObject.getObject("data")
-                    .getObject(i).getString("cancel_url"),
-                    checkoutObject.getObject("data")
-                    .getObject(i).getString("success_url"),
-                    checkoutObject.getObject("data")
-                    .getObject(i).getString("url"),
-                    checkoutObject.getObject("data")
-                    .getObject(i).getString("currency"),
-                    checkoutObject.getObject("data")
-                    .getObject(i).getString("customer"),
-                    checkoutObject.getObject("data")
-                    .getObject(i).getString("line_items"),
-                    checkoutObject.getObject("data")
-                    .getObject(i).getString("mode"),
-                    checkoutObject.getObject("data")
-                    .getObject(i).getString("payment_status"),
-                    checkoutObject.getObject("data")
-                    .getObject(i).getString("status"),
-                    checkoutObject.getObject("data")
-                    .getObject(i).getString("amount_total"))
+                alloc()~init(
+                    checkoutObject("data")(i)("id"),
+                    checkoutObject("data")(i)("client_reference_id"),
+                    checkoutObject("data")(i)("cancel_url"),
+                    checkoutObject("data")(i)("success_url"),
+                    checkoutObject("data")(i)("url"),
+                    checkoutObject("data")(i)("currency"),
+                    checkoutObject("data")(i)("customer"),
+                    checkoutObject("data")(i)("line_items"),
+                    checkoutObject("data")(i)("mode"),
+                    checkoutObject("data")(i)("payment_status"),
+                    checkoutObject("data")(i)("status"),
+                    checkoutObject("data")(i)("amount_total")
+                );
             }
             checkOutArray.add(checkout);
         }
@@ -64,24 +54,25 @@
         def checkoutObject: Json = request.responseBody;
         def checkout: SrdRef[CheckoutSession];
         checkout = SrdRef[CheckoutSession]().{
-            alloc()~init(checkoutObject.getString("id"),
-                checkoutObject.getString("client_reference_id"),
-                checkoutObject.getString("cancel_url"),
-                checkoutObject.getString("success_url"),
-                checkoutObject.getString("url"),
-                checkoutObject.getString("currency"),
-                checkoutObject.getString("customer"),
-                checkoutObject.getString("line_items"),
-                checkoutObject.getString("mode"),
-                checkoutObject.getString("payment_status"),
-                checkoutObject.getString("status"),
-                checkoutObject.getString("amount_total"))
+            alloc()~init(
+                checkoutObject("id"),
+                checkoutObject("client_reference_id"),
+                checkoutObject("cancel_url"),
+                checkoutObject("success_url"),
+                checkoutObject("url"),
+                checkoutObject("currency"),
+                checkoutObject("customer"),
+                checkoutObject("line_items"),
+                checkoutObject("mode"),
+                checkoutObject("payment_status"),
+                checkoutObject("status"),
+                checkoutObject("amount_total")
+            );
         }
         return Possible[SrdRef[CheckoutSession]].success(checkout);
     }
 
     func createCheckoutSession(key: String, parameters: String, verbose: Bool): Possible[String] {
-        def checkOutSessionId: String;
         def request: Net.Request(
             String("https://api.stripe.com/v1/checkout/sessions"),
             key, String("Bearer"),
@@ -99,8 +90,7 @@
             return Possible[String].failure(Errors.unexpected());
         }
         def checkOutSessionObject: Json = request.responseBody;
-        checkOutSessionId = checkOutSessionObject.getString("id");
-        return Possible[String].success(checkOutSessionId);
+        return Possible[String].success(checkOutSessionObject("id"));
     }
 
     func createCheckoutSession(

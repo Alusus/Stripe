@@ -17,7 +17,7 @@
             return Possible[String].failure(Errors.unexpected());
         }
         def sessionJson: Json = request.responseBody;
-        return Possible[String].success(sessionJson.getString("url"));
+        return Possible[String].success(sessionJson("url"));
     }
 
     func createBillingPortalSession(
