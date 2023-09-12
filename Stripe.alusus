@@ -113,6 +113,10 @@ import "Errors";
             return Stripe.getSubscriptions(this.key, this.verbose);
         }
 
+        handler this.getSubscriptions(searchString : String): Possible[Array[SrdRef[Subscription]]] {
+            return Stripe.getSubscriptions(this.key,searchString, this.verbose);
+        }
+
         handler this.getSubscription(subscriptionId: String): Possible[SrdRef[Subscription]] {
             return Stripe.getSubscription(this.key, subscriptionId, this.verbose);
         }
@@ -121,9 +125,14 @@ import "Errors";
             return Stripe.createSubscription(this.key, parameters, this.verbose);
         }
 
+        handler this.updateSubscription(parameters: String,subscriptionId : String): Possible[String] {
+            return Stripe.updateSubscription(this.key, parameters,subscriptionId, this.verbose);
+        }
+
         handler this.createSubscription(items: Map[String, Int], customerId: String): Possible[String] {
             return Stripe.createSubscription(this.key, items, customerId, this.verbose);
         }
+
 
         // PaymentMethod APIs
         handler this.getPaymentMethods(customerId: String): Possible[Array[SrdRef[PaymentMethod]]] {

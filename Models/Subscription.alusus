@@ -15,6 +15,7 @@
         def currency: String = "usd";
         def customerId: String;
         def collectionMethod: String;
+        def containerStatus : String="";
 
         handler this~init() {
         }
@@ -23,7 +24,7 @@
             id: String, automaticTax: Bool, billingCycleAnchor: Int[64], created: Int[64],
             collectionMethod: String, startDate: Int[64], cancelAtPeriodEnd: Bool,
             currentPeriodEnd: Int[64], currentPeriodStart: Int[64], description: String, status: String,
-            trialEnd: Int[64], customerId: String, currency: String
+            trialEnd: Int[64], customerId: String, currency: String,containerStatus : String
         ) {
             this.id = id;
             this.automaticTax = automaticTax;
@@ -39,6 +40,7 @@
             this.trialEnd = trialEnd;
             this.customerId = customerId;
             this.currency = currency;
+            this.containerStatus = containerStatus;
         }
     }
 }
