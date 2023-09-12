@@ -17,47 +17,45 @@
         def j: int = 0;
         def source: SrdRef[Source];
         def balance: SrdRef[Balance];
-        for i = 0, i < balanceObject.getObject("available").getLength(), i += 1 {
-            for j = 0, j < balanceObject.getObject("available").getObject(i).getObject("source_types").getLength(), j++ {
+        for i = 0, i < balanceObject("available").getLength(), i += 1 {
+            for j = 0, j < balanceObject("available")(i)("source_types").getLength(), j++ {
                 source = SrdRef[Source]().{
                     alloc()~init(
                         String.parseFloat(
-                            balanceObject.getObject("available").getObject(i).getObject("source_types").values(j)
+                            balanceObject("available")(i)("source_types").values(j)
                         ),
-                        balanceObject.getObject("available").getObject(i).getObject("source_types").keys(j)
+                        balanceObject("available")(i)("source_types").keys(j)
                     )
                 }
                 sourceArray.add(source);
             }
             balance = SrdRef[Balance](). {
                 alloc()~init(
-                    String.parseFloat(
-                        balanceObject.getObject("available").getObject(i).getString("amount")
-                    ),
-                    balanceObject.getObject("available").getObject(i).getString("currency"),
+                    balanceObject("available")(i)("amount"),
+                    balanceObject("available")(i)("currency"),
                     sourceArray, String("available")
                 )
             }
             balanceArray.add(balance);
             sourceArray.clear();
         }
-        for i = 0, i < balanceObject.getObject("pending").getLength(), i += 1 {
-            for j = 0, j < balanceObject.getObject("pending").getObject(i).getObject("source_types").getLength(), j++ {
+        for i = 0, i < balanceObject("pending").getLength(), i += 1 {
+            for j = 0, j < balanceObject("pending")(i)("source_types").getLength(), j++ {
                 source = SrdRef[Source]().{
                     alloc()~init(
-                        String.parseFloat(
-                            balanceObject.getObject("pending").getObject(i).getObject("source_types").values(j)
-                        ),
-                        balanceObject.getObject("pending").getObject(i).getObject("source_types").keys(j)
+                        balanceObject("pending")(i)("source_types")(j),
+                        balanceObject("pending")(i)("source_types").getKey(j)
                     )
                 }
                 sourceArray.add(source);
             }
-            balance = SrdRef[Balance](). {
-                alloc()~init(String.parseFloat(balanceObject.getObject("available")
-                    .getObject(i).getString("amount")),
-                    balanceObject.getObject("available").getObject(i).getString("currency"),
-                    sourceArray, String("pending"))
+            balance = SrdRef[Balance]().{
+                alloc()~init(
+                    balanceObject("available")(i)("amount"),
+                    balanceObject("available")(i)("currency"),
+                    sourceArray,
+                    String("pending")
+                );
             }
             balanceArray.add(balance);
             sourceArray.clear();

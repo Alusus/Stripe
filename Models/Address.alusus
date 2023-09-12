@@ -10,7 +10,9 @@
         handler this~init() {
         }
 
-        handler this~init(city: String, country: String, line1: String, line2: String, postalCode: String, state: String) {
+        handler this~init(
+            city: String, country: String, line1: String, line2: String, postalCode: String, state: String
+        ) {
             this.city = city;
             this.country = country;
             this.line1 = line1;
