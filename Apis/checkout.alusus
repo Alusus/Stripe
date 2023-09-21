@@ -1,7 +1,16 @@
 @merge module Stripe {
-    func getCheckoutSessions(key: String, verbose: Bool): Possible[Array[SrdRef[CheckoutSession]]] {
+    func getCheckoutSessions(key: String,limit : int,startId: String, verbose: Bool): Possible[Array[SrdRef[CheckoutSession]]] {
         def checkOutArray: Array[SrdRef[CheckoutSession]];
-        def request: Net.Request(String("https://api.stripe.com/v1/checkout/sessions"), key, String("Bearer"));
+        def requestUrl:  String;
+        if startId == String(""){
+            requestUrl = String("https://api.stripe.com/v1/checkout/sessions");
+        }else{
+            requestUrl = String.format("https://api.stripe.com/v1/checkout/sessions?starting_after=%s",startId.buf);
+        }
+        def request : SrdRef[Net.Request];
+        request = SrdRef[Net.Request]().{
+            alloc()~init(requestUrl, key, String("Bearer"));
+        };
         request.verbose = verbose;
         request.get();
         if request.responseHttpStatus == 401 {
@@ -11,30 +20,56 @@
         } else if request.responseHttpStatus != 200 {
             return Possible[Array[SrdRef[CheckoutSession]]].failure(Errors.unexpected());
         }
-        def checkoutObject: Json = request.responseBody;
+        def checkoutSessionObject: Json = request.responseBody;
         def i: int = 0;
-        def j: int = 0;
-        def checkout: SrdRef[CheckoutSession];
-        for i = 0, i < checkoutObject("data").getLength(), i += 1 {
-            checkout = SrdRef[CheckoutSession]().{
-                alloc()~init(
-                    checkoutObject("data")(i)("id"),
-                    checkoutObject("data")(i)("client_reference_id"),
-                    checkoutObject("data")(i)("cancel_url"),
-                    checkoutObject("data")(i)("success_url"),
-                    checkoutObject("data")(i)("url"),
-                    checkoutObject("data")(i)("currency"),
-                    checkoutObject("data")(i)("customer"),
-                    checkoutObject("data")(i)("line_items"),
-                    checkoutObject("data")(i)("mode"),
-                    checkoutObject("data")(i)("payment_status"),
-                    checkoutObject("data")(i)("status"),
-                    checkoutObject("data")(i)("amount_total")
-                );
+        def objectString : String=checkoutSessionObject("object");
+        if  objectString != String("list") {
+            checkOutArray.add(convertToCheckoutSession(checkoutSessionObject));
+        } else {
+            def length : int=0;
+            if  limit > checkoutSessionObject("data").getLength() or limit==-1{
+                length=  checkoutSessionObject("data").getLength();
             }
-            checkOutArray.add(checkout);
+            else {
+                length=limit;
+            }
+            for i = 0, i < length, i += 1 {
+                checkOutArray.add(convertToCheckoutSession(checkoutSessionObject("data")(i)));
+            }
+            if limit >0{
+                length = limit-length;
+            }
+             // limit =-1 to recive all the data 
+            def haseMore : bool=checkoutSessionObject("has_more");
+            while haseMore and (limit ==-1 or length>0) {
+                request = SrdRef[Net.Request]().{
+                    alloc()~init(String.format("https://api.stripe.com/v1/checkout/sessions?starting_after=%s", checkOutArray(checkOutArray.getLength() - 1).id.buf), key, String("Bearer"));
+                }
+                request.verbose = verbose;
+                request.get();
+                if request.responseHttpStatus == 401 {
+                    return Possible[Array[SrdRef[Customer]]].failure(Errors.unauthenticated());
+                } else if request.responseHttpStatus == 0 {
+                    return Possible[Array[SrdRef[Customer]]].failure(Errors.connection());
+                } else if request.responseHttpStatus != 200 {
+                    return Possible[Array[SrdRef[Customer]]].failure(Errors.unexpected());
+                }
+                checkoutSessionObject = request.responseBody;
+                haseMore = checkoutSessionObject("has_more");
+                if  length >= checkoutSessionObject("data").getLength() or limit==-1{
+                    for i = 0, i < checkoutSessionObject("data").getLength(), i += 1 {
+                        checkOutArray.add(convertToCheckoutSession(checkoutSessionObject("data")(i)));
+                    }
+                    length = length -  checkoutSessionObject("data").getLength();
+                }
+                else{
+                    for i = 0, i < length, i += 1 {
+                        checkOutArray.add(convertToCheckoutSession(checkoutSessionObject("data")(i)));
+                    }
+                    length=0;
+                }
+            }
         }
-
         return Possible[Array[SrdRef[CheckoutSession]]].success(checkOutArray);
     }
 
@@ -51,25 +86,8 @@
         } else if request.responseHttpStatus != 200 {
             return Possible[SrdRef[CheckoutSession]].failure(Errors.unexpected());
         }
-        def checkoutObject: Json = request.responseBody;
-        def checkout: SrdRef[CheckoutSession];
-        checkout = SrdRef[CheckoutSession]().{
-            alloc()~init(
-                checkoutObject("id"),
-                checkoutObject("client_reference_id"),
-                checkoutObject("cancel_url"),
-                checkoutObject("success_url"),
-                checkoutObject("url"),
-                checkoutObject("currency"),
-                checkoutObject("customer"),
-                checkoutObject("line_items"),
-                checkoutObject("mode"),
-                checkoutObject("payment_status"),
-                checkoutObject("status"),
-                checkoutObject("amount_total")
-            );
-        }
-        return Possible[SrdRef[CheckoutSession]].success(checkout);
+        def checkoutSessionObject: Json = request.responseBody;
+        return Possible[SrdRef[CheckoutSession]].success(convertToCheckoutSession(checkoutSessionObject));
     }
 
     func createCheckoutSession(key: String, parameters: String, verbose: Bool): Possible[String] {
@@ -115,5 +133,25 @@
             );
         }
         return createCheckoutSession(key, parameters, verbose);
+    }
+    func convertToCheckoutSession(checkoutSessionObject: Json): SrdRef[CheckoutSession] {
+        def checkoutSession: SrdRef[CheckoutSession];
+        checkoutSession = SrdRef[CheckoutSession]().{
+        alloc()~init(
+                checkoutSessionObject("id"),
+                checkoutSessionObject("client_reference_id"),
+                checkoutSessionObject("cancel_url"),
+                checkoutSessionObject("success_url"),
+                checkoutSessionObject("url"),
+                checkoutSessionObject("currency"),
+                checkoutSessionObject("customer"),
+                checkoutSessionObject("line_items"),
+                checkoutSessionObject("mode"),
+                checkoutSessionObject("payment_status"),
+                checkoutSessionObject("status"),
+                checkoutSessionObject("amount_total")
+            )
+        };
+        return checkoutSession;
     }
 }

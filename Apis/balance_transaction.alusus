@@ -1,52 +1,98 @@
 @merge module Stripe {
-    func getBalanceTranasactions(key: String, verbose: Bool): Possible[Array[SrdRef[BalanceTransaction]]] {
+    func getBalanceTransactions(key: String, limit : int,startId: String,verbose: Bool): Possible[Array[SrdRef[BalanceTransaction]]] {
         def balanceTransactionArray: Array[SrdRef[BalanceTransaction]];
-        def request: Net.Request(String("https:/api.stripe.com/v1/balance_transactions"), key, String("Bearer"));
+        def requestUrl : String;
+        if startId == String(""){
+            requestUrl = String("https:/api.stripe.com/v1/balance_transactions");
+        }else{
+            requestUrl = String.format("https:/api.stripe.com/v1/balance_transactions?starting_after=%s",startId.buf);
+        }
+        def request: SrdRef[Net.Request]
+        request = SrdRef[Net.Request]().{
+        alloc()~init(requestUrl, key, String("Bearer"));
+        };
         request.verbose = verbose;
         request.get();
+        Console.print("\n%s\n",request.responseBody.buf);
         if request.responseHttpStatus == 401 {
             return Possible[Array[SrdRef[BalanceTransaction]]].failure(Errors.unauthenticated());
+        }else if request.responseHttpStatus == 404 {
+            return Possible[Array[SrdRef[BalanceTransaction]]].failure(Errors.notFound());
         } else if request.responseHttpStatus == 0 {
             return Possible[Array[SrdRef[BalanceTransaction]]].failure(Errors.connection());
         } else if request.responseHttpStatus != 200 {
             return Possible[Array[SrdRef[BalanceTransaction]]].failure(Errors.unexpected());
         }
-        def balanceObject: Json = request.responseBody;
-        def i: int = 0;
-        def j: int = 0;
-        def balanceTransaction: SrdRef[BalanceTransaction];
-        def feeDetails: Array[String];
-        for i = 0, i < balanceObject("data").getLength(), i += 1 {
-            for j = 0, j < balanceObject("data")(i)("fee_details").getLength(), j++ {
-                feeDetails.add(balanceObject("data")(i)("fee_details")(i));
+        def balanceTransactionObject: Json = request.responseBody;
+        Console.print("\n%s\n",balanceTransactionObject("object"))
+        def objectString : String=balanceTransactionObject("object");
+        if  objectString != String("list") {
+            balanceTransactionArray.add(convertToBalanceTransaction(balanceTransactionObject));
+        } else{
+            def i: int = 0;
+            def length : int=0;
+            if  limit > balanceTransactionObject("data").getLength() or limit==-1{
+                length=  balanceTransactionObject("data").getLength();
             }
-            balanceTransaction = SrdRef[BalanceTransaction]().{
-                alloc()~init(
-                    balanceObject("data")(i)("id"),
-                    balanceObject("data")(i)("amount"),
-                    balanceObject("data")(i)("available_on"),
-                    balanceObject("data")(i)("created"),
-                    balanceObject("data")(i)("currency"),
-                    balanceObject("data")(i)("description"),
-                    balanceObject("data")(i)("exchange_rate"),
-                    balanceObject("data")(i)("fee"),
-                    feeDetails,
-                    balanceObject("data")(i)("net"),
-                    balanceObject("data")(i)("reporting_category"),
-                    balanceObject("data")(i)("source"),
-                    balanceObject("data")(i)("status"),
-                    balanceObject("data")(i)("type")
-                );
+            else {
+                length=limit;
             }
-            balanceTransactionArray.add(balanceTransaction);
-            feeDetails.clear();
+            for i = 0, i < length, i += 1 {
+                balanceTransactionArray.add(convertToBalanceTransaction(balanceTransactionObject("data")(i)));   
+            }
+            if limit >0{
+                length = limit-length;
+            }
+             // limit =-1 to recive all the data 
+             def haseMore : bool=balanceTransactionObject("has_more");
+             Console.print("\n%i\n",length);
+            while  haseMore and (limit ==-1 or length>0){
+                Console.print("\n%i\n",length);
+                request = SrdRef[Net.Request]().{
+                    alloc()~init(String.format("https:/api.stripe.com/v1/balance_transactions?starting_after=%s",
+                                 balanceTransactionArray(balanceTransactionArray.getLength() - 1).id.buf), 
+                                 key, String("Bearer"));
+                };
+                request.verbose = verbose;
+                request.get();
+                if request.responseHttpStatus == 401 {
+                    return Possible[Array[SrdRef[BalanceTransaction]]].failure(Errors.unauthenticated());
+                }else if request.responseHttpStatus == 404 {
+                    return Possible[Array[SrdRef[BalanceTransaction]]].failure(Errors.notFound());
+                } else if request.responseHttpStatus == 0 {
+                    return Possible[Array[SrdRef[BalanceTransaction]]].failure(Errors.connection());
+                } else if request.responseHttpStatus != 200 {
+                    return Possible[Array[SrdRef[BalanceTransaction]]].failure(Errors.unexpected());
+                }
+                
+                balanceTransactionObject = request.responseBody;
+                haseMore = balanceTransactionObject("has_more");
+                if  length >= balanceTransactionObject("data").getLength() or limit==-1{
+                    
+                    for i = 0, i < balanceTransactionObject("data").getLength(), i += 1 {
+                        balanceTransactionArray.add(convertToBalanceTransaction(balanceTransactionObject("data")(i)));   
+                    }
+                    length = length -  balanceTransactionObject("data").getLength()
+                }
+                else{
+                    for i = 0, i < length, i += 1 {
+                        balanceTransactionArray.add(convertToBalanceTransaction(balanceTransactionObject("data")(i)));   
+                    }
+                    length=0;
+                
+                }
+                
+            }
         }
-
-
+        
         return Possible[Array[SrdRef[BalanceTransaction]]].success(balanceTransactionArray);
     }
+    
+    
+    
+    
 
-    func getBalanceTranasaction(key: String, id: String, verbose: Bool): SrdRef[BalanceTransaction] {
+    func getBalanceTransaction(key: String, id: String, verbose: Bool): SrdRef[BalanceTransaction] {
         def request: Net.Request(
             String.format("https:/api.stripe.com/v1/balance_transactions%s", id.buf),
             key,
@@ -63,31 +109,35 @@
         } else if request.responseHttpStatus != 200 {
             return Possible[SrdRef[BalanceTransaction]].failure(Errors.unexpected());
         }
-        def balanceObject: Json = request.responseBody.buf;
+        def balanceTransactionObject: Json = request.responseBody.buf;
+        return Possible[SrdRef[BalanceTransaction]].success(convertToBalanceTransaction(balanceTransactionObject));
+    }
+    func convertToBalanceTransaction(balanceTransactionObject: Json): SrdRef[BalanceTransaction] {
+        def balanceTransaction : SrdRef[BalanceTransaction];
         def i: int = 0;
         def feeDetails: Array[String];
-        for i = 0, i < balanceObject("fee_details").getLength(), i++ {
-            feeDetails.add(balanceObject("fee_details")(i));
+        for i = 0, i < balanceTransactionObject("fee_details").getLength(), i++ {
+            feeDetails.add(balanceTransactionObject("fee_details")(i));
         }
 
         balanceTransaction = SrdRef[BalanceTransaction]().{
             alloc()~init(
-                balanceObject("id"),
-                balanceObject("amount"),
-                balanceObject("available_on"),
-                balanceObject("created"),
-                balanceObject("currency"),
-                balanceObject("description"),
-                balanceObject("exchange_rate"),
-                balanceObject("fee"),
+                balanceTransactionObject("id"),
+                balanceTransactionObject("amount"),
+                balanceTransactionObject("available_on"),
+                balanceTransactionObject("created"),
+                balanceTransactionObject("currency"),
+                balanceTransactionObject("description"),
+                balanceTransactionObject("exchange_rate"),
+                balanceTransactionObject("fee"),
                 feeDetails,
-                balanceObject("net"),
-                balanceObject("reporting_category"),
-                balanceObject("source"),
-                balanceObject("status"),
-                balanceObject("type")
+                balanceTransactionObject("net"),
+                balanceTransactionObject("reporting_category"),
+                balanceTransactionObject("source"),
+                balanceTransactionObject("status"),
+                balanceTransactionObject("type")
             );
         }
-        return Possible[SrdRef[BalanceTransaction]].success(balanceTransaction);
+        return balanceTransaction;
     }
 }
