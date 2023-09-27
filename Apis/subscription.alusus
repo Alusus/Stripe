@@ -1,64 +1,52 @@
 @merge module Stripe {
     func getSubscriptions(key: String, verbose: Bool): Possible[Array[SrdRef[Subscription]]] {
-        def request: Net.Request(String("https://api.stripe.com/v1/subscriptions"), key, String("Bearer"));
-        request.verbose = verbose;
-        request.get();
-        if request.responseHttpStatus == 401 {
-            return Possible[Array[SrdRef[Subscription]]].failure(Errors.unauthenticated());
-        } else if request.responseHttpStatus == 0 {
-            return Possible[Array[SrdRef[Subscription]]].failure(Errors.connection());
-        } else if request.responseHttpStatus != 200 {
-            return Possible[Array[SrdRef[Subscription]]].failure(Errors.unexpected());
-        }
-        def subscriptionsJson: Json = request.responseBody("data");
+        return getRecords[Subscription, convertToSubscription](
+            key, String("https://api.stripe.com/v1/subscriptions"), -1, String(), verbose
+        );
+    }
+    
+    func getSubscriptions(key: String, searchString: String, verbose: Bool): Possible[Array[SrdRef[Subscription]]] {
         def subscriptions: Array[SrdRef[Subscription]];
-        def i: int = 0;
-        for i = 0, i < subscriptionsJson.getLength(), i += 1 {
-            subscriptions.add(convertToSubscription(subscriptionsJson(i)));
+        def page: String;
+        while 1 {
+            def searchUrl: String = "https://api.stripe.com/v1/subscriptions/search";
+            if page != "" searchUrl += String("?page=") + page
+            else searchUrl += String("?query=") + Net.uriEncode(searchString);
+            def request: Net.Request(searchUrl, key, String("Bearer"));
+            request.verbose = verbose;
+            request.get();
+            if request.responseHttpStatus == 401 {
+                return Possible[Array[SrdRef[Subscription]]].failure(Errors.unauthenticated());
+            } else if request.responseHttpStatus == 404 {
+                return Possible[Array[SrdRef[Subscription]]].failure(Errors.notFound());
+            } else if request.responseHttpStatus == 0 {
+                return Possible[Array[SrdRef[Subscription]]].failure(Errors.connection());
+            } else if request.responseHttpStatus != 200 {
+                return Possible[Array[SrdRef[Subscription]]].failure(Errors.unexpected());
+            }
+            def subscriptionsJson: Json = request.responseBody;
+            if subscriptionsJson("object") == String("search_result") {
+                for i = 0, i < subscriptionsJson("data").getLength(), i += 1 {
+                    subscriptions.add(convertToSubscription(subscriptionsJson("data")(i)));
+                }
+                if not subscriptionsJson("has_more") break;
+                page = subscriptionsJson("next_page");
+            } else {
+                subscriptions.add(convertToSubscription(subscriptionsJson));
+                break;
+            }
         }
         return Possible[Array[SrdRef[Subscription]]].success(subscriptions);
     }
 
     func getSubscription(key: String, checkoutId: String, verbose: Bool): Possible[SrdRef[Subscription]] {
-        def request: Net.Request(
-            String.format("https://api.stripe.com/v1/subscriptions/%s", checkoutId.buf),
-            key,
-            String("Bearer")
+        return getRecord[Subscription, convertToSubscription](
+            key, "https://api.stripe.com/v1/subscriptions", checkoutId, verbose
         );
-        request.verbose = verbose;
-        request.get();
-        if request.responseHttpStatus == 401 {
-            return Possible[SrdRef[Subscription]].failure(Errors.unauthenticated());
-        } else if request.responseHttpStatus == 404 {
-            return Possible[SrdRef[Subscription]].failure(Errors.notFound());
-        } else if request.responseHttpStatus == 0 {
-            return Possible[SrdRef[Subscription]].failure(Errors.connection());
-        } else if request.responseHttpStatus != 200 {
-            return Possible[SrdRef[Subscription]].failure(Errors.unexpected());
-        }
-        def subscriptionJson: Json = request.responseBody;
-        return Possible[SrdRef[Subscription]].success(convertToSubscription(subscriptionJson));
     }
 
     func createSubscription(key: String, parameters: String, verbose: Bool): Possible[String] {
-        def request: Net.Request(
-            String("https://api.stripe.com/v1/subscriptions"),
-            key, String("Bearer"),
-            String("application/x-www-form-urlencoded")
-        );
-        request.verbose = verbose;
-        request.post(parameters.buf);
-        if request.responseHttpStatus == 401 {
-            return Possible[String].failure(Errors.unauthenticated());
-        } else if request.responseHttpStatus == 400 {
-            return Possible[String].failure(Errors.invalidParams());
-        } else if request.responseHttpStatus == 0 {
-            return Possible[String].failure(Errors.connection());
-        } else if request.responseHttpStatus != 200 {
-            return Possible[String].failure(Errors.unexpected());
-        }
-        def subscriptionJson: Json = request.responseBody;
-        return Possible[String].success(subscriptionJson("id"));
+        return postRecord(key, String("https://api.stripe.com/v1/subscriptions"), parameters, verbose);
     }
 
     func createSubscription(
@@ -79,6 +67,11 @@
     }
 
     func convertToSubscription(subscriptionJson: Json): SrdRef[Subscription] {
+        def metadata: Map[String, String];
+        def i: Int;
+        for i = 0, i < subscriptionJson("metadata").getLength(), ++i {
+            metadata[subscriptionJson("metadata").getKey(i)] = subscriptionJson("metadata")(i);
+        }
         return SrdRef[Subscription]().{
             alloc()~init(
                 subscriptionJson("id"),
@@ -94,8 +87,18 @@
                 subscriptionJson("status"),
                 subscriptionJson("trial_end"),
                 subscriptionJson("customer"),
-                subscriptionJson("currency")
+                subscriptionJson("currency"),
+                metadata
             )
         };
+    }
+
+    func updateSubscription(key: String, subscriptionId: String, parameters: String, verbose: Bool): Possible[String] {
+        return postRecord(
+            key,
+            String.format("https://api.stripe.com/v1/subscriptions/%s", subscriptionId.buf),
+            parameters,
+            verbose
+        );
     }
 }

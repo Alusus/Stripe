@@ -38,6 +38,14 @@
         عرف نوع_المصدر: لقب sourceType؛
     }
 
+    عرف تـفاصيل_فوترة: لقب BillingDetails؛
+    @دمج صنف تـفاصيل_فوترة {
+        عرف العنوان: لقب address؛
+        عرف البريد_الإلكتروني: لقب email؛
+        عرف الاسم: لقب name؛
+        عرف رقم_الهاتف: لقب phone؛
+    }
+
     عرف جـلسة_شراء: لقب CheckoutSession؛
     @دمج صنف جـلسة_شراء {
         عرف المعرف: لقب id؛
@@ -73,6 +81,20 @@
         عرف تسلسل_الفاتورة_التالي: لقب nextInvoiceSequence؛
         عرف العملة: لقب currency؛
         عرف الوصف: لقب description؛
+        عرف طريقة_الدفع_المبدئية: لقب defaultPaymentMethod؛
+    }
+
+    عرف طـريقة_دفع: لقب PaymentMethod؛
+    @دمج صنف طـريقة_دفع {
+        عرف المعرف: لقب id؛
+        عرف تفاصيل_الفوترة: لقب billingDetails؛
+        عرف تاريخ_الإنشاء: لقب created؛
+        عرف العملة: لقب currency؛
+        عرف معرف_الزبون: لقب customerId؛
+        عرف سنة_انقضاء_الصلاحية: لقب expYear؛
+        عرف شهر_انقضاء_الصلاحية: لقب expMonth؛
+        عرف آخر4: لقب last4؛
+        عرف النوع: لقب type؛
     }
 
     عرف مـصدر: لقب Source؛
@@ -98,6 +120,7 @@
         عرف العملة: لقب currency؛
         عرف معرف_الزبون: لقب customerId؛
         عرف طريقة_الجمع: لقب collectionMethod؛
+        عرف بيانات_وصفية: لقب metadata؛
     }
 
     عرف وكـيل: لقب Client؛
@@ -106,16 +129,21 @@
         عرف هات_الزبائن: لقب getCustomers؛
         عرف هات_زبونا: لقب getCustomer؛
         عرف أنشئ_زبونا: لقب createCustomer؛
+        عرف أيملك_الزبون_طريقة_دفع_مبدئية: لقب doesCustomerHaveDefaultPaymentMethod؛
+        عرف أضف_طريقة_دفع_مبدئية_للزبون: لقب addCustomerDefaultPaymentMethod؛
         عرف هات_جلسات_إتمام_الشراء: لقب getCheckoutSessions؛
         عرف هات_جلسة_إتمام_الشراء: لقب getCheckoutSession؛
         عرف أنشئ_جلسة_إتمام_شراء: لقب createCheckoutSession؛
         عرف هات_الرصيد: لقب getBalance؛
-        عرف هات_عمليات_الرصيد: لقب getBalanceTranasactions؛
-        عرف هات_عملية_رصيد: لقب getBalanceTranasaction؛
+        عرف هات_عمليات_الرصيد: لقب getBalanceTransactions؛
+        عرف هات_عملية_رصيد: لقب getBalanceTransaction؛
         عرف أنشئ_جلسة_تحكم_بالفوترة: لقب createBillingPortalSession؛
         عرف هات_الاشتراكات: لقب getSubscriptions؛
         عرف هات_اشتراكا: لقب getSubscription؛
         عرف أنشئ_اشتراكا: لقب createSubscription؛
+        عرف حدث_اشتراكا: لقب updateSubscription؛
+        عرف هات_طرق_الدفع: لقب getPaymentMethods؛
+        عرف هات_طريقة_دفع: لقب getPaymentMethod؛
     }
 
     عرف أخـطاء: لقب Errors؛

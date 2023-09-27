@@ -1,0 +1,63 @@
+@merge module Stripe {
+    func getPaymentMethods(key: String, customerId: String, verbose: Bool): Possible[Array[SrdRef[PaymentMethod]]] {
+        return getRecords[PaymentMethod, convertToPaymentMethod](
+            key, String.format("https://api.stripe.com/v1/customers/%s/payment_methods", customerId.buf),
+            -1, String(), verbose
+        );
+    }
+
+    func getPaymentMethod(key: String, paymentMethodId: String, verbose: Bool): Possible[SrdRef[PaymentMethod]] {
+        return getRecord[PaymentMethod, convertToPaymentMethod](
+            key, "https://api.stripe.com/v1/payment_methods", paymentMethodId, verbose
+        );
+    }
+
+    func convertToPaymentMethod(paymentMethodObject: Json): SrdRef[PaymentMethod] {
+        def paymentMethod: SrdRef[PaymentMethod];
+        def address: SrdRef[Address];
+        def billingDetails: SrdRef[BillingDetails];
+        if not paymentMethodObject("billing_details").isNull() {
+            if paymentMethodObject("billing_details")("address").isNull(){
+                address = SrdRef[Address]().{
+                    alloc()~init(
+                        paymentMethodObject("billing_details")("address")("city"),
+                        paymentMethodObject("billing_details")("address")("country"),
+                        paymentMethodObject("billing_details")("address")("line1"),
+                        paymentMethodObject("billing_details")("address")("line2"),
+                        paymentMethodObject("billing_details")("address")("postalCode"),
+                        paymentMethodObject("billing_details")("address")("state")
+                    )
+                };
+            } else {
+                address = SrdRef[Address]().{
+                    alloc()~init()
+                };
+            }
+            billingDetails = SrdRef[BillingDetails](). {
+                alloc()~init(
+                    address,
+                    paymentMethodObject("billing_details")("email"),
+                    paymentMethodObject("billing_details")("name"),
+                    paymentMethodObject("billing_details")("phone")
+                )
+            };
+        } else {
+            billingDetails = SrdRef[BillingDetails]().{
+                alloc()~init()
+            };
+        }
+        paymentMethod = SrdRef[PaymentMethod](). {
+            alloc()~init(
+                paymentMethodObject("id"),
+                billingDetails,
+                String.parseInt(paymentMethodObject("created")),
+                String.parseInt(paymentMethodObject("card")("exp_year")),
+                String.parseInt(paymentMethodObject("card")("exp_month")),
+                paymentMethodObject("currency"),
+                paymentMethodObject("card")("last4"),
+                paymentMethodObject("type")
+            )
+        };
+        return paymentMethod;
+    }
+}

@@ -1,0 +1,31 @@
+@merge module Stripe {
+    class PaymentMethod {
+        def id: String;
+        def billingDetails: SrdRef[BillingDetails];
+        def created: Int[64];
+        def currency: String = "usd";
+        def customerId: String;
+        def expYear: Int;
+        def expMonth: Int;
+        def last4: String;
+        def type: String;
+
+        handler this~init() {
+        }
+
+        handler this~init(
+            id: String, billingDetails: SrdRef[BillingDetails], created: Int[64], expYear: Int, expMonth: Int,
+            currency: String, last4: String, type: String
+        ) {
+            this.id = id;
+            this.billingDetails = billingDetails;
+            this.created = created;
+            this.expYear = expYear;
+            this.expMonth = expMonth;
+            this.currency = currency;
+            this.last4 = last4;
+            this.type = type;
+        }
+    }
+}
+

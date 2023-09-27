@@ -1,0 +1,45 @@
+@merge module Stripe {
+    func getRecords [RecordType: type, convertor: function] (
+        key: String, url: String, limit: Int, startId: String, verbose: Bool
+    ): Possible[Array[SrdRef[RecordType]]] {
+        def records: Array[SrdRef[RecordType]];
+        while 1 {
+            def requestUrl: String;
+            if startId == "" {
+                requestUrl = url;
+            } else {
+                requestUrl = String.format("%s?starting_after=%s", url.buf, startId.buf);
+            }
+            def request: Net.Request(requestUrl, key, String("Bearer"));
+            request.verbose = verbose;
+            request.get();
+            if request.responseHttpStatus == 401 {
+                return Possible[Array[SrdRef[RecordType]]].failure(Errors.unauthenticated());
+            } else if request.responseHttpStatus == 404 {
+                return Possible[Array[SrdRef[RecordType]]].failure(Errors.notFound());
+            } else if request.responseHttpStatus == 0 {
+                return Possible[Array[SrdRef[RecordType]]].failure(Errors.connection());
+            } else if request.responseHttpStatus != 200 {
+                return Possible[Array[SrdRef[RecordType]]].failure(Errors.unexpected());
+            }
+            def recordsJson: Json = request.responseBody;
+            if recordsJson("object")~cast[String] == "list" {
+                def length: Int = recordsJson("data").getLength();
+                if limit != -1 {
+                    if length > limit length = limit;
+                    limit -= length;
+                }
+                def i: Int;
+                for i = 0, i < length, i += 1 {
+                    records.add(convertor(recordsJson("data")(i)));
+                }
+                if limit == 0 or not recordsJson("has_more") break;
+                startId = records(records.getLength() - 1).id;
+            } else {
+                records.add(convertor(recordsJson));
+                break;
+            }
+        }
+        return Possible[Array[SrdRef[RecordType]]].success(records);
+    }
+}

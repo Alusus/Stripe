@@ -1,101 +1,34 @@
 @merge module Stripe {
-    func getCustomers(key: String, verbose: Bool): Possible[Array[SrdRef[Customer]]] {
-        def customerArray: Array[SrdRef[Customer]];
-        def prfLoc: Array[String];
-        def request: Net.Request(String("https://api.stripe.com/v1/customers"), key, String("Bearer"));
-        request.verbose = verbose;
-        request.get();
-        if request.responseHttpStatus == 401 {
-            return Possible[Array[SrdRef[Customer]]].failure(Errors.unauthenticated());
-        } else if request.responseHttpStatus == 0 {
-            return Possible[Array[SrdRef[Customer]]].failure(Errors.connection());
-        } else if request.responseHttpStatus != 200 {
-            return Possible[Array[SrdRef[Customer]]].failure(Errors.unexpected());
-        }
-        def customerObject: Json = request.responseBody;
-        def i: int = 0;
-        def j: int = 0;
-        def customer: SrdRef[Customer];
-        def address: SrdRef[Address];
-        for i = 0, i < customerObject("data").getLength(), i += 1 {
-            for j = 0, j < customerObject("data")(i)("preferred_locales").getLength(), j++ {
-                prfLoc.add(customerObject("data")(i)("preferred_locales")(j));
-            }
-            if not customerObject("data")(i)("address").isNull() {
-                address = SrdRef[Address]().{
-                    alloc()~init(
-                        customerObject("data")(i)("address")("city"),
-                        customerObject("data")(i)("address")("country"),
-                        customerObject("data")(i)("address")("line1"),
-                        customerObject("data")(i)("address")("line2"),
-                        customerObject("data")(i)("address")("postalCode"),
-                        customerObject("data")(i)("address")("state")
-                    )
-                };
-            } else
-                address = SrdRef[Address](). {
-                alloc()~init()
-            };
-            customer = SrdRef[Customer]().{
-                alloc()~init(
-                    customerObject("data")(i)("id"),
-                    address,
-                    customerObject("data")(i)("balance"),
-                    customerObject("data")(i)("created"),
-                    customerObject("data")(i)("currency"),
-                    customerObject("data")(i)("default_source"),
-                    customerObject("data")(i)("delinquent"),
-                    customerObject("data")(i)("description"),
-                    customerObject("data")(i)("email"),
-                    customerObject("data")(i)("invoice_prefix"),
-                    customerObject("data")(i)("name"),
-                    customerObject("data")(i)("nextInvoiceSequence"),
-                    customerObject("data")(i)("phone"),
-                    prfLoc,
-                    customerObject("data")(i)("shipping"),
-                    customerObject("data")(i)("tax_exempt"),
-                    customerObject("data")(i)("test_clock")
-                )
-            }
-            customerArray.add(customer);
-            prfLoc.clear();
-        }
-        return Possible[Array[SrdRef[Customer]]].success(customerArray);
+    func getCustomers(key: String, limit: int, startId: String, verbose: Bool): Possible[Array[SrdRef[Customer]]] {
+        return getRecords[Customer, convertToCustomer](
+            key, String("https://api.stripe.com/v1/customers"), limit, startId, verbose
+        );
     }
 
     func getCustomer(key: String, customerId: String, verbose: Bool): Possible[SrdRef[Customer]] {
-        def prfLoc: Array[String];
-        def request: Net.Request(
-            String.format("https://api.stripe.com/v1/customers/%s", customerId), key, String("Bearer")
+        return getRecord[Customer, convertToCustomer](
+            key, "https://api.stripe.com/v1/customers", customerId, verbose
         );
-        request.verbose = verbose;
-        request.get();
-        if request.responseHttpStatus == 401 {
-            return Possible[SrdRef[Customer]].failure(Errors.unauthenticated());
-        } else if request.responseHttpStatus == 404 {
-            return Possible[SrdRef[Customer]].failure(Errors.notFound());
-        } else if request.responseHttpStatus == 0 {
-            return Possible[SrdRef[Customer]].failure(Errors.connection());
-        } else if request.responseHttpStatus != 200 {
-            return Possible[SrdRef[Customer]].failure(Errors.unexpected());
-        }
-        def customerObject: Json = request.responseBody;
+    }
+
+    func convertToCustomer(customerJson: Json): SrdRef[Customer] {
         def i: int = 0;
+        def prfLoc: Array[String];
         def customer: SrdRef[Customer];
         def address: SrdRef[Address];
 
-        for i = 0, i < customerObject("preferred_locales").getLength(), i++ {
-            prfLoc.add(customerObject("data")(i)("preferred_locales")(i));
+        for i = 0, i < customerJson("preferred_locales").getLength(), i++ {
+            prfLoc.add(customerJson("data")(i)("preferred_locales")(i));
         }
-        if not customerObject("address").isNull() {
+        if not customerJson("address").isNull() {
             address = SrdRef[Address]().{
                 alloc()~init(
-                    customerObject("address")("city"),
-                    customerObject("address")("country"),
-                    customerObject("address")("line1"),
-                    customerObject("address")("line2"),
-                    customerObject("address")("postalCode"),
-                    customerObject("address")("state")
+                    customerJson("address")("city"),
+                    customerJson("address")("country"),
+                    customerJson("address")("line1"),
+                    customerJson("address")("line2"),
+                    customerJson("address")("postalCode"),
+                    customerJson("address")("state")
                 );
             };
         } else
@@ -104,32 +37,47 @@
         };
         customer = SrdRef[Customer]().{
             alloc()~init(
-                customerObject("id"),
+                customerJson("id"),
                 address,
-                customerObject("balance"),
-                customerObject("created"),
-                customerObject("currency"),
-                customerObject("default_source"),
-                customerObject("delinquent"),
-                customerObject("description"),
-                customerObject("email"),
-                customerObject("invoice_prefix"),
-                customerObject("name"),
-                customerObject("nextInvoiceSequence"),
-                customerObject("phone"),
+                customerJson("balance"),
+                customerJson("created"),
+                customerJson("currency"),
+                customerJson("default_source"),
+                customerJson("delinquent"),
+                customerJson("description"),
+                customerJson("email"),
+                customerJson("invoice_prefix"),
+                customerJson("name"),
+                customerJson("nextInvoiceSequence"),
+                customerJson("phone"),
                 prfLoc,
-                customerObject("shipping"),
-                customerObject("tax_exempt"),
-                customerObject("test_clock")
+                customerJson("shipping"),
+                customerJson("tax_exempt"),
+                customerJson("test_clock"),
+                customerJson("invoice_settings")("default_payment_method")
             );
         }
-        return Possible[SrdRef[Customer]].success(customer);
+        return customer
     }
 
     func createCustomer(key: String, parameters: String, verbose: Bool): Possible[String] {
+        return postRecord(key, String("https://api.stripe.com/v1/customers"), parameters, verbose);
+    }
+
+    func doesCustomerHaveDefaultPaymentMethod(key: String, customerId: String, verbose: Bool): Bool {
+        def customer: Possible[SrdRef[Customer]] = getCustomer(key, customerId, verbose);
+        if customer and customer.defaultPaymentMethod != String("null")
+            return true;
+        return false;
+    }
+
+    func addCustomerDefaultPaymentMethod(key: String, customerId: String, paymentMethodId: String, verbose: Bool): Bool {
+        def parameters: String = "invoice_settings[default_payment_method]=";
+        parameters = parameters + paymentID;
         def b: Bool = true;
+        def customerId: String;
         def request: Net.Request(
-            String("https://api.stripe.com/v1/customers"),
+            String.format("https://api.stripe.com/v1/customers/%s", customerId.buf),
             key,
             String("Bearer"),
             String("application/x-www-form-urlencoded")
@@ -137,15 +85,14 @@
         request.verbose = verbose;
         request.post(parameters.buf);
         if request.responseHttpStatus == 401 {
-            return Possible[String].failure(Errors.unauthenticated());
+            return false;
         } else if request.responseHttpStatus == 400 {
-            return Possible[String].failure(Errors.invalidParams());
+            return false;
         } else if request.responseHttpStatus == 0 {
-            return Possible[String].failure(Errors.connection());
+            return false;
         } else if request.responseHttpStatus != 200 {
-            return Possible[String].failure(Errors.unexpected());
+            return false;
         }
-        def customerObject: Json = request.responseBody;
-        return Possible[String].success(customerObject("id"));
+        return true;
     }
 }

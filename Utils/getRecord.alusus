@@ -1,0 +1,20 @@
+@merge module Stripe {
+    func getRecord [RecordType: type, convertor: function] (
+        key: String, url: CharsPtr, id: CharsPtr, verbose: Bool
+    ): Possible[SrdRef[RecordType]] {
+        def request: Net.Request(String.format("%s/%s", url, id), key, String("Bearer"));
+        request.verbose = verbose;
+        request.get();
+        if request.responseHttpStatus == 401 {
+            return Possible[SrdRef[RecordType]].failure(Errors.unauthenticated());
+        } else if request.responseHttpStatus == 404 {
+            return Possible[SrdRef[RecordType]].failure(Errors.notFound());
+        } else if request.responseHttpStatus == 0 {
+            return Possible[SrdRef[RecordType]].failure(Errors.connection());
+        } else if request.responseHttpStatus != 200 {
+            return Possible[SrdRef[RecordType]].failure(Errors.unexpected());
+        }
+        def balanceTransactionJson: Json = request.responseBody;
+        return Possible[SrdRef[RecordType]].success(convertor(balanceTransactionJson));
+    }
+}

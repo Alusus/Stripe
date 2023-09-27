@@ -1,0 +1,65 @@
+@merge module Stripe {
+    func getCheckoutSessions(
+        key: String, limit: int, startId: String, verbose: Bool
+    ): Possible[Array[SrdRef[CheckoutSession]]] {
+        return getRecords[CheckoutSession, convertToCheckoutSession](
+            key, String("https://api.stripe.com/v1/checkout/sessions"), limit, startId, verbose
+        );
+    }
+
+    func getCheckoutSession(key: String, checkoutId: String, verbose: Bool): Possible[SrdRef[CheckoutSession]] {
+        return getRecord[CheckoutSession, convertToCheckoutSession](
+            key, "https://api.stripe.com/v1/checkout/sessions", checkoutId, verbose
+        );
+    }
+
+    func createCheckoutSession(key: String, parameters: String, verbose: Bool): Possible[String] {
+        return postRecord(key, String("https://api.stripe.com/v1/checkout/sessions"), parameters, verbose);
+    }
+
+    func createCheckoutSession(
+        key: String, items: Map[String, Int], customerId: String, successUrl: CharsPtr, verbose: Bool
+    ): Possible[String] {
+        if items.getLength() == 0 {
+            return Possible[String].failure(Errors.invalidParams());
+        }
+        def parameters: String;
+        if customerId != String() {
+            parameters = String.format(
+                "mode=payment&customer=%s&success_url=%s"، customerId.buf, Net.uriEncode(successUrl).buf
+            );
+        } else {
+            parameters = String.format("mode=payment&success_url=%s", Net.uriEncode(successUrl).buf);
+        }
+        def i: Int;
+        for i = 0, i < items.getLength(), ++i {
+            parameters += String.format(
+                "&line_items[%i][price]=%s&line_items[%i][quantity]=%i"،
+                i, Net.uriEncode(items.keyAt(i)).buf, i, items.valAt(i)
+            );
+        }
+        return createCheckoutSession(key, parameters, verbose);
+    }
+
+    func convertToCheckoutSession(checkoutSessionJson: Json): SrdRef[CheckoutSession] {
+        def checkoutSession: SrdRef[CheckoutSession];
+        checkoutSession = SrdRef[CheckoutSession]().{
+            alloc()~init(
+                checkoutSessionJson("id"),
+                checkoutSessionJson("client_reference_id"),
+                checkoutSessionJson("cancel_url"),
+                checkoutSessionJson("success_url"),
+                checkoutSessionJson("url"),
+                checkoutSessionJson("currency"),
+                checkoutSessionJson("customer"),
+                checkoutSessionJson("line_items"),
+                checkoutSessionJson("mode"),
+                checkoutSessionJson("payment_status"),
+                checkoutSessionJson("status"),
+                checkoutSessionJson("amount_total")
+            )
+        };
+        return checkoutSession;
+    }
+}
+

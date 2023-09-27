@@ -115,7 +115,7 @@ for j = 0, j < balanceArray.getLength(), j++ {
     عرف تسلسل_الفاتورة_التالي: صـحيح؛
     عرف العملة: نـص؛
     عرف الوصف: نـص؛
-
+    عرف طريقة_الدفع_المبدئية: نـص؛
 
     عملية هذا~هيئ();
 
@@ -126,7 +126,7 @@ for j = 0, j < balanceArray.getLength(), j++ {
         العملة: نـص: معرف_المصدر_المبدئي: نـص، مقصر: ثـنائي،
         الوصف: نـص، البريد_الإلكتروني: نـص، بادئة_الفاتورة: نـص، الاسم: نـص،
         تسلسل_الفاتورة_التالي: نـص، رقم_الهاتف: نـص، النسق_المفضلة: مـصفوفة[نـص]،
-        الشحن: نـص، معفي_من_الضريبة: نـص، ساعة_اختبار: نـص
+        الشحن: نـص، معفي_من_الضريبة: نـص، ساعة_اختبار: نـص، طريقة_الدفع_المبدئية: نـص
     )؛
 }
 ```
@@ -152,7 +152,7 @@ class Customer {
     def nextInvoiceSequence: Int;
     def currency: String;
     def description: String;
-
+    def defaultPaymentMethod: String;
 
     handler this~init();
 
@@ -163,7 +163,7 @@ class Customer {
         currency: String, defaultSourceId: String, delinquent: Bool,
         description: String, email: String, invoicePrefix: String, name: String,
         nextInvoiceSequence: Int, phone: String, preferredLocales: Array[String],
-        shipping: String, taxExempt: String, testClock: String
+        shipping: String, taxExempt: String, testClock: String, defaultPaymentMethod: String
     );
 }
 ```
@@ -322,6 +322,44 @@ class BalanceTransaction {
 
 `سعر_الصرف` (`exchangeRate`) سعر الصرف المتبع في العملية.
 
+### تـفاصيل_فوترة (BillingDetails)
+
+يحمل فاصيل الفوترة لزبون.
+
+```
+صنف تـفاصيل_فوترة {
+    عرف العنوان: سـندنا[عـنوان]؛
+    عرف البريد_الإلكتروني: نـص؛
+    عرف الاسم: نـص؛
+    عرف رقم_الهاتف: نـص؛
+    
+    عملية هذا~هيئ()؛
+    
+    عملية هذا~هيئ(
+        عنوان: سـندنا[عـنوان]، البريد_الإلكتروني: نـص، الاسم: نـص، رقم_الهاتف: نـص
+    )؛
+}
+```
+
+<div dir=ltr>
+
+```
+class BillingDetails {
+    def address: SrdRef[Address];
+    def email: String;
+    def name: String;
+    def phone: String;
+
+    handler this~init();
+
+    handler this~init(
+        address: SrdRef[Address], email: String, name: String, phone: String
+    );
+}
+```
+
+</div>
+
 ### جـلسة_شراء (CheckoutSession)
 
 يحمل خصائص عملية إتمام شراء واحدة.
@@ -390,6 +428,56 @@ class CheckoutSession {
 
 `رابط_الإلغاء` (`cancelUrl`) الرابط الذي يُرسل المستخدم إليه في حال إلغاء العملية.
 
+### طـريقة_دفع (PaymentMethod)
+
+يحمل معلومات لطريقة دفع واحدة.
+
+```
+صنف طـريقة_دفع {
+    عرف المعرف: نـص؛
+    عرف تفاصيل_الفوترة: سـندنا[تـفاصيل_فوترة]؛
+    عرف تاريخ_الإنشاء: صـحيح[64]؛
+    عرف العملة: نـص = "usd"؛
+    عرف معرف_الزبون: نـص؛
+    عرف سنة_انقضاء_الصلاحية: صـحيح؛
+    عرف شهر_انقضاء_الصلاحية: صـحيح؛
+    عرف آخر4: نـص؛
+    عرف النوع: نـص؛
+    
+    عملية هذا~هيئ()؛
+    
+    عملية هذا~هيئ(
+        المعرف: نـص، تفاصيل_الفوترة: سـندنا[تـفاصيل_فوترة]، تاريخ_الإنشاء: صـحيح[64]، سنة_انقضاء_الصلاحية: صـحيح،
+        شهر_انقضاء_الصلاحية: صـحيح، العملة: نـص، آخر4: نـص، النوع: نـص
+    )؛
+}
+```
+
+<div dir=ltr>
+
+```
+class PaymentMethod {
+    def id: String;
+    def billingDetails: SrdRef[BillingDetails];
+    def created: Int[64];
+    def currency: String = "usd";
+    def customerId: String;
+    def expYear: Int;
+    def expMonth: Int;
+    def last4: String;
+    def type: String;
+
+    handler this~init();
+
+    handler this~init(
+        id: String, billingDetails: SrdRef[BillingDetails], created: Int[64], expYear: Int, expMonth: Int,
+        currency: String, last4: String, type: String
+    );
+}
+```
+
+</div>
+
 ### مـصدر (Source)
 
 يحمل معلومات لمصدر واحد من مصادر الرصيد (مثل بطاقة أو حساب مصرفي).
@@ -441,6 +529,7 @@ class Source {
     عرف العملة: نـص؛
     عرف معرف_الزبون: نـص؛
     عرف طريقة_الجمع: نـص؛
+    عرف بيانات_وصفية: تـطبيق[نـص، نـص]؛
     
     عملية هذا~هيئ()؛
     
@@ -448,7 +537,7 @@ class Source {
         المعرف: نـص، ضريبة_تلقائية: ثنائي، زمن_بدء_دورة_الفاتورة: صـحيح[64]، زمن_الإنشاء: صـحيح[64]، طريقة_الجمع: نـص،
         زمن_البدء: صـحيح[64]، الألغاء_عند_انتهاء_الاشتراك: ثنائي، زمن_انتهاء_الفترة_الحالية: صـحيح[64]،
          زمن_بدء_الفترة_الحالية: صـحيح[64]، الوصف: نـص، الحالة: نـص، زمن_انتهاء_الفترة_التجريبية: صـحيح[64]،
-          معرف_الزبون: نـص، العملة: نـص 
+          معرف_الزبون: نـص، العملة: نـص، بيانات_وصفية: تـطبيق[نـص، نـص]
     )؛
 }
 ```
@@ -472,6 +561,7 @@ class Subscription {
     def currency: String = "usd";
     def customerId: String;
     def collectionMethod: String;
+    def metadata: Map[String, String];
 
     handler this~init();
 
@@ -479,7 +569,7 @@ class Subscription {
         id: String, automaticTax: Bool, billingCycleAnchor: Int[64], created: Int[64],
         collectionMethod: String, startDate: Int[64], cancelAtPeriodEnd: Bool,
         currentPeriodEnd: Int[64], currentPeriodStart: Int[64], description: String, status: String,
-        trialEnd: Int[64], customerId: String, currency: String
+        trialEnd: Int[64], customerId: String, currency: String, metadata: Map[String, String]
     );
 }
 ```
@@ -518,7 +608,15 @@ handler this~init(key: String);
 #### هات_الزبائن (getCustomers)
 
 ```
-عملية هذا.هات_الزبائن(): لـا_مضمون[مـصفوفة[سـندنا[زبـون]]]
+عملية هذا.هات_الزبائن(): لـا_مضمون[مـصفوفة[سـندنا[زبـون]]]؛
+```
+
+```
+عملية هذا.هات_الزبائن(الحد_الأقصى: صـحيح): لـا_مضمون[مـصفوفة[سـندنا[زبـون]]]؛
+```
+
+```
+عملية هذا.هات_الزبائن(الحد_الأقصى: صـحيح، آخر_معرف: نـص): لـا_مضمون[مـصفوفة[سـندنا[زبـون]]]؛
 ```
 
 <div dir=ltr>
@@ -527,9 +625,21 @@ handler this~init(key: String);
 handler this.getCustomers(): Possible[Array[SrdRef[Customer]]]
 ```
 
+```
+handler this.getCustomers(limit: Int): Possible[Array[SrdRef[Customer]]]
+```
+
+```
+handler this.getCustomers(limit: Int, startId: String): Possible[Array[SrdRef[Customer]]]
+```
+
 </div>
 
-يُرجع جميع الزبائن.
+تُرجع جميع الزبائن.
+
+`الحد_الأقصى` (`limit`): الحد الأقصى للقيود المطلوب جلبها.
+
+`آخر_معرف` (`startId`): معرف القيد المطلوب جلب البيانات بدءًا مما يليه.
 
 #### هات_زبونا (getCustomer)
 
@@ -567,6 +677,38 @@ handler this.createCustomer(parameters: String): Possible[String]
 
 تُرجع معرف الزبون.
 
+#### أيملك_الزبون_طريقة_دفع_مبدئية (doesCustomerHaveDefaultPaymentMethod)
+
+```
+عملية هذا.أيملك_الزبون_طريقة_دفع_مبدئية(معرف_الزبون: نـص): ثـنائي؛
+```
+
+<div dir=ltr>
+
+```
+handler this.doesCustomerHaveDefaultPaymentMethod(customerId: String): Bool;
+```
+
+</div>
+
+ترجع 1 إن كان لدى الزبون بالمعرف المعطى طريقة دفع مبدئية.
+
+####  أضف_طريقة_دفع_مبدئية_للزبون (addCustomerDefaultPaymentMethod)
+
+```
+عملية هذا.أضف_طريقة_دفع_مبدئية_للزبون(معرف_الزبون: نـص، معرف_طريقة_الدفع: نـص): ثـنائي؛
+```
+
+<div dir=ltr>
+
+```
+handler this.addCustomerDefaultPaymentMethod(customerId: String, paymentMethodId: String): Bool;
+```
+
+</div>
+
+تضيف طريقة الدفع المحددة كطريقة دفع مبدئية للزبون. ترجع 1 في حال نجاح العملية.
+
 #### هات_الرصيد (getBalance)
 
 ```
@@ -586,18 +728,38 @@ handler this.getBalance(): Possible[Array[SrdRef[Balance]]]
 #### هات_عمليات_الرصيد (getBalanceTranasactions)
 
 ```
-عملية هذا.هات_عمليات_الرصيد(): لـا_مضمون[مـصفوفة[سـندنا[عـملية_رصيد]]]
+عملية هذا.هات_عمليات_الرصيد(): لـا_مضمون[مـصفوفة[سـندنا[عـملية_رصيد]]]؛
+```
+
+```
+عملية هذا.هات_عمليات_الرصيد(الحد_الأقصى: صـحيح): لـا_مضمون[مـصفوفة[سـندنا[عـملية_رصيد]]]؛
+```
+
+```
+عملية هذا.هات_عمليات_الرصيد(الحد_الأقصى: صـحيح، آخر_معرف: نـص): لـا_مضمون[مـصفوفة[سـندنا[عـملية_رصيد]]]؛
 ```
 
 <div dir=ltr>
 
 ```
-handler this.getBalanceTranasactions(): Possible[Array[SrdRef[BalanceTranasaction]]]
+handler this.getBalanceTranasactions(): Possible[Array[SrdRef[BalanceTranasaction]]];
+```
+
+```
+handler this.getBalanceTranasactions(limit: Int): Possible[Array[SrdRef[BalanceTranasaction]]];
+```
+
+```
+handler this.getBalanceTranasactions(limit: Int, startId: String): Possible[Array[SrdRef[BalanceTranasaction]]];
 ```
 
 </div>
 
 ترجع قائمة العمليات التي ساهمت في إيصال الحساب إلى الرصيد الحالي (مثل الدفع والتحويل وما شابه).
+
+`الحد_الأقصى` (`limit`): الحد الأقصى للقيود المطلوب جلبها.
+
+`آخر_معرف` (`startId`): معرف القيد المطلوب جلب البيانات بدءًا مما يليه.
 
 #### هات_عملية_رصيد (getBalanceTranasaction)
 
@@ -637,7 +799,6 @@ handler this.createBillingPortalSession(parameters: String): Possible[String]
 
 ```
 عملية هذا.أنشئ_جلسة_تحكم_بالفوترة(
-    العناصر: تـطبيق[نـص، صـحيح]،
     معرف_الزبون: نص،
     رابط_الرجوع: مـؤشر_محارف
 ): لـا_مضمون[نـص]
@@ -668,15 +829,35 @@ handler this.createBillingPortalSession(
 عملية هذا.هات_جلسات_إتمام_الشراء(): لـا_مضمون[مـصفوفة[سـندنا[جـلسة_شراء]]]
 ```
 
+```
+عملية هذا.هات_جلسات_إتمام_الشراء(الحد_الأقصى: صـحيح): لـا_مضمون[مـصفوفة[سـندنا[جـلسة_شراء]]]
+```
+
+```
+عملية هذا.هات_جلسات_إتمام_الشراء(الحد_الأقصى: صـحيح، آخر_معرف: نـص): لـا_مضمون[مـصفوفة[سـندنا[جـلسة_شراء]]]
+```
+
 <div dir=ltr>
 
 ```
 handler this.getCheckoutSessions(): Possible[Array[SrdRef[CheckoutSession]]]
 ```
 
+```
+handler this.getCheckoutSessions(limit: Int): Possible[Array[SrdRef[CheckoutSession]]]
+```
+
+```
+handler this.getCheckoutSessions(limit: Int, startId: String): Possible[Array[SrdRef[CheckoutSession]]]
+```
+
 </div>
 
 ترجع قائمة جلسات إتمام الشراء.
+
+`الحد_الأقصى` (`limit`): الحد الأقصى للقيود المطلوب جلبها.
+
+`آخر_معرف` (`startId`): معرف القيد المطلوب جلب البيانات بدءًا مما يليه.
 
 #### هات_جلسة_إتمام_الشراء (getCheckoutSession)
 
@@ -765,15 +946,26 @@ handler this.createCheckoutSession(
 عملية هذا.هات_الاشتراكات(): لـا_مضمون[مـصفوفة[سـندنا[اشتراك]]]
 ```
 
+```
+عملية هذا.هات_الاشتراكات(شرط_التصفية: نـص): لـا_مضمون[مـصفوفة[سـندنا[اشتراك]]]
+```
+
 <div dir=ltr>
 
 ```
 handler this.getSubscriptions(): Possible[Array[SrdRef[Subscription]]]
 ```
 
+```
+handler this.getSubscriptions(filterQuery: String): Possible[Array[SrdRef[Subscription]]]
+```
+
 </div>
 
 ترجع قائمة الاشتراكات.
+
+`شرط_التصفية` (`filterQuery`): تركيب يحتوي الشرط الذي تُصفى به النتائج. ستجلب الدالة القيود التي
+تطابق هذا الشرط دون غيرها.
 
 #### هات_اشتراكا (getSubscription)
 
@@ -837,6 +1029,56 @@ handler this.createSubscription(
 `معرف_الزبون` (`customerId`): معرف قيد الزبون الذي يقوم  بالاشتراك.
 
 تُرجع معرف الاشتراك المُنشأ.
+
+#### حدث_اشتراكا (updateSubscription)
+
+```
+عملية هذا.حدث_اشتراكا(معرف_الاشتراك: نـص، معطيات: نـص): لـا_مضمون[نـص]؛
+```
+
+<div dir=ltr>
+
+```
+handler this.updateSubscription(subscriptionId: String, parameters: String): Possible[String];
+```
+
+</div>
+
+تحدث الاشتراك ذا المعرف المعطى.
+
+`معطيات` (`parameters`) معطيات الاشتراك المطلوبة بالصيغة التالية: "customer=customerID&line_items=planID".
+
+#### هات_طرق_الدفع (getPaymentMethods)
+
+```
+عملية هذا.هات_طرق_الدفع(معرف_الزبون: نـص): لـا_مضمون[مـصفوفة[سـندنا[طـريقة_دفع]]]؛
+```
+
+<div dir=ltr>
+
+```
+handler this.getPaymentMethods(customerId: String): Possible[Array[SrdRef[PaymentMethod]]];
+```
+
+</div>
+
+ترجع طرق الدفع التي يملكها الزبون ذو المعرف المعطى.
+
+#### هات_طريقة_دفع (getPaymentMethod)
+
+```
+عملية هذا.هات_طريقة_دفع(معرف_طريقة_الدفع: نـص): لـا_مضمون[سـندنا[طـريقة_دفع]]؛
+```
+
+<div dir=ltr>
+
+```
+handler this.getPaymentMethod(paymentMethodId: String): Possible[SrdRef[PaymentMethod]];
+```
+
+</div>
+
+ترجع طريقة الدفع ذات المعرف المعطى.
 
 
 ### أخـطاء (Errors)
