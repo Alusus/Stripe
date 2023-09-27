@@ -70,6 +70,7 @@ class Customer {
     def nextInvoiceSequence: Int;
     def currency: String;
     def description: String;
+    def defaultPaymentMethod: String;
 
     handler this~init();
 
@@ -80,7 +81,7 @@ class Customer {
         currency: String, defaultSourceId: String, delinquent: Bool,
         description: String, email: String, invoicePrefix: String, name: String,
         nextInvoiceSequence: Int, phone: String, preferredLocales: Array[String],
-        shipping: String, taxExempt: String, testClock: String
+        shipping: String, taxExempt: String, testClock: String, defaultPaymentMethod: String
     );
 }
 ```
@@ -168,6 +169,25 @@ class BalanceTransaction {
 
 `exchangeRate` The exchange rate of the transaction.
 
+### BillingDetails
+
+Carries billing details for a customer.
+
+```
+class BillingDetails {
+    def address: SrdRef[Address];
+    def email: String;
+    def name: String;
+    def phone: String;
+
+    handler this~init();
+
+    handler this~init(
+        address: SrdRef[Address], email: String, name: String, phone: String
+    );
+}
+```
+
 ### CheckoutSession
 
 This class holds the properties of a checkout object from Stripe API.
@@ -207,6 +227,31 @@ class CheckoutSession {
 
 `cancelUrl` The url to redirect to if the checkout is canceled.
 
+### PaymentMethod
+
+Carries information of a single payment method.
+
+```
+class PaymentMethod {
+    def id: String;
+    def billingDetails: SrdRef[BillingDetails];
+    def created: Int[64];
+    def currency: String = "usd";
+    def customerId: String;
+    def expYear: Int;
+    def expMonth: Int;
+    def last4: String;
+    def type: String;
+
+    handler this~init();
+
+    handler this~init(
+        id: String, billingDetails: SrdRef[BillingDetails], created: Int[64], expYear: Int, expMonth: Int,
+        currency: String, last4: String, type: String
+    );
+}
+```
+
 ### Source
 
 Holds the info of a single source contributing to a balance.
@@ -243,6 +288,7 @@ class Subscription {
     def currency: String = "usd";
     def customerId: String;
     def collectionMethod: String;
+    def metadata: Map[String, String];
 
     handler this~init();
 
@@ -250,7 +296,7 @@ class Subscription {
         id: String, automaticTax: Bool, billingCycleAnchor: Int[64], created: Int[64],
         collectionMethod: String, startDate: Int[64], cancelAtPeriodEnd: Bool,
         currentPeriodEnd: Int[64], currentPeriodStart: Int[64], description: String, status: String,
-        trialEnd: Int[64], customerId: String, currency: String
+        trialEnd: Int[64], customerId: String, currency: String, metadata: Map[String, String]
     );
 }
 ```
@@ -283,7 +329,20 @@ It has the following methods:
 handler this.getCustomers(): Possible[Array[SrdRef[Customer]]]
 ```
 
+```
+handler this.getCustomers(limit: Int): Possible[Array[SrdRef[Customer]]]
+```
+
+```
+handler this.getCustomers(limit: Int, startId: String): Possible[Array[SrdRef[Customer]]]
+```
+
 Returns all customers.
+
+`limit`: The max number of records to return.
+
+`startId`: The ID of the record after which to start retrieving records. The record with this ID
+will not be included in the result.
 
 #### getCustomer
 
@@ -305,6 +364,23 @@ Creates a customer entry.
 
 Returns the customer's id.
 
+#### doesCustomerHaveDefaultPaymentMethod
+
+```
+handler this.doesCustomerHaveDefaultPaymentMethod(customerId: String): Bool;
+```
+
+Returns 1 if the customer with the given ID has a default payment method.
+
+#### addCustomerDefaultPaymentMethod
+
+```
+handler this.addCustomerDefaultPaymentMethod(customerId: String, paymentMethodId: String): Bool;
+```
+
+Assigns the payment method with the given ID as the customer's default payment method. Returns 1 on
+success.
+
 #### getBalance
 
 ```
@@ -319,8 +395,21 @@ Returns the balance of all the accounts owned by the API key.
 handler this.getBalanceTranasactions(): Possible[Array[SrdRef[BalanceTranasaction]]]
 ```
 
+```
+handler this.getBalanceTranasactions(limit: Int): Possible[Array[SrdRef[BalanceTranasaction]]];
+```
+
+```
+handler this.getBalanceTranasactions(limit: Int, startId: String): Possible[Array[SrdRef[BalanceTranasaction]]];
+```
+
 Returns a list of transactions that have contributed to the Stripe account balance (e.g., charges,
 transfers, and so forth).
+
+`limit`: The max number of records to return.
+
+`startId`: The ID of the record after which to start retrieving records. The record with this ID
+will not be included in the result.
 
 #### getBalanceTranasaction
 
@@ -336,7 +425,20 @@ Retrieves the balance transaction with the given ID.
 handler this.getCheckoutSessions(): Possible[Array[SrdRef[CheckoutSession]]] 
 ```
 
+```
+handler this.getCheckoutSessions(limit: Int): Possible[Array[SrdRef[CheckoutSession]]]
+```
+
+```
+handler this.getCheckoutSessions(limit: Int, startId: String): Possible[Array[SrdRef[CheckoutSession]]]
+```
+
 Returns a list of Checkout Sessions.
+
+`limit`: The max number of records to return.
+
+`startId`: The ID of the record after which to start retrieving records. The record with this ID
+will not be included in the result.
 
 #### getCheckoutSession
 
@@ -388,7 +490,14 @@ Returns CheckoutSession id.
 handler this.getSubscriptions(): Possible[Array[SrdRef[Subscription]]] 
 ```
 
+```
+handler this.getSubscriptions(filterQuery: String): Possible[Array[SrdRef[Subscription]]]
+```
+
 Returns the list of subscriptions.
+
+`filterQuery`: The query to use to filter the records. Only reocrds matching this criteria will be
+returned.
 
 #### getSubscription
 
@@ -425,6 +534,17 @@ in the previous version.
 
 Returns subscription id.
 
+#### updateSubscription
+
+```
+handler this.updateSubscription(subscriptionId: String, parameters: String): Possible[String];
+```
+
+Updates the subscription having the given ID.
+
+`parameters`: The parameters to assign to this subscription. It should have the following format:
+`customer=customerID&line_items=planID`.
+
 #### createBillingPortalSession
 
 ```
@@ -451,6 +571,23 @@ in the previous version.
 `returnUrl`:  The URL to redirect the user to after close the portal session .
 
 Returns customer account  url.
+
+#### getPaymentMethods
+
+```
+handler this.getPaymentMethods(customerId: String): Possible[Array[SrdRef[PaymentMethod]]];
+```
+
+Returns the payment methods of the customer with the given ID.
+
+#### getPaymentMethod
+
+```
+handler this.getPaymentMethod(paymentMethodId: String): Possible[SrdRef[PaymentMethod]];
+```
+
+Returns the payment method having the given ID.
+
 
 ### Errors
 
