@@ -1,75 +1,15 @@
 @merge module Stripe {
     func getPaymentMethods(key: String, customerId: String, verbose: Bool): Possible[Array[SrdRef[PaymentMethod]]] {
-        def paymentMethodArray: Array[SrdRef[PaymentMethod]];
-        def request: Net.Request(String.format("https://api.stripe.com/v1/customers/%s/payment_methods", customerId.buf), key, String("Bearer"));
-        request.verbose = verbose;
-        request.get();
-        if request.responseHttpStatus == 401 {
-            return Possible[Array[SrdRef[PaymentMethod]]].failure(Errors.unauthenticated());
-        } else if request.responseHttpStatus == 0 {
-            return Possible[Array[SrdRef[PaymentMethod]]].failure(Errors.connection());
-        } else if request.responseHttpStatus != 200 {
-            return Possible[Array[SrdRef[PaymentMethod]]].failure(Errors.unexpected());
-        }
-        def paymentMethodObject: Json = request.responseBody;
-        def i: int = 0;
-        def objectString : String=paymentMethodObject("object")
-        if objectString != String("list") {
-            paymentMethodArray.add(convertToPaymentMethod(paymentMethodObject));
-        } else {
-            if paymentMethodObject("data").getLength() == 1 {
-                def id : String=paymentMethodObject("data")(0)("id")
-                if  id== String("") {
-                    return Possible[Array[SrdRef[PaymentMethod]]].success(paymentMethodArray);
-                }
-            }
-            for i = 0, i < paymentMethodObject("data").getLength(), i += 1 {
-                paymentMethodArray.add(convertToPaymentMethod(paymentMethodObject("data")(i)));
-            }
-             def haseMore : bool=paymentMethodObject("has_more");
-            while haseMore {
-                request = SrdRef[Net.Request]().{
-                    alloc()~init(String.format("https://api.stripe.com/v1/customers/%s/payment_methods?starting_after=%s", paymentMethodArray(paymentMethodArray.getLength() - 1).id.buf), key, String("Bearer"));
-                }
-                request.verbose = verbose;
-                request.get();
-                if request.responseHttpStatus == 401 {
-                    return Possible[Array[SrdRef[Customer]]].failure(Errors.unauthenticated());
-                } else if request.responseHttpStatus == 0 {
-                    return Possible[Array[SrdRef[Customer]]].failure(Errors.connection());
-                } else if request.responseHttpStatus != 200 {
-                    return Possible[Array[SrdRef[Customer]]].failure(Errors.unexpected());
-                }
-                paymentMethodObject = request.responseBody;
-
-                for i = 0, i < paymentMethodObject("data").getLength(), i += 1 {
-                    paymentMethodArray.add(convertToPaymentMethod(paymentMethodObject("data")(i)));
-                }
-            }
-        }
-        return Possible[Array[SrdRef[PaymentMethod]]].success(paymentMethodArray);
+        return getRecords[PaymentMethod, convertToPaymentMethod](
+            key, String.format("https://api.stripe.com/v1/customers/%s/payment_methods", customerId.buf),
+            -1, String(), verbose
+        );
     }
 
     func getPaymentMethod(key: String, paymentMethodId: String, verbose: Bool): Possible[SrdRef[PaymentMethod]] {
-        def loc: String;
-        def prfLoc: Array[String];
-        def request: Net.Request(
-            String.format("https://api.stripe.com/v1/payment_methods/%s", paymentMethodId.buf), key, String("Bearer")
+        return getRecord[PaymentMethod, convertToPaymentMethod](
+            key, "https://api.stripe.com/v1/payment_methods", paymentMethodId, verbose
         );
-        request.verbose = verbose;
-        request.get();
-        if request.responseHttpStatus == 401 {
-            return Possible[SrdRef[PaymentMethod]].failure(Errors.unauthenticated());
-        } else if request.responseHttpStatus == 404 {
-            return Possible[SrdRef[PaymentMethod]].failure(Errors.notFound());
-        } else if request.responseHttpStatus == 0 {
-            return Possible[SrdRef[PaymentMethod]].failure(Errors.connection());
-        } else if request.responseHttpStatus != 200 {
-            return Possible[SrdRef[PaymentMethod]].failure(Errors.unexpected());
-        }
-        def paymentMethodObject: Json = request.responseBody;
-
-        return Possible[SrdRef[PaymentMethod]].success(convertToPaymentMethod(paymentMethodObject));
     }
 
     func convertToPaymentMethod(paymentMethodObject: Json): SrdRef[PaymentMethod] {
@@ -121,4 +61,3 @@
         return paymentMethod;
     }
 }
-

@@ -21,8 +21,11 @@ import "Models/Customer";
 import "Models/CheckoutSession";
 import "Models/Subscription";
 import "Models/PaymentMethod";
+import "Utils/getRecord";
+import "Utils/getRecords";
+import "Utils/postRecord";
 import "Apis/customer";
-import "Apis/checkout";
+import "Apis/checkout_session";
 import "Apis/balance_transaction";
 import "Apis/balance";
 import "Apis/billing_portal_session";
@@ -44,15 +47,15 @@ import "Errors";
         // Customer APIs
 
         handler this.getCustomers(): Possible[Array[SrdRef[Customer]]] {
-            return Stripe.getCustomers(this.key,-1,String(""), this.verbose);
+            return Stripe.getCustomers(this.key, -1, String(), this.verbose);
         }
         
-        handler this.getCustomers(limit : int): Possible[Array[SrdRef[Customer]]] {
-            return Stripe.getCustomers(this.key,limit,String(""), this.verbose);
+        handler this.getCustomers(limit: Int): Possible[Array[SrdRef[Customer]]] {
+            return Stripe.getCustomers(this.key, limit, String(), this.verbose);
         }
         
-        handler this.getCustomers(limit : int , startId : String): Possible[Array[SrdRef[Customer]]] {
-            return Stripe.getCustomers(this.key,-1,startId, this.verbose);
+        handler this.getCustomers(limit: Int, startId: String): Possible[Array[SrdRef[Customer]]] {
+            return Stripe.getCustomers(this.key, limit, startId, this.verbose);
         }
 
         handler this.getCustomer(customerId: String): Possible[SrdRef[Customer]] {
@@ -62,24 +65,26 @@ import "Errors";
         handler this.createCustomer(parameters: String): Possible[String] {
             return Stripe.createCustomer(this.key, parameters, this.verbose);
         }
-        handler this.customerHasDefaultPaymentMethod(customerId: String): bool {
-            return Stripe.customerHasDefaultPaymentMethod(this.key, customerId, this.verbose);
+        handler this.doesCustomerHaveDefaultPaymentMethod(customerId: String): Bool {
+            return Stripe.doesCustomerHaveDefaultPaymentMethod(this.key, customerId, this.verbose);
         }
 
-        handler this.customerAddDefaultPaymentMethod(customerId: String, paymentMethodId: String): bool {
-            return Stripe.customerAddDefaultPaymentMethod(this.key, customerId, paymentMethodId, this.verbose);
+        handler this.addCustomerDefaultPaymentMethod(customerId: String, paymentMethodId: String): Bool {
+            return Stripe.addCustomerDefaultPaymentMethod(this.key, customerId, paymentMethodId, this.verbose);
         }
 
-        // Chekcout APIs
+        // Chekcout Session APIs
 
         handler this.getCheckoutSessions(): Possible[Array[SrdRef[CheckoutSession]]] {
-            return Stripe.getCheckoutSessions(this.key,-1,String(""), this.verbose);
+            return Stripe.getCheckoutSessions(this.key, -1, String(), this.verbose);
         }
-        handler this.getCheckoutSessions(limit : int): Possible[Array[SrdRef[CheckoutSession]]] {
-            return Stripe.getCheckoutSessions(this.key,limit,String(""), this.verbose);
+
+        handler this.getCheckoutSessions(limit: Int): Possible[Array[SrdRef[CheckoutSession]]] {
+            return Stripe.getCheckoutSessions(this.key, limit, String(), this.verbose);
         }
-        handler this.getCheckoutSessions(limit : int,startId : String): Possible[Array[SrdRef[CheckoutSession]]] {
-            return Stripe.getCheckoutSessions(this.key,limit,startId, this.verbose);
+
+        handler this.getCheckoutSessions(limit: Int, startId: String): Possible[Array[SrdRef[CheckoutSession]]] {
+            return Stripe.getCheckoutSessions(this.key, limit, startId, this.verbose);
         }
 
         handler this.getCheckoutSession(sessionId: String): Possible[SrdRef[CheckoutSession]] {
@@ -109,14 +114,17 @@ import "Errors";
         // Balance Transaction APIs
 
         handler this.getBalanceTransactions(): Possible[Array[SrdRef[BalanceTransaction]]] {
-            return Stripe.getBalanceTransactions(this.key, -1,String(""),this.verbose);
+            return Stripe.getBalanceTransactions(this.key, -1, String(), this.verbose);
         }
-        handler this.getBalanceTransactions(limit : int): Possible[Array[SrdRef[BalanceTransaction]]] {
-            return Stripe.getBalanceTransactions(this.key,limit,String(""), this.verbose);
+
+        handler this.getBalanceTransactions(limit: Int): Possible[Array[SrdRef[BalanceTransaction]]] {
+            return Stripe.getBalanceTransactions(this.key, limit, String(), this.verbose);
         }
-        handler this.getBalanceTransactions(limit : int,startId : String): Possible[Array[SrdRef[BalanceTransaction]]] {
-            return Stripe.getBalanceTransactions(this.key,limit,startId, this.verbose);
+
+        handler this.getBalanceTransactions(limit: Int, startId: String): Possible[Array[SrdRef[BalanceTransaction]]] {
+            return Stripe.getBalanceTransactions(this.key, limit, startId, this.verbose);
         }
+
         handler this.getBalanceTransaction(id: String): Possible[SrdRef[BalanceTransaction]] {
             return Stripe.getBalanceTransaction(this.key, id, this.verbose);
         }
@@ -127,7 +135,7 @@ import "Errors";
             return Stripe.createBillingPortalSession(this.key, parameters, this.verbose);
         }
 
-        handler this.createBillingPortalSession(customerId:String, returnUrl: CharsPtr): Possible[String] {
+        handler this.createBillingPortalSession(customerId: String, returnUrl: CharsPtr): Possible[String] {
             return Stripe.createBillingPortalSession(this.key, customerId, returnUrl, this.verbose);
         }
 
@@ -137,8 +145,8 @@ import "Errors";
             return Stripe.getSubscriptions(this.key, this.verbose);
         }
         
-        handler this.getSubscriptions(searchString : String): Possible[Array[SrdRef[Subscription]]] {
-            return Stripe.getSubscriptions(this.key,searchString, this.verbose);
+        handler this.getSubscriptions(searchString: String): Possible[Array[SrdRef[Subscription]]] {
+            return Stripe.getSubscriptions(this.key, searchString, this.verbose);
         }
 
         handler this.getSubscription(subscriptionId: String): Possible[SrdRef[Subscription]] {
@@ -149,15 +157,16 @@ import "Errors";
             return Stripe.createSubscription(this.key, parameters, this.verbose);
         }
 
-        handler this.createSubscription(items: Map[String, Int], customerId:String): Possible[String] {
+        handler this.createSubscription(items: Map[String, Int], customerId: String): Possible[String] {
             return Stripe.createSubscription(this.key, items, customerId, this.verbose);
         }
         
-        handler this.updateSubscription(parameters: String,subscriptionId : String): Possible[String] {
-            return Stripe.updateSubscription(this.key, parameters,subscriptionId, this.verbose);
+        `handler this.updateSubscription(subscriptionId: String, parameters: String): Possible[String] {
+            return Stripe.updateSubscription(this.key, subscriptionId, parameters, this.verbose);
         }
         
         // PaymentMethod APIs
+
         handler this.getPaymentMethods(customerId: String): Possible[Array[SrdRef[PaymentMethod]]] {
             return Stripe.getPaymentMethods(this.key, customerId, this.verbose);
         }

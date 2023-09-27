@@ -17,8 +17,7 @@
         def nextInvoiceSequence: Int;
         def currency: String = "usd";
         def description: String;
-        def defaultPaymentMethod: String = "";
-
+        def defaultPaymentMethod: String;
 
         handler this~init() {
         }
@@ -58,4 +57,3 @@
         }
     }
 }
-

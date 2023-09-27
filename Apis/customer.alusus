@@ -1,99 +1,34 @@
 @merge module Stripe {
-    func getCustomers(key: String,limit : int,startId: String, verbose: Bool): Possible[Array[SrdRef[Customer]]] {
-        def customerArray: Array[SrdRef[Customer]];
-        def prfLoc: Array[String];
-        def requestUrl:  String;
-        if startId == String(""){
-            requestUrl = String("https://api.stripe.com/v1/customers");
-        }else{
-            requestUrl = String.format("https://api.stripe.com/v1/customers?starting_after=%s",startId.buf);
-        }
-        def request: SrdRef[Net.Request];
-            request = SrdRef[Net.Request]().{
-            alloc()~init(requestUrl, key, String("Bearer"));
-        }
-        request.verbose = verbose;
-        request.get();
-        if request.responseHttpStatus == 401 {
-            return Possible[Array[SrdRef[Customer]]].failure(Errors.unauthenticated());
-        } else if request.responseHttpStatus == 0 {
-            return Possible[Array[SrdRef[Customer]]].failure(Errors.connection());
-        } else if request.responseHttpStatus != 200 {
-            return Possible[Array[SrdRef[Customer]]].failure(Errors.unexpected());
-        }
-        def customerObject: Json = request.responseBody;
-        def i: int = 0;
-        def objectString : String=customerObject("object");
-        if  objectString != String("list") {
-            customerArray.add(convertToCustomer(customerObject));
-        } else {
-            def length : int=0;
-            if  limit > customerObject("data").getLength() or limit==-1{
-                length=  customerObject("data").getLength();
-            }
-            else {
-                length=limit;
-            }
-            for i = 0, i < length, i += 1 {
-                customerArray.add(convertToCustomer(customerObject("data")(i)));
-            }
-            if limit >0{
-                length = limit-length;
-            }
-             // limit =-1 to recive all the data 
-            def haseMore : bool=customerObject("has_more");
-            while haseMore and (limit ==-1 or length>0) {
-                request = SrdRef[Net.Request]().{
-                    alloc()~init(String.format("https://api.stripe.com/v1/customers?starting_after=%s", 
-                        customerArray(customerArray.getLength() - 1).id.buf)
-                        , key, String("Bearer"));
-                }
-                request.verbose = verbose;
-                request.get();
-                if request.responseHttpStatus == 401 {
-                    return Possible[Array[SrdRef[Customer]]].failure(Errors.unauthenticated());
-                } else if request.responseHttpStatus == 0 {
-                    return Possible[Array[SrdRef[Customer]]].failure(Errors.connection());
-                } else if request.responseHttpStatus != 200 {
-                    return Possible[Array[SrdRef[Customer]]].failure(Errors.unexpected());
-                }
-                customerObject = request.responseBody;
-                haseMore = customerObject("has_more");
-                if  length >= customerObject("data").getLength() or limit==-1{
-                    for i = 0, i < customerObject("data").getLength(), i += 1 {
-                        customerArray.add(convertToCustomer(customerObject("data")(i)));
-                    }
-                    length = length -  customerObject("data").getLength();
-                }
-                else{
-                    for i = 0, i < length, i += 1 {
-                        customerArray.add(convertToCustomer(customerObject("data")(i)));
-                    }
-                    length=0;
-                }
-            }
-        }
-        return Possible[Array[SrdRef[Customer]]].success(customerArray);
+    func getCustomers(key: String, limit: int, startId: String, verbose: Bool): Possible[Array[SrdRef[Customer]]] {
+        return getRecords[Customer, convertToCustomer](
+            key, String("https://api.stripe.com/v1/customers"), limit, startId, verbose
+        );
     }
-    
-    func convertToCustomer(customerObject : Json) : SrdRef[Customer]{
+
+    func getCustomer(key: String, customerId: String, verbose: Bool): Possible[SrdRef[Customer]] {
+        return getRecord[Customer, convertToCustomer](
+            key, "https://api.stripe.com/v1/customers", customerId, verbose
+        );
+    }
+
+    func convertToCustomer(customerJson: Json): SrdRef[Customer] {
         def i: int = 0;
         def prfLoc: Array[String];
         def customer: SrdRef[Customer];
         def address: SrdRef[Address];
 
-        for i = 0, i < customerObject("preferred_locales").getLength(), i++ {
-            prfLoc.add(customerObject("data")(i)("preferred_locales")(i));
+        for i = 0, i < customerJson("preferred_locales").getLength(), i++ {
+            prfLoc.add(customerJson("data")(i)("preferred_locales")(i));
         }
-        if not customerObject("address").isNull() {
+        if not customerJson("address").isNull() {
             address = SrdRef[Address]().{
                 alloc()~init(
-                    customerObject("address")("city"),
-                    customerObject("address")("country"),
-                    customerObject("address")("line1"),
-                    customerObject("address")("line2"),
-                    customerObject("address")("postalCode"),
-                    customerObject("address")("state")
+                    customerJson("address")("city"),
+                    customerJson("address")("country"),
+                    customerJson("address")("line1"),
+                    customerJson("address")("line2"),
+                    customerJson("address")("postalCode"),
+                    customerJson("address")("state")
                 );
             };
         } else
@@ -102,60 +37,44 @@
         };
         customer = SrdRef[Customer]().{
             alloc()~init(
-                customerObject("id"),
+                customerJson("id"),
                 address,
-                customerObject("balance"),
-                customerObject("created"),
-                customerObject("currency"),
-                customerObject("default_source"),
-                customerObject("delinquent"),
-                customerObject("description"),
-                customerObject("email"),
-                customerObject("invoice_prefix"),
-                customerObject("name"),
-                customerObject("nextInvoiceSequence"),
-                customerObject("phone"),
+                customerJson("balance"),
+                customerJson("created"),
+                customerJson("currency"),
+                customerJson("default_source"),
+                customerJson("delinquent"),
+                customerJson("description"),
+                customerJson("email"),
+                customerJson("invoice_prefix"),
+                customerJson("name"),
+                customerJson("nextInvoiceSequence"),
+                customerJson("phone"),
                 prfLoc,
-                customerObject("shipping"),
-                customerObject("tax_exempt"),
-                customerObject("test_clock"),
-                customerObject("invoice_settings")("default_payment_method")
+                customerJson("shipping"),
+                customerJson("tax_exempt"),
+                customerJson("test_clock"),
+                customerJson("invoice_settings")("default_payment_method")
             );
         }
         return customer
     }
 
-    func getCustomer(key: String, customerId: String, verbose: Bool): Possible[SrdRef[Customer]] {
-        
-        def request: Net.Request(
-            String.format("https://api.stripe.com/v1/customers/%s", customerId), key, String("Bearer")
-        );
-        request.verbose = verbose;
-        request.get();
-        if request.responseHttpStatus == 401 {
-            return Possible[SrdRef[Customer]].failure(Errors.unauthenticated());
-        } else if request.responseHttpStatus == 404 {
-            return Possible[SrdRef[Customer]].failure(Errors.notFound());
-        } else if request.responseHttpStatus == 0 {
-            return Possible[SrdRef[Customer]].failure(Errors.connection());
-        } else if request.responseHttpStatus != 200 {
-            return Possible[SrdRef[Customer]].failure(Errors.unexpected());
-        }
-        def customerObject: Json = request.responseBody;
-        return Possible[SrdRef[Customer]].success(convertToCustomer(customerObject));
+    func createCustomer(key: String, parameters: String, verbose: Bool): Possible[String] {
+        return postRecord(key, String("https://api.stripe.com/v1/customers"), parameters, verbose);
     }
-    func customerHasDefaultPaymentMethod(key: String, customerId: String, verbose: Bool): bool {
-        def customer: SrdRef[Customer]
-            customer = getCustomer(key, customerId, verbose);
-        if customer.defaultPaymentMethod != String("null")
+
+    func doesCustomerHaveDefaultPaymentMethod(key: String, customerId: String, verbose: Bool): Bool {
+        def customer: Possible[SrdRef[Customer]] = getCustomer(key, customerId, verbose);
+        if customer and customer.defaultPaymentMethod != String("null")
             return true;
         return false;
     }
 
-    func customerAddDefaultPaymentMethod(key: String, customerId: String, paymentMethodId: String, verbose: Bool): bool {
+    func addCustomerDefaultPaymentMethod(key: String, customerId: String, paymentMethodId: String, verbose: Bool): Bool {
         def parameters: String = "invoice_settings[default_payment_method]=";
         parameters = parameters + paymentID;
-        def b: bool = true;
+        def b: Bool = true;
         def customerId: String;
         def request: Net.Request(
             String.format("https://api.stripe.com/v1/customers/%s", customerId.buf),
@@ -175,28 +94,5 @@
             return false;
         }
         return true;
-    }
-
-    func createCustomer(key: String, parameters: String, verbose: Bool): Possible[String] {
-        def b: Bool = true;
-        def request: Net.Request(
-            String("https://api.stripe.com/v1/customers"),
-            key,
-            String("Bearer"),
-            String("application/x-www-form-urlencoded")
-        );
-        request.verbose = verbose;
-        request.post(parameters.buf);
-        if request.responseHttpStatus == 401 {
-            return Possible[String].failure(Errors.unauthenticated());
-        } else if request.responseHttpStatus == 400 {
-            return Possible[String].failure(Errors.invalidParams());
-        } else if request.responseHttpStatus == 0 {
-            return Possible[String].failure(Errors.connection());
-        } else if request.responseHttpStatus != 200 {
-            return Possible[String].failure(Errors.unexpected());
-        }
-        def customerObject: Json = request.responseBody;
-        return Possible[String].success(customerObject("id"));
     }
 }
