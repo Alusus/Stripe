@@ -1,8 +1,8 @@
 @merge module Stripe {
     func getRecord [RecordType: type, convertor: function] (
         key: String, url: CharsPtr, id: CharsPtr, verbose: Bool
-    ): SrdRef[RecordType] {
-        def request: Net.Request(String.format("%s/%s", url, id.buf), key, String("Bearer"));
+    ): Possible[SrdRef[RecordType]] {
+        def request: Net.Request(String.format("%s/%s", url, id), key, String("Bearer"));
         request.verbose = verbose;
         request.get();
         if request.responseHttpStatus == 401 {

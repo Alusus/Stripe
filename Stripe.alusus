@@ -30,7 +30,7 @@ import "Apis/balance_transaction";
 import "Apis/balance";
 import "Apis/billing_portal_session";
 import "Apis/subscription";
-import "Apis/paymentMethod";
+import "Apis/payment_method";
 import "Errors";
 
 @merge module Stripe {
@@ -161,7 +161,7 @@ import "Errors";
             return Stripe.createSubscription(this.key, items, customerId, this.verbose);
         }
         
-        `handler this.updateSubscription(subscriptionId: String, parameters: String): Possible[String] {
+        handler this.updateSubscription(subscriptionId: String, parameters: String): Possible[String] {
             return Stripe.updateSubscription(this.key, subscriptionId, parameters, this.verbose);
         }
         
