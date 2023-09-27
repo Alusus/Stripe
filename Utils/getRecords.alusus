@@ -23,12 +23,13 @@
                 return Possible[Array[SrdRef[RecordType]]].failure(Errors.unexpected());
             }
             def recordsJson: Json = request.responseBody;
-            if recordsJson("object") == String("list") {
+            if recordsJson("object")~cast[String] == "list" {
                 def length: Int = recordsJson("data").getLength();
                 if limit != -1 {
                     if length > limit length = limit;
                     limit -= length;
                 }
+                def i: Int;
                 for i = 0, i < length, i += 1 {
                     records.add(convertor(recordsJson("data")(i)));
                 }
