@@ -1048,6 +1048,22 @@ handler this.updateSubscription(subscriptionId: String, parameters: String): Pos
 
 `معطيات` (`parameters`) معطيات الاشتراك المطلوبة بالصيغة التالية: "customer=customerID&line_items=planID".
 
+#### ألغ_اشتراكا (cancelSubscription)
+
+```
+عملية هذا.ألغ_اشتراكا(معرف_الاشتراك: نـص): سـندنا[خـطأ]؛
+```
+
+<div dir=ltr>
+
+```
+handler this.cancelSubscription(subscriptionId: String): SrdRef[Error];
+```
+
+</div>
+
+تلغي الاشتراك ذا المعرف المعطى.
+
 #### هات_طرق_الدفع (getPaymentMethods)
 
 ```

@@ -545,6 +545,14 @@ Updates the subscription having the given ID.
 `parameters`: The parameters to assign to this subscription. It should have the following format:
 `customer=customerID&line_items=planID`.
 
+#### cancelSubscription
+
+```
+handler this.cancelSubscription(subscriptionId: String): SrdRef[Error];
+```
+
+Cancels the subscription having the given ID.
+
 #### createBillingPortalSession
 
 ```

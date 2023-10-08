@@ -1,0 +1,19 @@
+@merge module Stripe {
+    func deleteRecord [RecordType: type, convertor: function] (
+        key: String, url: CharsPtr, id: CharsPtr, verbose: Bool
+    ): SrdRef[Error] {
+        def request: Net.Request(String.format("%s/%s", url, id), key, String("Bearer"));
+        request.verbose = verbose;
+        request.delete();
+        if request.responseHttpStatus == 401 {
+            return Errors.unauthenticated();
+        } else if request.responseHttpStatus == 404 {
+            return Errors.notFound();
+        } else if request.responseHttpStatus == 0 {
+            return Errors.connection();
+        } else if request.responseHttpStatus != 200 {
+            return Errors.unexpected();
+        }
+        return SrdRef[Error]();
+    }
+}

@@ -39,9 +39,9 @@
         return Possible[Array[SrdRef[Subscription]]].success(subscriptions);
     }
 
-    func getSubscription(key: String, checkoutId: String, verbose: Bool): Possible[SrdRef[Subscription]] {
+    func getSubscription(key: String, subscriptionId: String, verbose: Bool): Possible[SrdRef[Subscription]] {
         return getRecord[Subscription, convertToSubscription](
-            key, "https://api.stripe.com/v1/subscriptions", checkoutId, verbose
+            key, "https://api.stripe.com/v1/subscriptions", subscriptionId, verbose
         );
     }
 
@@ -99,6 +99,12 @@
             String.format("https://api.stripe.com/v1/subscriptions/%s", subscriptionId.buf),
             parameters,
             verbose
+        );
+    }
+
+    func cancelSubscription(key: String, subscriptionId: String, verbose: Bool): SrdRef[Error] {
+        return deleteRecord[Subscription, convertToSubscription](
+            key, "https://api.stripe.com/v1/subscriptions", subscriptionId, verbose
         );
     }
 }

@@ -142,6 +142,7 @@
         عرف هات_اشتراكا: لقب getSubscription؛
         عرف أنشئ_اشتراكا: لقب createSubscription؛
         عرف حدث_اشتراكا: لقب updateSubscription؛
+        عرف ألغ_اشتراكا: لقب cancelSubscription؛
         عرف هات_طرق_الدفع: لقب getPaymentMethods؛
         عرف هات_طريقة_دفع: لقب getPaymentMethod؛
     }

@@ -24,6 +24,7 @@ import "Models/PaymentMethod";
 import "Utils/getRecord";
 import "Utils/getRecords";
 import "Utils/postRecord";
+import "Utils/deleteRecord";
 import "Apis/customer";
 import "Apis/checkout_session";
 import "Apis/balance_transaction";
@@ -164,7 +165,11 @@ import "Errors";
         handler this.updateSubscription(subscriptionId: String, parameters: String): Possible[String] {
             return Stripe.updateSubscription(this.key, subscriptionId, parameters, this.verbose);
         }
-        
+
+        handler this.cancelSubscription(subscriptionId: String): SrdRef[Error] {
+            return Stripe.updateSubscription(this.key, subscriptionId, this.verbose);
+        }
+
         // PaymentMethod APIs
 
         handler this.getPaymentMethods(customerId: String): Possible[Array[SrdRef[PaymentMethod]]] {
