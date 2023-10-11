@@ -167,7 +167,7 @@ import "Errors";
         }
 
         handler this.cancelSubscription(subscriptionId: String): SrdRef[Error] {
-            return Stripe.updateSubscription(this.key, subscriptionId, this.verbose);
+            return Stripe.cancelSubscription(this.key, subscriptionId, this.verbose);
         }
 
         // PaymentMethod APIs

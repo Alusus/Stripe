@@ -71,9 +71,10 @@
         return false;
     }
 
-    func addCustomerDefaultPaymentMethod(key: String, customerId: String, paymentMethodId: String, verbose: Bool): Bool {
-        def parameters: String = "invoice_settings[default_payment_method]=";
-        parameters = parameters + paymentID;
+    func addCustomerDefaultPaymentMethod(
+        key: String, customerId: String, paymentMethodId: String, verbose: Bool
+    ): Bool {
+        def parameters: String = String("invoice_settings[default_payment_method]=") + paymentMethodId;
         def b: Bool = true;
         def customerId: String;
         def request: Net.Request(
