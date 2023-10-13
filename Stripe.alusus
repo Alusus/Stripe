@@ -70,7 +70,7 @@ import "Errors";
             return Stripe.doesCustomerHaveDefaultPaymentMethod(this.key, customerId, this.verbose);
         }
 
-        handler this.addCustomerDefaultPaymentMethod(customerId: String, paymentMethodId: String): Bool {
+        handler this.addCustomerDefaultPaymentMethod(customerId: String, paymentMethodId: String): SrdRef[Error] {
             return Stripe.addCustomerDefaultPaymentMethod(this.key, customerId, paymentMethodId, this.verbose);
         }
 

@@ -696,13 +696,13 @@ handler this.doesCustomerHaveDefaultPaymentMethod(customerId: String): Bool;
 ####  أضف_طريقة_دفع_مبدئية_للزبون (addCustomerDefaultPaymentMethod)
 
 ```
-عملية هذا.أضف_طريقة_دفع_مبدئية_للزبون(معرف_الزبون: نـص، معرف_طريقة_الدفع: نـص): ثـنائي؛
+عملية هذا.أضف_طريقة_دفع_مبدئية_للزبون(معرف_الزبون: نـص، معرف_طريقة_الدفع: نـص): سـندنا[خـطأ]؛
 ```
 
 <div dir=ltr>
 
 ```
-handler this.addCustomerDefaultPaymentMethod(customerId: String, paymentMethodId: String): Bool;
+handler this.addCustomerDefaultPaymentMethod(customerId: String, paymentMethodId: String): SrdRef[Error];
 ```
 
 </div>

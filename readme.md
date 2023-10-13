@@ -375,7 +375,7 @@ Returns 1 if the customer with the given ID has a default payment method.
 #### addCustomerDefaultPaymentMethod
 
 ```
-handler this.addCustomerDefaultPaymentMethod(customerId: String, paymentMethodId: String): Bool;
+handler this.addCustomerDefaultPaymentMethod(customerId: String, paymentMethodId: String): SrdRef[Error];
 ```
 
 Assigns the payment method with the given ID as the customer's default payment method. Returns 1 on
