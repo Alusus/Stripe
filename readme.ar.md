@@ -799,7 +799,7 @@ handler this.createBillingPortalSession(parameters: String): Possible[String]
 
 ```
 عملية هذا.أنشئ_جلسة_تحكم_بالفوترة(
-    معرف_الزبون: نص،
+    معرف_الزبون: مـؤشر_محارف،
     رابط_الرجوع: مـؤشر_محارف
 ): لـا_مضمون[نـص]
 ```
@@ -808,7 +808,7 @@ handler this.createBillingPortalSession(parameters: String): Possible[String]
 
 ```
 handler this.createBillingPortalSession(
-    customerId:String, 
+    customerId:CharsPtr, 
     returnUrl: CharsPtr
 ): Possible[String]
 ```

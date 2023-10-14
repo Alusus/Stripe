@@ -567,7 +567,7 @@ Returns customer account  url.
 
 ```
 handler this.createBillingPortalSession(
-    customerId:String, 
+    customerId: CharsPtr, 
     returnUrl: CharsPtr
 ): Possible[String]
 ```

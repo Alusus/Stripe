@@ -4,14 +4,11 @@
     }
 
     func createBillingPortalSession(
-        key: String, customerId : String ,returnUrl: CharsPtr, verbose: Bool
+        key: String, customerId: CharsPtr, returnUrl: CharsPtr, verbose: Bool
     ): Possible[String] {
-        if items.getLength() == 0 {
-            return Possible[String].failure(Errors.invalidParams());
-        }
         def parameters: String = String.format(
             "customer=%s&return_url=%s"،
-            customerId.buf,
+            Net.uriEncode(customerId).buf,
             Net.uriEncode(returnUrl).buf
         );
         return createBillingPortalSession(key, parameters, verbose);

@@ -136,7 +136,7 @@ import "Errors";
             return Stripe.createBillingPortalSession(this.key, parameters, this.verbose);
         }
 
-        handler this.createBillingPortalSession(customerId: String, returnUrl: CharsPtr): Possible[String] {
+        handler this.createBillingPortalSession(customerId: CharsPtr, returnUrl: CharsPtr): Possible[String] {
             return Stripe.createBillingPortalSession(this.key, customerId, returnUrl, this.verbose);
         }
 
