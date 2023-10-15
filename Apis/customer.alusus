@@ -66,33 +66,22 @@
 
     func doesCustomerHaveDefaultPaymentMethod(key: String, customerId: String, verbose: Bool): Bool {
         def customer: Possible[SrdRef[Customer]] = getCustomer(key, customerId, verbose);
-        if customer and customer.defaultPaymentMethod != String("null")
+        if customer and customer.defaultPaymentMethod != ""
             return true;
         return false;
     }
 
-    func addCustomerDefaultPaymentMethod(key: String, customerId: String, paymentMethodId: String, verbose: Bool): Bool {
-        def parameters: String = "invoice_settings[default_payment_method]=";
-        parameters = parameters + paymentID;
-        def b: Bool = true;
-        def customerId: String;
-        def request: Net.Request(
-            String.format("https://api.stripe.com/v1/customers/%s", customerId.buf),
+    func addCustomerDefaultPaymentMethod(
+        key: String, customerId: String, paymentMethodId: String, verbose: Bool
+    ): SrdRef[Error] {
+        def parameters: String = String("invoice_settings[default_payment_method]=") + paymentMethodId;
+        def res: Possible[String] = postRecord(
             key,
-            String("Bearer"),
-            String("application/x-www-form-urlencoded")
+            String.format("https://api.stripe.com/v1/customers/%s", customerId.buf),
+            parameters,
+            verbose
         );
-        request.verbose = verbose;
-        request.post(parameters.buf);
-        if request.responseHttpStatus == 401 {
-            return false;
-        } else if request.responseHttpStatus == 400 {
-            return false;
-        } else if request.responseHttpStatus == 0 {
-            return false;
-        } else if request.responseHttpStatus != 200 {
-            return false;
-        }
-        return true;
+        if not res return res.error
+        else return SrdRef[Error]();
     }
 }

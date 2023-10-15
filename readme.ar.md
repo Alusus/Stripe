@@ -696,13 +696,13 @@ handler this.doesCustomerHaveDefaultPaymentMethod(customerId: String): Bool;
 ####  أضف_طريقة_دفع_مبدئية_للزبون (addCustomerDefaultPaymentMethod)
 
 ```
-عملية هذا.أضف_طريقة_دفع_مبدئية_للزبون(معرف_الزبون: نـص، معرف_طريقة_الدفع: نـص): ثـنائي؛
+عملية هذا.أضف_طريقة_دفع_مبدئية_للزبون(معرف_الزبون: نـص، معرف_طريقة_الدفع: نـص): سـندنا[خـطأ]؛
 ```
 
 <div dir=ltr>
 
 ```
-handler this.addCustomerDefaultPaymentMethod(customerId: String, paymentMethodId: String): Bool;
+handler this.addCustomerDefaultPaymentMethod(customerId: String, paymentMethodId: String): SrdRef[Error];
 ```
 
 </div>
@@ -799,7 +799,7 @@ handler this.createBillingPortalSession(parameters: String): Possible[String]
 
 ```
 عملية هذا.أنشئ_جلسة_تحكم_بالفوترة(
-    معرف_الزبون: نص،
+    معرف_الزبون: مـؤشر_محارف،
     رابط_الرجوع: مـؤشر_محارف
 ): لـا_مضمون[نـص]
 ```
@@ -808,7 +808,7 @@ handler this.createBillingPortalSession(parameters: String): Possible[String]
 
 ```
 handler this.createBillingPortalSession(
-    customerId:String, 
+    customerId:CharsPtr, 
     returnUrl: CharsPtr
 ): Possible[String]
 ```
@@ -1047,6 +1047,22 @@ handler this.updateSubscription(subscriptionId: String, parameters: String): Pos
 تحدث الاشتراك ذا المعرف المعطى.
 
 `معطيات` (`parameters`) معطيات الاشتراك المطلوبة بالصيغة التالية: "customer=customerID&line_items=planID".
+
+#### ألغ_اشتراكا (cancelSubscription)
+
+```
+عملية هذا.ألغ_اشتراكا(معرف_الاشتراك: نـص): سـندنا[خـطأ]؛
+```
+
+<div dir=ltr>
+
+```
+handler this.cancelSubscription(subscriptionId: String): SrdRef[Error];
+```
+
+</div>
+
+تلغي الاشتراك ذا المعرف المعطى.
 
 #### هات_طرق_الدفع (getPaymentMethods)
 

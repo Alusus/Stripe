@@ -25,7 +25,8 @@
                 return Possible[Array[SrdRef[Subscription]]].failure(Errors.unexpected());
             }
             def subscriptionsJson: Json = request.responseBody;
-            if subscriptionsJson("object") == String("search_result") {
+            if subscriptionsJson("object")~cast[String] == "search_result" {
+                def i: Int;
                 for i = 0, i < subscriptionsJson("data").getLength(), i += 1 {
                     subscriptions.add(convertToSubscription(subscriptionsJson("data")(i)));
                 }
@@ -39,9 +40,9 @@
         return Possible[Array[SrdRef[Subscription]]].success(subscriptions);
     }
 
-    func getSubscription(key: String, checkoutId: String, verbose: Bool): Possible[SrdRef[Subscription]] {
+    func getSubscription(key: String, subscriptionId: String, verbose: Bool): Possible[SrdRef[Subscription]] {
         return getRecord[Subscription, convertToSubscription](
-            key, "https://api.stripe.com/v1/subscriptions", checkoutId, verbose
+            key, "https://api.stripe.com/v1/subscriptions", subscriptionId, verbose
         );
     }
 
@@ -70,7 +71,7 @@
         def metadata: Map[String, String];
         def i: Int;
         for i = 0, i < subscriptionJson("metadata").getLength(), ++i {
-            metadata[subscriptionJson("metadata").getKey(i)] = subscriptionJson("metadata")(i);
+            metadata(subscriptionJson("metadata").getKey(i)) = subscriptionJson("metadata")(i);
         }
         return SrdRef[Subscription]().{
             alloc()~init(
@@ -99,6 +100,12 @@
             String.format("https://api.stripe.com/v1/subscriptions/%s", subscriptionId.buf),
             parameters,
             verbose
+        );
+    }
+
+    func cancelSubscription(key: String, subscriptionId: String, verbose: Bool): SrdRef[Error] {
+        return deleteRecord[Subscription, convertToSubscription](
+            key, "https://api.stripe.com/v1/subscriptions", subscriptionId, verbose
         );
     }
 }

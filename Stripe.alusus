@@ -24,6 +24,7 @@ import "Models/PaymentMethod";
 import "Utils/getRecord";
 import "Utils/getRecords";
 import "Utils/postRecord";
+import "Utils/deleteRecord";
 import "Apis/customer";
 import "Apis/checkout_session";
 import "Apis/balance_transaction";
@@ -69,7 +70,7 @@ import "Errors";
             return Stripe.doesCustomerHaveDefaultPaymentMethod(this.key, customerId, this.verbose);
         }
 
-        handler this.addCustomerDefaultPaymentMethod(customerId: String, paymentMethodId: String): Bool {
+        handler this.addCustomerDefaultPaymentMethod(customerId: String, paymentMethodId: String): SrdRef[Error] {
             return Stripe.addCustomerDefaultPaymentMethod(this.key, customerId, paymentMethodId, this.verbose);
         }
 
@@ -135,7 +136,7 @@ import "Errors";
             return Stripe.createBillingPortalSession(this.key, parameters, this.verbose);
         }
 
-        handler this.createBillingPortalSession(customerId: String, returnUrl: CharsPtr): Possible[String] {
+        handler this.createBillingPortalSession(customerId: CharsPtr, returnUrl: CharsPtr): Possible[String] {
             return Stripe.createBillingPortalSession(this.key, customerId, returnUrl, this.verbose);
         }
 
@@ -164,7 +165,11 @@ import "Errors";
         handler this.updateSubscription(subscriptionId: String, parameters: String): Possible[String] {
             return Stripe.updateSubscription(this.key, subscriptionId, parameters, this.verbose);
         }
-        
+
+        handler this.cancelSubscription(subscriptionId: String): SrdRef[Error] {
+            return Stripe.cancelSubscription(this.key, subscriptionId, this.verbose);
+        }
+
         // PaymentMethod APIs
 
         handler this.getPaymentMethods(customerId: String): Possible[Array[SrdRef[PaymentMethod]]] {

@@ -375,7 +375,7 @@ Returns 1 if the customer with the given ID has a default payment method.
 #### addCustomerDefaultPaymentMethod
 
 ```
-handler this.addCustomerDefaultPaymentMethod(customerId: String, paymentMethodId: String): Bool;
+handler this.addCustomerDefaultPaymentMethod(customerId: String, paymentMethodId: String): SrdRef[Error];
 ```
 
 Assigns the payment method with the given ID as the customer's default payment method. Returns 1 on
@@ -545,6 +545,14 @@ Updates the subscription having the given ID.
 `parameters`: The parameters to assign to this subscription. It should have the following format:
 `customer=customerID&line_items=planID`.
 
+#### cancelSubscription
+
+```
+handler this.cancelSubscription(subscriptionId: String): SrdRef[Error];
+```
+
+Cancels the subscription having the given ID.
+
 #### createBillingPortalSession
 
 ```
@@ -559,7 +567,7 @@ Returns customer account  url.
 
 ```
 handler this.createBillingPortalSession(
-    customerId:String, 
+    customerId: CharsPtr, 
     returnUrl: CharsPtr
 ): Possible[String]
 ```
