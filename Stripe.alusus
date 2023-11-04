@@ -41,6 +41,9 @@ import "Errors";
         def key: String;
         def verbose: Bool = true;
 
+        handler this~init() {
+        }
+
         handler this~init(k: String) {
             this.key = k;
         }
