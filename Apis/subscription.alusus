@@ -60,7 +60,7 @@
         def i: Int;
         for i = 0, i < items.getLength(), ++i {
             parameters += String.format(
-                "&line_items[%i][price]=%s&line_items[%i][quantity]=%i"،
+                "&items[%i][price]=%s&items[%i][quantity]=%i"،
                 i, Net.uriEncode(items.keyAt(i)).buf, i, items.valAt(i)
             );
         }
