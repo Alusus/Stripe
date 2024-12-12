@@ -54,7 +54,7 @@
         key: String, items: Map[String, Int], customerId: String, verbose: Bool
     ): Possible[String] {
         if items.getLength() == 0 {
-            return Possible[String].failure(Errors.invalidParams());
+            return Possible[String].failure(Errors.invalidParam(String("items")));
         }
         def parameters: String = String.format("customer=%s", customerId.buf);
         def i: Int;

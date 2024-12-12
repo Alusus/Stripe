@@ -6,7 +6,8 @@
         if request.responseHttpStatus == 401 {
             return Possible[String].failure(Errors.unauthenticated());
         } else if request.responseHttpStatus == 400 {
-            return Possible[String].failure(Errors.invalidParams());
+            def json: Json = request.responseBody;
+            return Possible[String].failure(Errors.invalidParam(json("error")("param")));
         } else if request.responseHttpStatus == 0 {
             return Possible[String].failure(Errors.connection());
         } else if request.responseHttpStatus != 200 {

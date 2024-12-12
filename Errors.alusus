@@ -24,10 +24,23 @@
             return GenericError.new(NOT_FOUND, NOT_FOUND_MSG);
         }
 
-        def INVALID_PARAMS: "stripe_invalid_params";
-        def INVALID_PARAMS_MSG: "Invalid request parameters";
-        func invalidParams(): SrdRef[GenericError] {
-            return GenericError.new(INVALID_PARAMS, INVALID_PARAMS_MSG);
+        def INVALID_PARAM: "stripe_invalid_param";
+        def INVALID_PARAM_MSG: "Invalid request parameter";
+        func invalidParam(paramName: String): SrdRef[InvalidParamError] {
+            return InvalidParamError.new(paramName);
+        }
+
+        class InvalidParamError {
+            @injection def error: GenericError;
+            def paramName: String;
+
+            func new(pn: String): SrdRef[InvalidParamError] {
+                return SrdRef[InvalidParamError].construct().{
+                    code = INVALID_PARAM;
+                    message = String.format("%s. Param: %s", INVALID_PARAM_MSG, pn.buf);
+                    paramName = pn;
+                }
+            }
         }
     }
 }
