@@ -1,0 +1,31 @@
+@merge module Stripe {
+    class Coupon {
+        def id: String;
+        def name: Nullable[String];
+        def duration: String;
+        def durationInMonths: Nullable[String];
+        def amountOff: Nullable[Int];
+        def percentOff: Nullable[Float];
+        def currency: Nullable[String];
+
+        handler this~init() {}
+
+        handler this~init(
+            id: String,
+            name: Nullable[String],
+            duration: String,
+            durationInMonths: Nullable[String],
+            amountOff: Nullable[Int],
+            percentOff: Nullable[Float],
+            currency: Nullable[String]
+        ) {
+            this.id = id;
+            this.name = name;
+            this.duration = duration;
+            this.durationInMonths = durationInMonths;
+            this.amountOff = amountOff;
+            this.percentOff = percentOff;
+            this.currency = currency;
+        }
+    }
+}

@@ -1,0 +1,25 @@
+@merge module Stripe {
+    class PromotionCode {
+        def id: String;
+        def active: Bool;
+        def code: String;
+        def livemode: Bool;
+        def coupon: SrdRef[Coupon];
+
+        handler this~init() {}
+
+        handler this~init(
+            id: String,
+            active: Bool,
+            code: String,
+            livemode: Bool,
+            coupon: SrdRef[Coupon]
+        ) {
+            this.id = id;
+            this.active = active;
+            this.code = code;
+            this.livemode = livemode;
+            this.coupon = coupon;
+        }
+    }
+}

@@ -1,0 +1,33 @@
+@merge module Stripe {
+    func getPromotionCodes(key: String, code: String, verbose: Bool): Possible[Array[SrdRef[PromotionCode]]] {
+        return getRecords[PromotionCode, convertToPromotionCode](
+            key, String("https://api.stripe.com/v1/promotion_codes?code=") + code, -1, String(), verbose
+        );
+    }
+
+    func convertToPromotionCode(promotionCodeJson: Json): SrdRef[PromotionCode] {
+        return SrdRef[PromotionCode]().{
+            alloc()~init(
+                promotionCodeJson("id"),
+                promotionCodeJson("active"),
+                promotionCodeJson("code"),
+                promotionCodeJson("livemode"),
+                convertToCoupon(promotionCodeJson("coupon"))
+            )
+        };
+    }
+
+    func convertToCoupon(couponJson: Json): SrdRef[Coupon] {
+        return SrdRef[Coupon]().{
+            alloc()~init(
+                couponJson("id"),
+                couponJson("name"),
+                couponJson("duration"),
+                couponJson("durationInMonths"),
+                couponJson("amountOff"),
+                couponJson("percentOff"),
+                couponJson("currency")
+            )
+        };
+    }
+}
