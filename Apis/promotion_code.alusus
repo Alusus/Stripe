@@ -23,9 +23,9 @@
                 couponJson("id"),
                 couponJson("name"),
                 couponJson("duration"),
-                couponJson("durationInMonths"),
-                couponJson("amountOff"),
-                couponJson("percentOff"),
+                couponJson("duration_in_months"),
+                couponJson("amount_off"),
+                couponJson("percent_off"),
                 couponJson("currency")
             )
         };
