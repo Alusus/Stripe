@@ -21,6 +21,8 @@ import "Models/Customer";
 import "Models/CheckoutSession";
 import "Models/Subscription";
 import "Models/PaymentMethod";
+import "Models/Coupon";
+import "Models/PromotionCode";
 import "Utils/getRecord";
 import "Utils/getRecords";
 import "Utils/postRecord";
@@ -32,6 +34,7 @@ import "Apis/balance";
 import "Apis/billing_portal_session";
 import "Apis/subscription";
 import "Apis/payment_method";
+import "Apis/promotion_code";
 import "Errors";
 
 @merge module Stripe {
@@ -181,6 +184,12 @@ import "Errors";
 
         handler this.getPaymentMethod(paymentMethodId: String): Possible[SrdRef[PaymentMethod]] {
             return Stripe.getPaymentMethod(this.key, paymentMethodId, this.verbose);
+        }
+
+        // PromotionCode APIs
+
+        handler this.getPromotionCodes(code: String): Possible[Array[SrdRef[PromotionCode]]] {
+            return Stripe.getPromotionCodes(this.key, code, this.verbose);
         }
     }
 }

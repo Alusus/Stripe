@@ -313,6 +313,57 @@ class Subscription {
 
 `trialEnd` The timestamp  of the subscription trail period end.
 
+
+### Coupon
+
+```
+class Coupon {
+    def id: String;
+    def name: Nullable[String];
+    def duration: String;
+    def durationInMonths: Nullable[String];
+    def amountOff: Nullable[Int];
+    def percentOff: Nullable[Float];
+    def currency: Nullable[String];
+
+    handler this~init();
+
+    handler this~init(
+        id: String,
+        name: Nullable[String],
+        duration: String,
+        durationInMonths: Nullable[String],
+        amountOff: Nullable[Int],
+        percentOff: Nullable[Float],
+        currency: Nullable[String]
+    );
+}
+```
+
+
+### PromotionCode
+
+```
+class PromotionCode {
+    def id: String;
+    def active: Bool;
+    def code: String;
+    def livemode: Bool;
+    def coupon: SrdRef[Coupon];
+
+    handler this~init() {}
+
+    handler this~init(
+        id: String,
+        active: Bool,
+        code: String,
+        livemode: Bool,
+        coupon: SrdRef[Coupon]
+    );
+}
+```
+
+
 ### Client
 
 This class has methods for all available calls to Stripe. It can be initialized with a Stripe API key:
@@ -596,6 +647,14 @@ handler this.getPaymentMethod(paymentMethodId: String): Possible[SrdRef[PaymentM
 
 Returns the payment method having the given ID.
 
+#### getPromotionCodes
+
+```
+handler this.getPromotionCodes(code: String): Possible[Array[SrdRef[PromotionCode]]];
+```
+
+Gets the promotion codes matching the provided code.
+
 
 ### Errors
 
@@ -605,4 +664,11 @@ The `Errors` submodule contains error codes for all errors that can be returned 
 * `Errors.CONNECTION`: Returned when connection fails.
 * `Errors.UNEXPECTED`: Returned when receiving unexpected response from Stripe.
 * `Errors.NOT_FOUND`: Returned when the requested record is not found.
+* `Errors.INVALID_PARAM`: Returned when the operation fails due to an invalid param.
+
+```
+class InvalidParamError {
+    def paramName: String;
+}
+```
 

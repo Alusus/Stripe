@@ -587,6 +587,112 @@ class Subscription {
 `معرف_الزبون` (`customerId`) معرف الزبون الخاص بعملية الاشتراك.
 
 
+### قـسيمة (Coupon)
+
+يحمل بيانات قسيمة ترويج واحدة.
+
+```
+صنف قـسيمة {
+    عرف المعرف: نـص؛
+    عرف الاسم: بـعدم[نـص]؛
+    عرف المدة: نـص؛
+    عرف المدة_بالأشهر: بـعدم[نـص]؛
+    عرف قيمة_التخفيض: بـعدم[صـحيح]؛
+    عرف نسبة_التخفيض: بـعدم[عـائم]؛
+    عرف العملة: بـعدم[نـص]؛
+    
+    عملية هذا~هيئ()؛
+    
+    عملية هذا~هيئ(
+        المعرف: نـص،
+        الاسم: بـعدم[نـص]،
+        المدة: نـص،
+        المدة_بالأشهر: بـعدم[نـص]،
+        قيمة_التخفيض: بـعدم[صـحيح]،
+        نسبة_التخفيض: بـعدم[عـائم]،
+        العملة: بـعدم[نـص]
+    )؛
+}
+```
+
+<div dir=ltr>
+
+```
+class Coupon {
+    def id: String;
+    def name: Nullable[String];
+    def duration: String;
+    def durationInMonths: Nullable[String];
+    def amountOff: Nullable[Int];
+    def percentOff: Nullable[Float];
+    def currency: Nullable[String];
+
+    handler this~init();
+
+    handler this~init(
+        id: String,
+        name: Nullable[String],
+        duration: String,
+        durationInMonths: Nullable[String],
+        amountOff: Nullable[Int],
+        percentOff: Nullable[Float],
+        currency: Nullable[String]
+    );
+}
+```
+
+</div>
+
+
+### رمـز_ترويج (PromotionCode)
+
+يحمل بيانات رمز ترويج واحد.
+
+```
+صنف قـسيمة {
+    عرف المعرف: نـص؛
+    عرف مفعل: ثـنائي؛
+    عرف الرمز: نـص؛
+    عرف النمط_الحي: ثـنائي؛
+    عرف القسيمة: سـندنا[قـسيمة]؛
+    
+    عملية هذا~هيئ()؛
+    
+    عملية هذا~هيئ(
+        المعرف: نـص،
+        مفعل: ثـنائي،
+        الرمز: نـص،
+        النمط_الحي: ثـنائي،
+        القسيمة: سـندنا[قـسيمة]
+    )؛
+}
+```
+
+<div dir=ltr>
+
+```
+class PromotionCode {
+    def id: String;
+    def active: Bool;
+    def code: String;
+    def livemode: Bool;
+    def coupon: SrdRef[Coupon];
+
+    handler this~init() {}
+
+    handler this~init(
+        id: String,
+        active: Bool,
+        code: String,
+        livemode: Bool,
+        coupon: SrdRef[Coupon]
+    );
+}
+```
+
+</div>
+
+
 ### وكـيل (Client)
 
 يحتوي هذا الصنف كل وظائف التواصل مع سترايب. يُهيأ باستخدام مفتاح الواجهة البرمجية المُقدم من سترايب (API key):
@@ -1096,6 +1202,22 @@ handler this.getPaymentMethod(paymentMethodId: String): Possible[SrdRef[PaymentM
 
 ترجع طريقة الدفع ذات المعرف المعطى.
 
+#### هات_رموز_الترويج (getPromotionCodes)
+
+```
+عملية هذا.هات_رموز_الترويج(كود: نـص): لـا_مضمون[مـصفوفة[سـندنا[رمـز_ترويج]]]؛
+```
+
+<div dir=ltr>
+
+```
+handler this.getPromotionCodes(code: String): Possible[Array[SrdRef[PromotionCode]]];
+```
+
+</div>
+
+ترجع رموز الترويج المطابقة للكود المعطى.
+
 
 ### أخـطاء (Errors)
 
@@ -1105,5 +1227,23 @@ handler this.getPaymentMethod(paymentMethodId: String): Possible[SrdRef[PaymentM
 * `أخـطاء._اتصال_` (`Errors.CONNECTION`): تُرجع عند فشل الاتصال بخوادم سترايب.
 * `أخـطاء._غير_متوقع_` (`Errors.UNEXPECTED`): تُرجع عند استلام رد غير متوقع من سترايب.
 * `أخـطاء._غير_موجود_` (`Errors.NOT_FOUND`): تُرجع عند الفشل في العثور على القيد ذي المعرف المعطى.
+* `أخـطاء._معطى_خاطئ_` (`Errors.INVALID_PARAM`): تُرجع عند فشل العملية بسبب معطى غير صالح.
+
+```
+صنف خـطأ_معطى_خاطئ {
+    عرف اسم_المعطى: نـص؛
+}
+```
+
+<div dir=ltr>
+
+```
+class InvalidParamError {
+    def paramName: String;
+}
+```
 
 </div>
+
+</div>
+
