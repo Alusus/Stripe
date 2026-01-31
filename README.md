@@ -672,3 +672,11 @@ class InvalidParamError {
 }
 ```
 
+---
+
+## License
+
+Copyright (C) 2026 Sarmad Abdullah
+
+This project is licensed under the GNU Lesser General Public License v3.0 (LGPL-3.0). See the `COPYING` and `COPYING.LESSER` files for details.
+
