@@ -1,5 +1,5 @@
 # Stripe
-[[عربي]](readme.ar.md)
+[[عربي]](README.ar.md)
 
 An API client library for Stripe payment gateway.
 
