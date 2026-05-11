@@ -28,8 +28,8 @@ import "Srl/Console";
 import "Srl/Possible";
 
 import "Apm";
-Apm.importFile("Alusus/Json");
-Apm.importFile("Alusus/ExtendedNet");
+Apm.importPackage("Alusus/Json@0.2");
+Apm.importPackage("Alusus/Sle@0.2", "Srl/Net");
 
 import "Models/Source";
 import "Models/Balance";

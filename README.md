@@ -9,14 +9,14 @@ We can install this library using the following statements:
 
 ```
 import "Apm";
-Apm.importFile("Alusus/Stripe");
+Apm.importPackage("Alusus/Stripe@0.3");
 ```
 
 ## Example
 
 ```
 import "Apm";
-Apm.importFile("Alusus/Stripe");
+Apm.importPackage("Alusus/Stripe@0.3");
 use Stripe;
 
 // Inistantiate the client.

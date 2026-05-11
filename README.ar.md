@@ -9,14 +9,14 @@
 
 ```
 اشمل "مـحا"؛
-مـحا.اشمل_ملف("Alusus/Stripe"، "سـترايب.أسس")؛
+مـحا.اشمل_حزمة("Alusus/Stripe@0.3"، "سـترايب.أسس")؛
 ```
 
 <div dir=ltr>
 
 ```
 import "Apm";
-Apm.importFile("Alusus/Stripe");
+Apm.importPackage("Alusus/Stripe@0.3");
 ```
 
 </div>
@@ -25,7 +25,7 @@ Apm.importFile("Alusus/Stripe");
 
 ```
 اشمل "مـحا"؛
-مـحا.اشمل_ملف("Alusus/Stripe"، "سـترايب.أسس")؛
+مـحا.اشمل_حزمة("Alusus/Stripe@0.3"، "سـترايب.أسس")؛
 استخدم سـترايب؛
 
 // أنشئ الوكيل
@@ -59,7 +59,7 @@ Apm.importFile("Alusus/Stripe");
 
 ```
 import "Apm";
-Apm.importFile("Alusus/Stripe");
+Apm.importPackage("Alusus/Stripe@0.3");
 use Stripe;
 
 // Inistantiate the client.
