@@ -1,7 +1,8 @@
-# Stripe
-[[English]](README.md)
+# سـترايب (Strip)
 
 <div dir=rtl>
+
+[[English]](README.md)
 
 مكتبة ربط مع الواجهة البرمجية لخدمة الدفع سترايب (Stripe).
 
@@ -44,11 +45,11 @@ Apm.importPackage("Alusus/Stripe@0.3");
         الرصيد(ع).نوع_الرصيد.صوان, الرصيد(ع).العملة.صوان, الرصيد(ع).المبلغ
     )؛
     عرف م: صـحيح؛
-    لكل م = 0, م < الرصيد(ع).نوع_المصدر.هات_الطول(), م++ {
+    لكل م = 0, م < الرصيد(ع).المصادر.هات_الطول(), م++ {
         طـرفية.اطبع(
             "    نوع المصدر: %s\ج"
             "    المبلغ: %f\ج"،
-            الرصيد(ع).نوع_المصدر(م).نوع_المصدر.صوان, الرصيد(ع).نوع_المصدر(م).المبلغ
+            الرصيد(ع).المصادر(م).النوع.صوان, الرصيد(ع).المصادر(م).المبلغ
         )
     }
     طـرفية.اطبع("\ج")؛
@@ -125,7 +126,7 @@ for j = 0, j < balanceArray.getLength(), j++ {
         المعرف: نـص، العنوان: سـندنا[عـنوان]، الرصيد: عـائم، زمن_الإنشاء: صـحيح[64]،
         العملة: نـص: معرف_المصدر_المبدئي: نـص، مقصر: ثـنائي،
         الوصف: نـص، البريد_الإلكتروني: نـص، بادئة_الفاتورة: نـص، الاسم: نـص،
-        تسلسل_الفاتورة_التالي: نـص، رقم_الهاتف: نـص، النسق_المفضلة: مـصفوفة[نـص]،
+        تسلسل_الفاتورة_التالي: صـحيح، رقم_الهاتف: نـص، النسق_المفضلة: مـصفوفة[نـص]،
         الشحن: نـص، معفي_من_الضريبة: نـص، ساعة_اختبار: نـص، طريقة_الدفع_المبدئية: نـص
     )؛
 }
@@ -234,8 +235,7 @@ class Balance {
     def sources: Array[SrdRef[Source]];
     def balanceType: String;
 
-    handler this~init() {
-    }
+    handler this~init();
 
     handler this~init(amount: Float, currency: String, sources: Array[SrdRef[Source]], balanceType: String);
 }
@@ -243,9 +243,37 @@ class Balance {
 
 </div>
 
-`المصادر` (`sources`) المصادر المساهمة في هذا الرصيد (حساب مصرفي bank_account أو بطاقة card).
+#### المصادر (sources)
 
-`نوع_الرصيد` `balanceType` نوع هذا الرصيد (available, pending).
+```
+عرف المصادر: مـصفوفة[سـندنا[مـصدر]]؛
+```
+
+<div dir=ltr>
+
+```
+def sources: Array[SrdRef[Source]]
+```
+
+</div>
+
+المصادر المساهمة في هذا الرصيد (حساب مصرفي bank_account أو بطاقة card).
+
+#### نوع_الرصيد (balanceType)
+
+```
+عرف نوع_الرصيد: نـص؛
+```
+
+<div dir=ltr>
+
+```
+def balanceType: String
+```
+
+</div>
+
+نوع هذا الرصيد (available, pending).
 
 ### عـملية_رصيد (BalanceTransaction)
 
@@ -298,7 +326,6 @@ class BalanceTransaction {
     def status: String;
     def sourceType: String;
 
-
     handler this~init();
 
     handler this~init(
@@ -312,15 +339,85 @@ class BalanceTransaction {
 
 </div>
 
-`المعرف` (`id`) معرف قيد العملية في سترايب.
+#### المعرف (id)
 
-`المبلغ` (`amount`) مبلغ العملية.
+```
+عرف المعرف: نـص؛
+```
 
-`زمن_التوفر` (`availableOn`) الزمن الذي ستكون فيه القيمة متوفرة في الحساب.
+<div dir=ltr>
 
-`الرسوم` (`fee`) رسوم العملية.
+```
+def id: String
+```
 
-`سعر_الصرف` (`exchangeRate`) سعر الصرف المتبع في العملية.
+</div>
+
+معرف قيد العملية في سترايب.
+
+#### المبلغ (amount)
+
+```
+عرف المبلغ: عـائم = 0؛
+```
+
+<div dir=ltr>
+
+```
+def amount: Float
+```
+
+</div>
+
+مبلغ العملية.
+
+#### زمن_التوفر (availableOn)
+
+```
+عرف زمن_التوفر: صـحيح[64]؛
+```
+
+<div dir=ltr>
+
+```
+def availableOn: Int[64]
+```
+
+</div>
+
+الزمن الذي ستكون فيه القيمة متوفرة في الحساب.
+
+#### سعر_الصرف (exchangeRate)
+
+```
+عرف سعر_الصرف: عـائم؛
+```
+
+<div dir=ltr>
+
+```
+def exchangeRate: Float
+```
+
+</div>
+
+سعر الصرف المتبع في العملية.
+
+#### الرسوم (fee)
+
+```
+عرف الرسوم: عـائم؛
+```
+
+<div dir=ltr>
+
+```
+def fee: Float
+```
+
+</div>
+
+رسوم العملية.
 
 ### تـفاصيل_فوترة (BillingDetails)
 
@@ -418,15 +515,85 @@ class CheckoutSession {
 
 </div>
 
-`المعرف` (`id`) معرف قيد إتمام الشراء في سترايب.
+#### المعرف (id)
 
-`المبلغ_الكلي` (`amountTotal`) المبلغ الكلي لعملية الشراء.
+```
+عرف المعرف: نـص؛
+```
 
-`الرابط` (`url`) رابط إتمام عملية الشراء.
+<div dir=ltr>
 
-`رابط_النجاح` (`successUrl`) الرابط الذي يُرسل المستخدم إليه في حال نجاح العملية.
+```
+def id: String
+```
 
-`رابط_الإلغاء` (`cancelUrl`) الرابط الذي يُرسل المستخدم إليه في حال إلغاء العملية.
+</div>
+
+معرف قيد إتمام الشراء في سترايب.
+
+#### رابط_الإلغاء (cancelUrl)
+
+```
+عرف رابط_الإلغاء: نـص؛
+```
+
+<div dir=ltr>
+
+```
+def cancelUrl: String
+```
+
+</div>
+
+الرابط الذي يُرسل المستخدم إليه في حال إلغاء العملية.
+
+#### رابط_النجاح (successUrl)
+
+```
+عرف رابط_النجاح: نـص؛
+```
+
+<div dir=ltr>
+
+```
+def successUrl: String
+```
+
+</div>
+
+الرابط الذي يُرسل المستخدم إليه في حال نجاح العملية.
+
+#### الرابط (url)
+
+```
+عرف الرابط: نـص؛
+```
+
+<div dir=ltr>
+
+```
+def url: String
+```
+
+</div>
+
+رابط إتمام عملية الشراء.
+
+#### المبلغ_الكلي (amountTotal)
+
+```
+عرف المبلغ_الكلي: نـص؛
+```
+
+<div dir=ltr>
+
+```
+def amountTotal: String
+```
+
+</div>
+
+المبلغ الكلي لعملية الشراء.
 
 ### طـريقة_دفع (PaymentMethod)
 
@@ -576,16 +743,117 @@ class Subscription {
 
 </div>
 
-`المعرف` (`id`) معرف قيد عملية اشتراك في سترايب.
+#### المعرف (id)
 
-`زمن_البدء` (`startDate`) زمن بدء الاشتراك.
+```
+عرف المعرف: نـص؛
+```
 
-`الحالة` (`status`) حالة الاشتراك.
+<div dir=ltr>
 
-`زمن_انتهاء_الفترة_التجريبية` (`trialEnd`) زمن انتهاء الفترة التجريبية.
+```
+def id: String;
+```
 
-`معرف_الزبون` (`customerId`) معرف الزبون الخاص بعملية الاشتراك.
+</div>
 
+معرف قيد عملية اشتراك في سترايب.
+
+#### زمن_الإنشاء (created)
+
+```
+عرف زمن_الإنشاء: صـحيح[64]؛
+```
+
+<div dir=ltr>
+
+```
+def created: Int[64];
+```
+
+</div>
+
+ختم زمني لتاريخ الإنشاء.
+
+#### زمن_البدء (startDate)
+
+```
+عرف زمن_البدء: صـحيح[64]؛
+```
+
+<div dir=ltr>
+
+```
+def startDate: Int[64];
+```
+
+</div>
+
+زمن بدء الاشتراك.
+
+#### الإلغاء_عند_انتهاء_الاشتراك (cancelAtPeriodEnd)
+
+```
+عرف الإلغاء_عند_انتهاء_الاشتراك: ثنائي؛
+```
+
+<div dir=ltr>
+
+```
+def cancelAtPeriodEnd: Bool;
+```
+
+</div>
+
+إنهاء الاشتراك عند انتهاء الفاتورة الحالية.
+
+#### الحالة (status)
+
+```
+عرف الحالة: نـص؛
+```
+
+<div dir=ltr>
+
+```
+def status: String;
+```
+
+</div>
+
+حالة الاشتراك.
+
+#### زمن_انتهاء_الفترة_التجريبية (trialEnd)
+
+```
+عرف زمن_انتهاء_الفترة_التجريبية: صـحيح[64]؛
+```
+
+<div dir=ltr>
+
+```
+def trialEnd: Int[64];
+```
+
+</div>
+
+زمن انتهاء الفترة التجريبية.
+
+#### معرف_الزبون (customerId)
+
+```
+ عرف معرف_الزبون: نـص؛
+```
+
+<div dir=ltr>
+
+```
+def customerId: String;
+```
+
+</div>
+
+معرف الزبون الخاص بعملية الاشتراك.
 
 ### قـسيمة (Coupon)
 
@@ -643,7 +911,6 @@ class Coupon {
 
 </div>
 
-
 ### رمـز_ترويج (PromotionCode)
 
 يحمل بيانات رمز ترويج واحد.
@@ -692,10 +959,11 @@ class PromotionCode {
 
 </div>
 
-
 ### وكـيل (Client)
 
-يحتوي هذا الصنف كل وظائف التواصل مع سترايب. يُهيأ باستخدام مفتاح الواجهة البرمجية المُقدم من سترايب (API key):
+يحتوي هذا الصنف كل وظائف التواصل مع سترايب.
+
+#### ~هيئ (init~)
 
 ```
 عملية هذا~هيئ(مفتاح: نـص)؛
@@ -704,48 +972,35 @@ class PromotionCode {
 <div dir=ltr>
 
 ```
-handler this~init(key: String);
+handler this~init(k: String);
 ```
 
 </div>
 
-يحتوي على الوظائف التالية:
+يُهيأ الوكيل بمفتاح الواجهة البرمجية المُقدم من سترايب (API key).
 
 #### هات_الزبائن (getCustomers)
 
 ```
 عملية هذا.هات_الزبائن(): لـا_مضمون[مـصفوفة[سـندنا[زبـون]]]؛
-```
-
-```
 عملية هذا.هات_الزبائن(الحد_الأقصى: صـحيح): لـا_مضمون[مـصفوفة[سـندنا[زبـون]]]؛
-```
-
-```
 عملية هذا.هات_الزبائن(الحد_الأقصى: صـحيح، آخر_معرف: نـص): لـا_مضمون[مـصفوفة[سـندنا[زبـون]]]؛
 ```
 
 <div dir=ltr>
 
 ```
-handler this.getCustomers(): Possible[Array[SrdRef[Customer]]]
-```
-
-```
-handler this.getCustomers(limit: Int): Possible[Array[SrdRef[Customer]]]
-```
-
-```
-handler this.getCustomers(limit: Int, startId: String): Possible[Array[SrdRef[Customer]]]
+handler this.getCustomers(): Possible[Array[SrdRef[Customer]]];
+handler this.getCustomers(limit: Int): Possible[Array[SrdRef[Customer]]];
+handler this.getCustomers(limit: Int, startId: String): Possible[Array[SrdRef[Customer]]];
 ```
 
 </div>
 
 تُرجع جميع الزبائن.
 
-`الحد_الأقصى` (`limit`): الحد الأقصى للقيود المطلوب جلبها.
-
-`آخر_معرف` (`startId`): معرف القيد المطلوب جلب البيانات بدءًا مما يليه.
+* `الحد_الأقصى` (`limit`): الحد الأقصى للقيود المطلوب جلبها.
+* `آخر_معرف` (`startId`): معرف القيد المطلوب جلب البيانات بدءًا مما يليه.
 
 #### هات_زبونا (getCustomer)
 
@@ -756,7 +1011,7 @@ handler this.getCustomers(limit: Int, startId: String): Possible[Array[SrdRef[Cu
 <div dir=ltr>
 
 ```
-handler this.getCustomer(id: String): Possible[SrdRef[Customer]]
+handler this.getCustomer(id: String): Possible[SrdRef[Customer]];
 ```
 
 </div>
@@ -772,16 +1027,14 @@ handler this.getCustomer(id: String): Possible[SrdRef[Customer]]
 <div dir=ltr>
 
 ```
-handler this.createCustomer(parameters: String): Possible[String]
+handler this.createCustomer(parameters: String): Possible[String];
 ```
 
 </div>
 
-تنشئ قيد زبون.
+تنشئ قيد زبون. تُرجع معرف الزبون.
 
-`معطيات` (`parameters`) معطيات الزبون بالصيغة التالية: "email=user123@example.com&name=john".
-
-تُرجع معرف الزبون.
+* `معطيات` (`parameters`): معطيات الزبون بالصيغة التالية: `"email=user123@example.com&name=john"`.
 
 #### أيملك_الزبون_طريقة_دفع_مبدئية (doesCustomerHaveDefaultPaymentMethod)
 
@@ -799,7 +1052,7 @@ handler this.doesCustomerHaveDefaultPaymentMethod(customerId: String): Bool;
 
 ترجع 1 إن كان لدى الزبون بالمعرف المعطى طريقة دفع مبدئية.
 
-####  أضف_طريقة_دفع_مبدئية_للزبون (addCustomerDefaultPaymentMethod)
+#### أضف_طريقة_دفع_مبدئية_للزبون (addCustomerDefaultPaymentMethod)
 
 ```
 عملية هذا.أضف_طريقة_دفع_مبدئية_للزبون(معرف_الزبون: نـص، معرف_طريقة_الدفع: نـص): سـندنا[خـطأ]؛
@@ -824,7 +1077,7 @@ handler this.addCustomerDefaultPaymentMethod(customerId: String, paymentMethodId
 <div dir=ltr>
 
 ```
-handler this.getBalance(): Possible[Array[SrdRef[Balance]]]
+handler this.getBalance(): Possible[Array[SrdRef[Balance]]];
 ```
 
 </div>
@@ -835,13 +1088,7 @@ handler this.getBalance(): Possible[Array[SrdRef[Balance]]]
 
 ```
 عملية هذا.هات_عمليات_الرصيد(): لـا_مضمون[مـصفوفة[سـندنا[عـملية_رصيد]]]؛
-```
-
-```
 عملية هذا.هات_عمليات_الرصيد(الحد_الأقصى: صـحيح): لـا_مضمون[مـصفوفة[سـندنا[عـملية_رصيد]]]؛
-```
-
-```
 عملية هذا.هات_عمليات_الرصيد(الحد_الأقصى: صـحيح، آخر_معرف: نـص): لـا_مضمون[مـصفوفة[سـندنا[عـملية_رصيد]]]؛
 ```
 
@@ -849,13 +1096,7 @@ handler this.getBalance(): Possible[Array[SrdRef[Balance]]]
 
 ```
 handler this.getBalanceTranasactions(): Possible[Array[SrdRef[BalanceTranasaction]]];
-```
-
-```
 handler this.getBalanceTranasactions(limit: Int): Possible[Array[SrdRef[BalanceTranasaction]]];
-```
-
-```
 handler this.getBalanceTranasactions(limit: Int, startId: String): Possible[Array[SrdRef[BalanceTranasaction]]];
 ```
 
@@ -863,107 +1104,47 @@ handler this.getBalanceTranasactions(limit: Int, startId: String): Possible[Arra
 
 ترجع قائمة العمليات التي ساهمت في إيصال الحساب إلى الرصيد الحالي (مثل الدفع والتحويل وما شابه).
 
-`الحد_الأقصى` (`limit`): الحد الأقصى للقيود المطلوب جلبها.
-
-`آخر_معرف` (`startId`): معرف القيد المطلوب جلب البيانات بدءًا مما يليه.
+* `الحد_الأقصى` (`limit`): الحد الأقصى للقيود المطلوب جلبها.
+* `آخر_معرف` (`startId`): معرف القيد المطلوب جلب البيانات بدءًا مما يليه.
 
 #### هات_عملية_رصيد (getBalanceTranasaction)
 
 ```
-عملية هذا.هات_عملية_رصيد(معرف: نـص): لـا_مضمون[سـندنا[عـملية_رصيد]]
+عملية هذا.هات_عملية_رصيد(معرف: نـص): لـا_مضمون[سـندنا[عـملية_رصيد]]؛
 ```
 
 <div dir=ltr>
 
 ```
-handler this.getBalanceTranasaction(id: String): Possible[SrdRef[BalanceTranasaction]]
+handler this.getBalanceTranasaction(id: String): Possible[SrdRef[BalanceTranasaction]];
 ```
 
 </div>
 
 ترجع عملية الرصيد ذات المعرف المحدد.
 
-#### أنشئ_جلسة_تحكم_بالفوترة (createBillingPortalSession)
-
-```
-عملية هذا.أنشئ_جلسة_تحكم_بالفوترة(معطيات: نـص): لـا_مضمون[نـص]
-```
-
-<div dir=ltr>
-
-```
-handler this.createBillingPortalSession(parameters: String): Possible[String]
-```
-
-</div>
-
-تنشئ جلسة جديدة للتحكم بالدفع.
-
-`معطيات` (`parameters`) معطيات الاشتراك المطلوبة بالصيغة التالية: "customer=customerID&returnUrl=returnUrl".
-
-تُرجع رابط جلسة بوابة الدفع.
-
-```
-عملية هذا.أنشئ_جلسة_تحكم_بالفوترة(
-    معرف_الزبون: مـؤشر_محارف،
-    رابط_الرجوع: مـؤشر_محارف
-): لـا_مضمون[نـص]
-```
-
-<div dir=ltr>
-
-```
-handler this.createBillingPortalSession(
-    customerId:CharsPtr, 
-    returnUrl: CharsPtr
-): Possible[String]
-```
-
-</div>
-
-هذه النسخة من دالة `أنشئ_جلسة_تحكم_بالفوترة` تستلم معطيات مفصلة بدل معطى خام كما في النسخة السابقة.
-
-`معرف_الزبون` (`customerId`): معرف قيد الزبون لفتح جلسة بوابة فاتورة خاصة به.
-
-`رابط_الرجوع` (`returnUrl`): الرابط لاعادة توجيه الزبون اليه عند الانتهاء من بوابة الفاتورة.
-
-تُرجع رابط جلسة التحكم بالفوترة.
-
 #### هات_جلسات_إتمام_الشراء (getCheckoutSessions)
 
 ```
-عملية هذا.هات_جلسات_إتمام_الشراء(): لـا_مضمون[مـصفوفة[سـندنا[جـلسة_شراء]]]
-```
-
-```
-عملية هذا.هات_جلسات_إتمام_الشراء(الحد_الأقصى: صـحيح): لـا_مضمون[مـصفوفة[سـندنا[جـلسة_شراء]]]
-```
-
-```
-عملية هذا.هات_جلسات_إتمام_الشراء(الحد_الأقصى: صـحيح، آخر_معرف: نـص): لـا_مضمون[مـصفوفة[سـندنا[جـلسة_شراء]]]
+عملية هذا.هات_جلسات_إتمام_الشراء(): لـا_مضمون[مـصفوفة[سـندنا[جـلسة_شراء]]]؛
+عملية هذا.هات_جلسات_إتمام_الشراء(الحد_الأقصى: صـحيح): لـا_مضمون[مـصفوفة[سـندنا[جـلسة_شراء]]]؛
+عملية هذا.هات_جلسات_إتمام_الشراء(الحد_الأقصى: صـحيح، آخر_معرف: نـص): لـا_مضمون[مـصفوفة[سـندنا[جـلسة_شراء]]]؛
 ```
 
 <div dir=ltr>
 
 ```
-handler this.getCheckoutSessions(): Possible[Array[SrdRef[CheckoutSession]]]
-```
-
-```
-handler this.getCheckoutSessions(limit: Int): Possible[Array[SrdRef[CheckoutSession]]]
-```
-
-```
-handler this.getCheckoutSessions(limit: Int, startId: String): Possible[Array[SrdRef[CheckoutSession]]]
+handler this.getCheckoutSessions(): Possible[Array[SrdRef[CheckoutSession]]];
+handler this.getCheckoutSessions(limit: Int): Possible[Array[SrdRef[CheckoutSession]]];
+handler this.getCheckoutSessions(limit: Int, startId: String): Possible[Array[SrdRef[CheckoutSession]]];
 ```
 
 </div>
 
 ترجع قائمة جلسات إتمام الشراء.
 
-`الحد_الأقصى` (`limit`): الحد الأقصى للقيود المطلوب جلبها.
-
-`آخر_معرف` (`startId`): معرف القيد المطلوب جلب البيانات بدءًا مما يليه.
+* `الحد_الأقصى` (`limit`): الحد الأقصى للقيود المطلوب جلبها.
+* `آخر_معرف` (`startId`): معرف القيد المطلوب جلب البيانات بدءًا مما يليه.
 
 #### هات_جلسة_إتمام_الشراء (getCheckoutSession)
 
@@ -985,104 +1166,64 @@ handler this.getCheckoutSession(sessionId: String): Possible[SrdRef[CheckoutSess
 
 ```
 عملية هذا.أنشئ_جلسة_إتمام_شراء(معطيات: نـص): لـا_مضمون[نـص]
-```
-
-<div dir=ltr>
-
-```
-handler this.createCheckoutSession(parameters: String): Possible[String]
-```
-
-</div>
-
-تنشئ جلسة إتمام شراء جديدة.
-
-`معطيات` (`parameters`) معطيات الجلسة المطلوبة بالصيغة التالية: "customer=customerID&line_items=planID".
-
-تُرجع معرف الجلسة المُنشأة.
-
-```
 عملية هذا.أنشئ_جلسة_إتمام_شراء(
     العناصر: تـطبيق[نـص، صـحيح]،
     رابط_النجاح: مـؤشر_محارف
 ): لـا_مضمون[نـص]؛
-```
-
-```
 عملية هذا.أنشئ_جلسة_إتمام_شراء(
     العناصر: تـطبيق[نـص، صـحيح]،
     معرف_الزبون: نـص،
     رابط_النجاح: مـؤشر_محارف
-): لـا_مضمون[نـص]
+): لـا_مضمون[نـص]؛
 ```
 
 <div dir=ltr>
 
 ```
-handler this.createCheckoutSession(
-    items: Map[String, Int],
-    successUrl: CharsPtr
-): Possible[String]
-```
-
-```
-handler this.createCheckoutSession(
-    items: Map[String, Int],
-    customerId: String,
-    successUrl: CharsPtr
-): Possible[String]
+handler this.createCheckoutSession(parameters: String): Possible[String];
+handler this.createCheckoutSession(items: Map[String, Int], successUrl: CharsPtr): Possible[String];
+handler this.createCheckoutSession(items: Map[String, Int], customerId: String, successUrl: CharsPtr): Possible[String];
 ```
 
 </div>
 
-هاتان النسخنان من دالة `أنشئ_جلسة_إتمام_شراء` تستلمان معطيات مفصلة بدل معطى خام كما في النسخة السابقة.
+تنشئ جلسة إتمام شراء جديدة. تُرجع معرف الجلسة المُنشأة. النسخة الأولى تأخذ معطيات خام، بينما النسختان الأخريان تستلمان معطيات مفصلة.
 
-`العناصر` (`items`): تطبيق يمثل مفتاحه معرف السعر من سترايب (price ID) بينما تمثل قيمته عدد العناصر
-المطلوبة.
-
-`معرف_الزبون` (`customerId`): معرف قيد الزبون الذي يقوم بعملية الشراء.
-
-`رابط_النجاح` (`successUrl`): الرابط الذي سيُحول إليه المستخدم بعد نجاح عملية الشراء.
-
-تُرجع معرف الجلسة المُنشأة.
+* `معطيات` (`parameters`): معطيات الجلسة المطلوبة بالصيغة التالية: `"customer=customerID&line_items=planID"`.
+* `العناصر` (`items`): تطبيق يمثل مفتاحه معرف السعر من سترايب (price ID) بينما تمثل قيمته عدد العناصر المطلوبة.
+* `معرف_الزبون` (`customerId`): معرف قيد الزبون الذي يقوم بعملية الشراء.
+* `رابط_النجاح` (`successUrl`): الرابط الذي سيُحول إليه المستخدم بعد نجاح عملية الشراء.
 
 #### هات_الاشتراكات (getSubscriptions)
 
 ```
-عملية هذا.هات_الاشتراكات(): لـا_مضمون[مـصفوفة[سـندنا[اشتراك]]]
-```
-
-```
-عملية هذا.هات_الاشتراكات(شرط_التصفية: نـص): لـا_مضمون[مـصفوفة[سـندنا[اشتراك]]]
+عملية هذا.هات_الاشتراكات(): لـا_مضمون[مـصفوفة[سـندنا[اشتراك]]]؛
+عملية هذا.هات_الاشتراكات(شرط_التصفية: نـص): لـا_مضمون[مـصفوفة[سـندنا[اشتراك]]]؛
 ```
 
 <div dir=ltr>
 
 ```
-handler this.getSubscriptions(): Possible[Array[SrdRef[Subscription]]]
-```
-
-```
-handler this.getSubscriptions(filterQuery: String): Possible[Array[SrdRef[Subscription]]]
+handler this.getSubscriptions(): Possible[Array[SrdRef[Subscription]]];
+handler this.getSubscriptions(filterQuery: String): Possible[Array[SrdRef[Subscription]]];
 ```
 
 </div>
 
 ترجع قائمة الاشتراكات.
 
-`شرط_التصفية` (`filterQuery`): تركيب يحتوي الشرط الذي تُصفى به النتائج. ستجلب الدالة القيود التي
-تطابق هذا الشرط دون غيرها.
+* `شرط_التصفية` (`filterQuery`): تركيب يحتوي الشرط الذي تُصفى به النتائج. ستجلب الدالة القيود التي تطابق هذا الشرط دون غيرها.
 
 #### هات_اشتراكا (getSubscription)
 
 ```
-عملية هذا.هات_اشتراكا(معرف_الاشتراك: نـص): لـا_مضمون[سـندنا[اشتراك]]
+عملية هذا.هات_اشتراكا(معرف_الاشتراك: نـص): لـا_مضمون[سـندنا[اشتراك]]؛
 ```
 
 <div dir=ltr>
 
 ```
-handler this.getSubscription(sessionId: String): Possible[SrdRef[Subscription]]
+handler this.getSubscription(sessionId: String): Possible[SrdRef[Subscription]];
 ```
 
 </div>
@@ -1092,49 +1233,27 @@ handler this.getSubscription(sessionId: String): Possible[SrdRef[Subscription]]
 #### أنشئ_اشتراكا (createSubscription)
 
 ```
-عملية هذا.أنشئ_اشتراكا(معطيات: نـص): لـا_مضمون[نـص]
-```
-
-<div dir=ltr>
-
-```
-handler this.createSubscription(parameters: String): Possible[String]
-```
-
-</div>
-
-تنشئ اشتراكا جديدا.
-
-`معطيات` (`parameters`) معطيات الاشتراك المطلوبة بالصيغة التالية: "customer=customerID&line_items=planID".
-
-تُرجع معرف الاشتراك المُنشأ.
-
-```
+عملية هذا.أنشئ_اشتراكا(معطيات: نـص): لـا_مضمون[نـص]؛
 عملية هذا.أنشئ_اشتراكا(
     العناصر: تـطبيق[نـص، صـحيح]،
     معرف_الزبون: نص
-): لـا_مضمون[نـص]
+): لـا_مضمون[نـص]؛
 ```
 
 <div dir=ltr>
 
 ```
-handler this.createSubscription(
-    items: Map[String, Int],
-    customerId: String
-): Possible[String]
+handler this.createSubscription(parameters: String): Possible[String];
+handler this.createSubscription(items: Map[String, Int], customerId: String): Possible[String];
 ```
 
 </div>
 
-هذه النسخة من دالة `أنشئ_اشتراكا` تستلم متعطيات مفصلة بدل معطى خام كما في النسخة السابقة.
+تنشئ اشتراكا جديدا. تُرجع معرف الاشتراك المُنشأ. النسخة الأولى تأخذ معطيات خام، بينما النسخة الثانية تستلم معطيات مفصلة.
 
-`العناصر` (`items`): تطبيق يمثل مفتاحه معرف السعر من سترايب (price ID) بينما تمثل قيمته عدد العناصر
-المطلوبة.
-
-`معرف_الزبون` (`customerId`): معرف قيد الزبون الذي يقوم  بالاشتراك.
-
-تُرجع معرف الاشتراك المُنشأ.
+* `معطيات` (`parameters`): معطيات الاشتراك المطلوبة بالصيغة التالية: `"customer=customerID&line_items=planID"`.
+* `العناصر` (`items`): تطبيق يمثل مفتاحه معرف السعر من سترايب (price ID) بينما تمثل قيمته عدد العناصر المطلوبة.
+* `معرف_الزبون` (`customerId`): معرف قيد الزبون الذي يقوم بالاشتراك.
 
 #### حدث_اشتراكا (updateSubscription)
 
@@ -1152,7 +1271,7 @@ handler this.updateSubscription(subscriptionId: String, parameters: String): Pos
 
 تحدث الاشتراك ذا المعرف المعطى.
 
-`معطيات` (`parameters`) معطيات الاشتراك المطلوبة بالصيغة التالية: "customer=customerID&line_items=planID".
+* `معطيات` (`parameters`): معطيات الاشتراك المطلوبة بالصيغة التالية: `"customer=customerID&line_items=planID"`.
 
 #### ألغ_اشتراكا (cancelSubscription)
 
@@ -1169,6 +1288,31 @@ handler this.cancelSubscription(subscriptionId: String): SrdRef[Error];
 </div>
 
 تلغي الاشتراك ذا المعرف المعطى.
+
+#### أنشئ_جلسة_تحكم_بالفوترة (createBillingPortalSession)
+
+```
+عملية هذا.أنشئ_جلسة_تحكم_بالفوترة(معطيات: نـص): لـا_مضمون[نـص]؛
+عملية هذا.أنشئ_جلسة_تحكم_بالفوترة(
+    معرف_الزبون: مـؤشر_محارف،
+    رابط_الرجوع: مـؤشر_محارف
+): لـا_مضمون[نـص]؛
+```
+
+<div dir=ltr>
+
+```
+handler this.createBillingPortalSession(parameters: String): Possible[String];
+handler this.createBillingPortalSession(customerId: CharsPtr, returnUrl: CharsPtr): Possible[String];
+```
+
+</div>
+
+تنشئ جلسة جديدة للتحكم بالفوترة. تُرجع رابط حساب الزبون. النسخة الأولى تأخذ معطيات خام، بينما النسخة الثانية تستلم معطيات مفصلة.
+
+* `معطيات` (`parameters`): معطيات جلسة بوابة الفوترة بالصيغة التالية: `"customer=customerID&return_url=returnUrl"`.
+* `معرف_الزبون` (`customerId`): معرف قيد الزبون لفتح جلسة بوابة فاتورة خاصة به.
+* `رابط_الرجوع` (`returnUrl`): الرابط لاعادة توجيه الزبون إليه عند الانتهاء من بوابة الفاتورة.
 
 #### هات_طرق_الدفع (getPaymentMethods)
 
@@ -1218,7 +1362,6 @@ handler this.getPromotionCodes(code: String): Possible[Array[SrdRef[PromotionCod
 
 ترجع رموز الترويج المطابقة للكود المعطى.
 
-
 ### أخـطاء (Errors)
 
 الوحدة الفرعية `أخـطاء` تحتوي تعريفات لرموز الأخطاء التي يمكن لمكتبة سـترايب إرجاعها.
@@ -1245,13 +1388,10 @@ class InvalidParamError {
 
 </div>
 
----
-
 ## الرخصة
 
 حقوق النشر © 2026 سرمد خالد عبد الله
 
-هذا المشروع مرخص بموجب رخصة غنو العمومية الصغرى الإصدار 3.0 (LGPL-3.0). راجع ملفات `COPYING` و `COPYING.LESSER` للحصول على التفاصيل.
+هذا المشروع مرخص بموجب رخصة غنو العمومية الصغرى الإصدار 3.0 (LGPL-3.0). راجع ملفي `COPYING` و `COPYING.LESSER` للحصول على التفاصيل.
 
 </div>
-
