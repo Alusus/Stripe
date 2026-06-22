@@ -1,4 +1,4 @@
-# سـترايب (Strip)
+# سـترايب (Stripe)
 
 <div dir=rtl>
 
