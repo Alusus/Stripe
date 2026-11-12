@@ -160,6 +160,20 @@
         عرف القسيمة: لقب coupon؛
     }
 
+    عرف فـاتورة: لقب Invoice؛
+    @دمج صنف فـاتورة {
+        عرف المعرف: لقب id؛
+        عرف معرف_الزبون: لقب customerId؛
+        عرف الحالة: لقب status؛
+        عرف العملة: لقب currency؛
+        عرف المبلغ_المستحق: لقب amountDue؛
+        عرف المبلغ_المدفوع: لقب amountPaid؛
+        عرف رابط_الفاتورة: لقب hostedInvoiceUrl؛
+        عرف زمن_الاستحقاق: لقب dueDate؛
+        عرف زمن_الإنشاء: لقب created؛
+        عرف بيانات_وصفية: لقب metadata؛
+    }
+
     عرف وكـيل: لقب Client؛
     @دمج صنف وكـيل {
         عرف إطناب: لقب verbose؛
@@ -183,6 +197,11 @@
         عرف هات_طرق_الدفع: لقب getPaymentMethods؛
         عرف هات_طريقة_دفع: لقب getPaymentMethod؛
         عرف هات_رموز_الترويج: لقب getPromotionCodes؛
+        عرف هات_فاتورة: لقب getInvoice؛
+        عرف أنشئ_فاتورة: لقب createInvoice؛
+        عرف اعتمد_فاتورة: لقب finalizeInvoice؛
+        عرف أرسل_فاتورة: لقب sendInvoice؛
+        عرف أنشئ_عنصر_فاتورة: لقب createInvoiceItem؛
     }
 
     عرف أخـطاء: لقب Errors؛

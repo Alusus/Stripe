@@ -1,0 +1,83 @@
+/*
+ * Copyright (C) 2026 Sarmad Abdullah
+ *
+ * This file is part of Alusus Stripe library.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+ */
+
+@merge module Stripe {
+    func getInvoice(key: String, invoiceId: String, verbose: Bool): Possible[SrdRef[Invoice]] {
+        return getRecord[Invoice, convertToInvoice](
+            key, "https://api.stripe.com/v1/invoices", invoiceId, verbose
+        );
+    }
+
+    // Creates a draft invoice and returns its id.
+    func createInvoice(key: String, parameters: String, verbose: Bool): Possible[String] {
+        return postRecord(key, String("https://api.stripe.com/v1/invoices"), parameters, verbose);
+    }
+
+    // Finalizes a draft invoice so it can be paid, and returns its hosted_invoice_url.
+    func finalizeInvoice(key: String, invoiceId: String, verbose: Bool): Possible[String] {
+        return postRecord(
+            key,
+            String.format("https://api.stripe.com/v1/invoices/%s/finalize", invoiceId.buf),
+            String(),
+            verbose,
+            "hosted_invoice_url"
+        );
+    }
+
+    // Emails a finalized invoice to the customer, and returns its id.
+    func sendInvoice(key: String, invoiceId: String, verbose: Bool): Possible[String] {
+        return postRecord(
+            key,
+            String.format("https://api.stripe.com/v1/invoices/%s/send", invoiceId.buf),
+            String(),
+            verbose
+        );
+    }
+
+    func convertToInvoice(invoiceJson: Json): SrdRef[Invoice] {
+        def metadata: Map[String, String];
+        def i: Int;
+        for i = 0, i < invoiceJson("metadata").getLength(), ++i {
+            metadata(invoiceJson("metadata").getKey(i)) = invoiceJson("metadata")(i);
+        }
+        def statusStr: Nullable[String] = invoiceJson("status");
+        def status: Nullable[InvoiceStatus];
+        if not statusStr.isNull {
+            status.isNull = false;
+            status.value.val = statusStr.value;
+        }
+        def collectionMethod: InvoiceCollectionMethod;
+        collectionMethod.val = invoiceJson("collection_method");
+        return SrdRef[Invoice]()~use_in(self) no_injection {
+            self.alloc()~init(
+                invoiceJson("id"),
+                invoiceJson("customer"),
+                status,
+                invoiceJson("currency"),
+                invoiceJson("amount_due"),
+                invoiceJson("amount_paid"),
+                invoiceJson("hosted_invoice_url"),
+                collectionMethod,
+                invoiceJson("due_date"),
+                invoiceJson("created"),
+                metadata
+            )
+        };
+    }
+}

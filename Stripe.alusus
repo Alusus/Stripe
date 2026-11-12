@@ -29,7 +29,7 @@ import "Srl/Possible";
 
 import "Apm";
 Apm.importPackage("Alusus/Json@0.3");
-Apm.importPackage("Alusus/Sle@0.3", "Srl/Net");
+Apm.importPackage("Alusus/Sle@0.3", { "Srl/Net.alusus", "Srl/enums.alusus" });
 
 import "Models/Source";
 import "Models/Balance";
@@ -42,6 +42,7 @@ import "Models/Subscription";
 import "Models/PaymentMethod";
 import "Models/Coupon";
 import "Models/PromotionCode";
+import "Models/Invoice";
 import "Utils/getRecord";
 import "Utils/getRecords";
 import "Utils/postRecord";
@@ -54,6 +55,8 @@ import "Apis/billing_portal_session";
 import "Apis/subscription";
 import "Apis/payment_method";
 import "Apis/promotion_code";
+import "Apis/invoice";
+import "Apis/invoice_item";
 import "Errors";
 
 @merge module Stripe {
@@ -209,6 +212,30 @@ import "Errors";
 
         handler this.getPromotionCodes(code: String): Possible[Array[SrdRef[PromotionCode]]] {
             return Stripe.getPromotionCodes(this.key, code, this.verbose);
+        }
+
+        // Invoice APIs
+
+        handler this.getInvoice(invoiceId: String): Possible[SrdRef[Invoice]] {
+            return Stripe.getInvoice(this.key, invoiceId, this.verbose);
+        }
+
+        handler this.createInvoice(parameters: String): Possible[String] {
+            return Stripe.createInvoice(this.key, parameters, this.verbose);
+        }
+
+        handler this.finalizeInvoice(invoiceId: String): Possible[String] {
+            return Stripe.finalizeInvoice(this.key, invoiceId, this.verbose);
+        }
+
+        handler this.sendInvoice(invoiceId: String): Possible[String] {
+            return Stripe.sendInvoice(this.key, invoiceId, this.verbose);
+        }
+
+        // Invoice Item APIs
+
+        handler this.createInvoiceItem(parameters: String): Possible[String] {
+            return Stripe.createInvoiceItem(this.key, parameters, this.verbose);
         }
     }
 }
