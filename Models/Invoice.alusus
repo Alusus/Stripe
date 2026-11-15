@@ -40,6 +40,7 @@
         def customerId: String;
         def status: Nullable[InvoiceStatus];
         def currency: String;
+        def total: Int[64];
         def amountDue: Int[64];
         def amountPaid: Int[64];
         def hostedInvoiceUrl: Nullable[String];
@@ -52,7 +53,8 @@
         }
 
         handler this~init(
-            id: String, customerId: String, status: Nullable[InvoiceStatus], currency: String, amountDue: Int[64],
+            id: String, customerId: String, status: Nullable[InvoiceStatus], currency: String, total: Int[64],
+            amountDue: Int[64],
             amountPaid: Int[64], hostedInvoiceUrl: Nullable[String], collectionMethod: InvoiceCollectionMethod,
             dueDate: Nullable[Int[64]], created: Int[64], metadata: Map[String, String]
         ) {
@@ -60,6 +62,7 @@
             this.customerId = customerId;
             this.status = status;
             this.currency = currency;
+            this.total = total;
             this.amountDue = amountDue;
             this.amountPaid = amountPaid;
             this.hostedInvoiceUrl = hostedInvoiceUrl;

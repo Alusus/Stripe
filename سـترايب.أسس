@@ -166,6 +166,7 @@
         عرف معرف_الزبون: لقب customerId؛
         عرف الحالة: لقب status؛
         عرف العملة: لقب currency؛
+        عرف المجموع: لقب total؛
         عرف المبلغ_المستحق: لقب amountDue؛
         عرف المبلغ_المدفوع: لقب amountPaid؛
         عرف رابط_الفاتورة: لقب hostedInvoiceUrl؛

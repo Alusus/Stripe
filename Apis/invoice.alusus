@@ -70,6 +70,7 @@
                 invoiceJson("customer"),
                 status,
                 invoiceJson("currency"),
+                invoiceJson("total"),
                 invoiceJson("amount_due"),
                 invoiceJson("amount_paid"),
                 invoiceJson("hosted_invoice_url"),
