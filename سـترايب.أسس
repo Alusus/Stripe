@@ -181,6 +181,7 @@
         عرف هات_الزبائن: لقب getCustomers؛
         عرف هات_زبونا: لقب getCustomer؛
         عرف أنشئ_زبونا: لقب createCustomer؛
+        عرف احذف_زبونا: لقب deleteCustomer؛
         عرف أيملك_الزبون_طريقة_دفع_مبدئية: لقب doesCustomerHaveDefaultPaymentMethod؛
         عرف أضف_طريقة_دفع_مبدئية_للزبون: لقب addCustomerDefaultPaymentMethod؛
         عرف هات_جلسات_إتمام_الشراء: لقب getCheckoutSessions؛

@@ -94,6 +94,10 @@ import "Errors";
         handler this.createCustomer(parameters: String): Possible[String] {
             return Stripe.createCustomer(this.key, parameters, this.verbose);
         }
+
+        handler this.deleteCustomer(customerId: String): SrdRef[Error] {
+            return Stripe.deleteCustomer(this.key, customerId, this.verbose);
+        }
         handler this.doesCustomerHaveDefaultPaymentMethod(customerId: String): Bool {
             return Stripe.doesCustomerHaveDefaultPaymentMethod(this.key, customerId, this.verbose);
         }

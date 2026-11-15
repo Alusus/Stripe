@@ -83,6 +83,13 @@
         return postRecord(key, String("https://api.stripe.com/v1/customers"), parameters, verbose);
     }
 
+    // Deletes the customer permanently. Stripe also cancels the customer's active subscriptions.
+    func deleteCustomer(key: String, customerId: String, verbose: Bool): SrdRef[Error] {
+        return deleteRecord[Customer, convertToCustomer](
+            key, "https://api.stripe.com/v1/customers", customerId, verbose
+        );
+    }
+
     func doesCustomerHaveDefaultPaymentMethod(key: String, customerId: String, verbose: Bool): Bool {
         def customer: Possible[SrdRef[Customer]] = getCustomer(key, customerId, verbose);
         if customer and customer.defaultPaymentMethod != ""
