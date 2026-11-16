@@ -228,8 +228,8 @@ import "Errors";
             return Stripe.createInvoice(this.key, parameters, this.verbose);
         }
 
-        handler this.finalizeInvoice(invoiceId: String): Possible[String] {
-            return Stripe.finalizeInvoice(this.key, invoiceId, this.verbose);
+        handler this.finalizeInvoice(invoiceId: String, parameters: String): Possible[String] {
+            return Stripe.finalizeInvoice(this.key, invoiceId, parameters, this.verbose);
         }
 
         handler this.sendInvoice(invoiceId: String): Possible[String] {

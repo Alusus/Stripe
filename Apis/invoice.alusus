@@ -30,11 +30,11 @@
     }
 
     // Finalizes a draft invoice so it can be paid, and returns its hosted_invoice_url.
-    func finalizeInvoice(key: String, invoiceId: String, verbose: Bool): Possible[String] {
+    func finalizeInvoice(key: String, invoiceId: String, parameters: String, verbose: Bool): Possible[String] {
         return postRecord(
             key,
             String.format("https://api.stripe.com/v1/invoices/%s/finalize", invoiceId.buf),
-            String(),
+            parameters,
             verbose,
             "hosted_invoice_url"
         );
